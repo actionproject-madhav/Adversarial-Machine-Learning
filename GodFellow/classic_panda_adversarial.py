@@ -24,7 +24,8 @@ image_decoded = tf.image.decode_jpeg(image_raw, channels=3)
 def preprocess(image):
     image = tf.cast(image, tf.float32)
     image = tf.image.resize(image, (224, 224))
-    image = tf.keras.applications.mobilenet_v2.preprocess_input(image)
+    # DON'T use MobileNetV2 preprocessing - keep in [0, 255] then normalize
+    image = image / 255.0  # Now [0, 1]
     return image
 
 image = preprocess(image_decoded)
@@ -57,7 +58,8 @@ with tf.GradientTape() as tape:
     loss = tf.reduce_mean(loss)  # scalar
 
 grad = tape.gradient(loss, image_variable)
-perturbation = tf.sign(grad)
+# FGSM uses NEGATIVE gradient to minimize the true class score
+perturbation = -tf.sign(grad)  # NEGATIVE!
 
 # Debug info
 print(f"  Loss value: {loss.numpy():.4f}")
@@ -66,14 +68,45 @@ print(f"  Non-zero perturbations: {np.sum(perturbation.numpy() != 0):,}")
 
 # Create adversarial example
 print("[5/5] Creating adversarial image...")
-eps = 0.01  # Start smaller for easier image
+eps = 0.1  # Much larger epsilon
 
-# FGSM formula: x_adv = x + eps * sign(∇_x Loss)
-adv_x = image_variable + eps * perturbation
-adv_x = tf.clip_by_value(adv_x, -1.0, 1.0)
+# Try BOTH directions to see which works
+print("\nTrying both gradient directions...")
+
+# Direction 1: + sign(grad) 
+adv_x_pos = image_variable + eps * tf.sign(grad)
+adv_x_pos = tf.clip_by_value(adv_x_pos, 0.0, 1.0)  # Clip to [0, 1]
+adv_probs_pos = pretrained_model.predict(adv_x_pos, verbose=0)
+conf_pos = adv_probs_pos[0, true_class]
+
+# Direction 2: - sign(grad)
+adv_x_neg = image_variable - eps * tf.sign(grad)
+adv_x_neg = tf.clip_by_value(adv_x_neg, 0.0, 1.0)  # Clip to [0, 1]
+adv_probs_neg = pretrained_model.predict(adv_x_neg, verbose=0)
+conf_neg = adv_probs_neg[0, true_class]
+
+print(f"  Original confidence: {image_probs[0, true_class]*100:.2f}%")
+print(f"  With + ε×sign(∇L):   {conf_pos*100:.2f}%")
+print(f"  With - ε×sign(∇L):   {conf_neg*100:.2f}%")
+
+# Use whichever direction DECREASES confidence
+if conf_pos < image_probs[0, true_class]:
+    print("\n✓ Using + ε×sign(∇L) (increases loss)")
+    adv_x = adv_x_pos
+    adv_probs = adv_probs_pos
+    sign_used = "+"
+elif conf_neg < image_probs[0, true_class]:
+    print("\n✓ Using - ε×sign(∇L) (decreases true class)")
+    adv_x = adv_x_neg
+    adv_probs = adv_probs_neg
+    sign_used = "-"
+else:
+    print("\n✗ Neither direction worked! Using + by default")
+    adv_x = adv_x_pos
+    adv_probs = adv_probs_pos
+    sign_used = "+"
 
 # Evaluate attack
-adv_probs = pretrained_model.predict(adv_x, verbose=0)
 adv_pred = decode_predictions(adv_probs, top=1)[0][0]
 adv_class = int(np.argmax(adv_probs))
 
@@ -108,7 +141,7 @@ print(patch_grad)
 print(f"\n3. Sign of gradient:")
 print(patch_sign.astype(int))
 
-print(f"\n4. FGSM formula: x_adv = x + ε × sign(∇L)")
+print(f"\n4. FGSM formula: x_adv = x - ε × sign(∇L)")
 print(f"   where ε = {eps}")
 print(f"\n   Adversarial pixels:")
 print(patch_adv)
@@ -121,8 +154,8 @@ print("KEY INSIGHT:")
 print(f"{'='*80}")
 print("• Cross-entropy loss measures how WRONG the prediction is")
 print("• Gradient ∇L shows direction that INCREASES loss")
-print("• Adding ε × sign(∇L) makes model MORE WRONG")
-print("• Model becomes less confident in correct class!")
+print("• We use NEGATIVE gradient to DECREASE true class confidence")
+print("• FGSM: x_adv = x - ε × sign(∇L)")
 print(f"{'='*80}")
 
 # Create visualizations
