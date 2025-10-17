@@ -115,6 +115,10 @@ def main(_):
     )
 
 
+#fast gradient sign method for creating adversarial exam
+
+
+
 if __name__ == "__main__":
     flags.DEFINE_integer("nb_epochs", 8, "Number of epochs.")
     flags.DEFINE_float("eps", 0.3, "Total epsilon for FGM and PGD attacks.")
@@ -122,3 +126,6 @@ if __name__ == "__main__":
         "adv_train", False, "Use adversarial training (on PGD adversarial examples)."
     )
     app.run(main)
+
+
+    
