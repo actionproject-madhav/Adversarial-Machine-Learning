@@ -24,8 +24,7 @@ image_decoded = tf.image.decode_jpeg(image_raw, channels=3)
 def preprocess(image):
     image = tf.cast(image, tf.float32)
     image = tf.image.resize(image, (224, 224))
-    # DON'T use MobileNetV2 preprocessing - keep in [0, 255] then normalize
-    image = image / 255.0  # Now [0, 1]
+    image = tf.keras.applications.mobilenet_v2.preprocess_input(image)
     return image
 
 image = preprocess(image_decoded)
@@ -66,61 +65,30 @@ print(f"  Loss value: {loss.numpy():.4f}")
 print(f"  Gradient L-inf norm: {tf.reduce_max(tf.abs(grad)).numpy():.6f}")
 print(f"  Non-zero perturbations: {np.sum(perturbation.numpy() != 0):,}")
 
-# Create adversarial example
+# Create adversarial example - TARGETED attack
 print("[5/5] Creating adversarial image...")
-eps = 0.1  # Much larger epsilon
+eps = 0.15  # Larger epsilon to fully change prediction
 
-# Try BOTH directions to see which works
-print("\nTrying both gradient directions...")
+# Targeted FGSM: x_adv = x - ε × sign(∇L_target)
+adv_x = image_variable + eps * perturbation
+adv_x = tf.clip_by_value(adv_x, -1.0, 1.0)
 
-# Direction 1: + sign(grad) 
-adv_x_pos = image_variable + eps * tf.sign(grad)
-adv_x_pos = tf.clip_by_value(adv_x_pos, 0.0, 1.0)  # Clip to [0, 1]
-adv_probs_pos = pretrained_model.predict(adv_x_pos, verbose=0)
-conf_pos = adv_probs_pos[0, true_class]
-
-# Direction 2: - sign(grad)
-adv_x_neg = image_variable - eps * tf.sign(grad)
-adv_x_neg = tf.clip_by_value(adv_x_neg, 0.0, 1.0)  # Clip to [0, 1]
-adv_probs_neg = pretrained_model.predict(adv_x_neg, verbose=0)
-conf_neg = adv_probs_neg[0, true_class]
-
-print(f"  Original confidence: {image_probs[0, true_class]*100:.2f}%")
-print(f"  With + ε×sign(∇L):   {conf_pos*100:.2f}%")
-print(f"  With - ε×sign(∇L):   {conf_neg*100:.2f}%")
-
-# Use whichever direction DECREASES confidence
-if conf_pos < image_probs[0, true_class]:
-    print("\n✓ Using + ε×sign(∇L) (increases loss)")
-    adv_x = adv_x_pos
-    adv_probs = adv_probs_pos
-    sign_used = "+"
-elif conf_neg < image_probs[0, true_class]:
-    print("\n✓ Using - ε×sign(∇L) (decreases true class)")
-    adv_x = adv_x_neg
-    adv_probs = adv_probs_neg
-    sign_used = "-"
-else:
-    print("\n✗ Neither direction worked! Using + by default")
-    adv_x = adv_x_pos
-    adv_probs = adv_probs_pos
-    sign_used = "+"
-
-# Evaluate attack
+# Evaluate
+adv_probs = pretrained_model.predict(adv_x, verbose=0)
 adv_pred = decode_predictions(adv_probs, top=1)[0][0]
 adv_class = int(np.argmax(adv_probs))
 
-success = adv_class != true_class
+success = adv_class == target_class
 print(f"\n{'='*80}")
 print(f"RESULT:")
 print(f"{'='*80}")
 print(f"Original: {initial_pred[1]:20s} ({initial_pred[2]*100:.1f}%)")
+print(f"Target:   goldfish")
 print(f"Adversarial: {adv_pred[1]:20s} ({adv_pred[2]*100:.1f}%)")
-print(f"\nTrue class confidence change:")
-print(f"  Before: {image_probs[0, true_class]*100:.2f}%")
-print(f"  After:  {adv_probs[0, true_class]*100:.2f}%")
-print(f"  Drop:   {(image_probs[0, true_class] - adv_probs[0, true_class])*100:.2f}%")
-print(f"\nAttack {'✓ SUCCESSFUL' if success else '✗ FAILED'}")
+print(f"\nTarget class confidence:")
+print(f"  Before: {image_probs[0, target_class]*100:.2f}%")
+print(f"  After:  {adv_probs[0, target_class]*100:.2f}%")
+print(f"\nAttack {'✓ SUCCESSFUL' if success else '✗ FAILED (but may have changed prediction)'}")
 
 # Show mathematical example
 print(f"\n{'='*80}")
