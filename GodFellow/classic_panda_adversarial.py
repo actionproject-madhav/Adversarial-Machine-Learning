@@ -1,13 +1,13 @@
 """
-FGSM Attack - Using TensorFlow's Official Tutorial Approach
-This uses the exact method from TensorFlow's adversarial example tutorial
+Improved FGSM Attack Implementation
+This version implements both targeted and untargeted attacks correctly
 """
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import numpy as np
 
 print("="*80)
-print("FGSM ATTACK - TensorFlow Official Tutorial Method")
+print("IMPROVED FGSM ATTACK")
 print("="*80)
 
 # Load pretrained model
@@ -38,116 +38,163 @@ image = preprocess(image)
 image_probs = pretrained_model.predict(image)
 
 # Get initial label
-plt.figure()
+plt.figure(figsize=(8, 8))
 plt.imshow(image[0] * 0.5 + 0.5)  # To change [-1, 1] to [0,1]
 _, image_class, class_confidence = get_imagenet_label(image_probs)
 plt.title(f'{image_class}: {class_confidence*100:.2f}%')
 plt.axis('off')
-plt.savefig('0_original_with_label.png', bbox_inches='tight', dpi=150)
+plt.savefig('0_original.png', bbox_inches='tight', dpi=150)
 plt.close()
 
 print(f"\nOriginal prediction: {image_class} ({class_confidence*100:.2f}%)")
+predicted_class_idx = np.argmax(image_probs)
 
-# Create adversarial pattern function
-loss_object = tf.keras.losses.CategoricalCrossentropy()
-
-def create_adversarial_pattern(input_image, input_label):
+# Method 1: Untargeted Attack (maximize loss for true class)
+def create_untargeted_pattern(input_image, true_class_idx):
     with tf.GradientTape() as tape:
         tape.watch(input_image)
         prediction = pretrained_model(input_image)
-        loss = loss_object(input_label, prediction)
+        # Use negative log likelihood of true class
+        loss = -tf.nn.softmax_cross_entropy_with_logits(
+            labels=tf.one_hot(true_class_idx, 1000),
+            logits=prediction
+        )
     
-    # Get the gradients of the loss w.r.t to the input image.
     gradient = tape.gradient(loss, input_image)
-    # Get the sign of the gradients to create the perturbation
     signed_grad = tf.sign(gradient)
     return signed_grad
 
-# Get the input label of the image (USE ACTUAL PREDICTED CLASS!)
-predicted_class_idx = np.argmax(image_probs)
-label = tf.one_hot(predicted_class_idx, image_probs.shape[-1])
-label = tf.reshape(label, (1, image_probs.shape[-1]))
+# Method 2: Targeted Attack (minimize loss for target class)
+def create_targeted_pattern(input_image, target_class_idx):
+    with tf.GradientTape() as tape:
+        tape.watch(input_image)
+        prediction = pretrained_model(input_image)
+        # Maximize probability of target class
+        loss = tf.nn.softmax_cross_entropy_with_logits(
+            labels=tf.one_hot(target_class_idx, 1000),
+            logits=prediction
+        )
+    
+    gradient = tape.gradient(loss, input_image)
+    signed_grad = tf.sign(gradient)
+    return signed_grad
 
-print(f"Using predicted class index: {predicted_class_idx}")
+print("\n" + "="*80)
+print("UNTARGETED ATTACK - Trying to change prediction from Labrador")
+print("="*80)
 
-perturbations = create_adversarial_pattern(image, label)
+# Create untargeted perturbation
+perturbations_untargeted = create_untargeted_pattern(image, [predicted_class_idx])
 
-# Visualize perturbation
-plt.figure()
-plt.imshow(perturbations[0] * 0.5 + 0.5)  # To change [-1, 1] to [0,1]
-plt.title('Perturbation Pattern')
-plt.axis('off')
-plt.savefig('1_perturbation.png', bbox_inches='tight', dpi=150)
-plt.close()
-
-print("\nTesting different epsilon values...")
+# Test different epsilon values
+epsilons = [0.005, 0.01, 0.02, 0.03, 0.05, 0.07, 0.1, 0.15]
+print("\nTesting epsilon values...")
 print("-" * 60)
 
-epsilons = [0, 0.01, 0.02, 0.05, 0.1, 0.15]
-descriptions = [('Epsilon = {:0.3f}'.format(eps), eps) for eps in epsilons]
-
-best_result = None
-
-for i, (desc, eps) in enumerate(descriptions):
-    # Try NEGATIVE direction (empirically this might work for MobileNetV2)
-    adv_x = image - eps*perturbations  # NEGATIVE!
+best_untargeted = None
+for eps in epsilons:
+    # Apply perturbation in POSITIVE direction for untargeted attack
+    adv_x = image + eps * perturbations_untargeted
     adv_x = tf.clip_by_value(adv_x, -1, 1)
     
-    adv_probs = pretrained_model.predict(adv_x)
+    adv_probs = pretrained_model.predict(adv_x, verbose=0)
     _, adv_class, adv_confidence = get_imagenet_label(adv_probs)
     
-    # Check if attack succeeded
     if adv_class != image_class:
-        print(f"ε = {eps:.3f}: ✓ {adv_class:25s} ({adv_confidence*100:5.1f}%) SUCCESS!")
-        if best_result is None:
-            best_result = (eps, adv_x, adv_probs, adv_class, adv_confidence)
+        print(f"ε = {eps:.3f}: ✓ SUCCESS! Changed to: {adv_class} ({adv_confidence*100:.1f}%)")
+        if best_untargeted is None:
+            best_untargeted = (eps, adv_x, adv_class, adv_confidence)
     else:
         orig_conf = image_probs[0, predicted_class_idx]
         adv_conf = adv_probs[0, predicted_class_idx]
-        print(f"ε = {eps:.3f}: ✗ {adv_class:25s} ({adv_confidence*100:5.1f}%) " +
-              f"[confidence: {orig_conf*100:.1f}% → {adv_conf*100:.1f}%]")
-    
-    if best_result is None:
-        best_result = (eps, adv_x, adv_probs, adv_class, adv_confidence)
-
-# Use best result
-eps_best, adv_x_best, adv_probs_best, adv_class_best, adv_confidence_best = best_result
+        print(f"ε = {eps:.3f}: Still {adv_class} (confidence: {orig_conf*100:.1f}% → {adv_conf*100:.1f}%)")
 
 print("\n" + "="*80)
-print("FINAL RESULT:")
+print("TARGETED ATTACK - Trying to make it predict 'tennis_ball' (class 852)")
 print("="*80)
-print(f"Original:    {image_class:25s} ({class_confidence*100:.1f}%)")
-print(f"Adversarial: {adv_class_best:25s} ({adv_confidence_best*100:.1f}%) with ε={eps_best}")
-print(f"Status:      {'✓ ATTACK SUCCESSFUL' if adv_class_best != image_class else '✗ Attack failed'}")
-print("="*80)
+
+# Targeted attack to tennis ball (class 852)
+target_class = 852  # tennis_ball
+perturbations_targeted = create_targeted_pattern(image, [target_class])
+
+print("\nTesting epsilon values for targeted attack...")
+print("-" * 60)
+
+best_targeted = None
+for eps in epsilons:
+    # Apply perturbation in NEGATIVE direction for targeted attack
+    adv_x = image - eps * perturbations_targeted
+    adv_x = tf.clip_by_value(adv_x, -1, 1)
+    
+    adv_probs = pretrained_model.predict(adv_x, verbose=0)
+    _, adv_class, adv_confidence = get_imagenet_label(adv_probs)
+    target_conf = adv_probs[0, target_class]
+    
+    if adv_class == 'tennis_ball':
+        print(f"ε = {eps:.3f}: ✓ SUCCESS! Predicted tennis_ball ({adv_confidence*100:.1f}%)")
+        if best_targeted is None:
+            best_targeted = (eps, adv_x, adv_class, adv_confidence)
+    else:
+        print(f"ε = {eps:.3f}: {adv_class} ({adv_confidence*100:.1f}%), tennis_ball conf: {target_conf*100:.2f}%")
 
 # Create final visualization
-fig, axes = plt.subplots(1, 3, figsize=(18, 6))
+fig, axes = plt.subplots(2, 3, figsize=(15, 10))
 
-# Original
-axes[0].imshow(image[0] * 0.5 + 0.5)
-axes[0].set_title(f'Original\n{image_class}\n{class_confidence*100:.1f}%', 
-                  fontsize=14, fontweight='bold')
-axes[0].axis('off')
+# Row 1: Untargeted Attack
+axes[0, 0].imshow(image[0] * 0.5 + 0.5)
+axes[0, 0].set_title(f'Original\n{image_class}\n{class_confidence*100:.1f}%', fontsize=12)
+axes[0, 0].axis('off')
 
-# Perturbation
-axes[1].imshow(perturbations[0] * 0.5 + 0.5)
-axes[1].set_title(f'Perturbation\nε = {eps_best}', 
-                  fontsize=14, fontweight='bold')
-axes[1].axis('off')
+if best_untargeted:
+    eps_u, adv_x_u, adv_class_u, adv_conf_u = best_untargeted
+    axes[0, 1].imshow(perturbations_untargeted[0] * 0.5 + 0.5)
+    axes[0, 1].set_title(f'Untargeted Perturbation\nε = {eps_u}', fontsize=12)
+    axes[0, 1].axis('off')
+    
+    axes[0, 2].imshow(adv_x_u[0] * 0.5 + 0.5)
+    axes[0, 2].set_title(f'Result: {adv_class_u}\n{adv_conf_u*100:.1f}%', 
+                        fontsize=12, color='green')
+    axes[0, 2].axis('off')
+else:
+    axes[0, 1].text(0.5, 0.5, 'Attack Failed', ha='center', va='center', fontsize=14)
+    axes[0, 1].axis('off')
+    axes[0, 2].axis('off')
 
-# Adversarial
-axes[2].imshow(adv_x_best[0] * 0.5 + 0.5)
-color = 'green' if adv_class_best != image_class else 'red'
-axes[2].set_title(f'Adversarial\n{adv_class_best}\n{adv_confidence_best*100:.1f}%', 
-                  fontsize=14, fontweight='bold', color=color)
-axes[2].axis('off')
+# Row 2: Targeted Attack
+axes[1, 0].imshow(image[0] * 0.5 + 0.5)
+axes[1, 0].set_title(f'Original\n{image_class}\n{class_confidence*100:.1f}%', fontsize=12)
+axes[1, 0].axis('off')
 
-plt.suptitle('FGSM Adversarial Attack', fontsize=18, fontweight='bold')
+if best_targeted:
+    eps_t, adv_x_t, adv_class_t, adv_conf_t = best_targeted
+    axes[1, 1].imshow(perturbations_targeted[0] * 0.5 + 0.5)
+    axes[1, 1].set_title(f'Targeted Perturbation\n(to tennis_ball, ε = {eps_t})', fontsize=12)
+    axes[1, 1].axis('off')
+    
+    axes[1, 2].imshow(adv_x_t[0] * 0.5 + 0.5)
+    axes[1, 2].set_title(f'Result: {adv_class_t}\n{adv_conf_t*100:.1f}%', 
+                        fontsize=12, color='green' if adv_class_t == 'tennis_ball' else 'orange')
+    axes[1, 2].axis('off')
+else:
+    axes[1, 1].text(0.5, 0.5, 'Attack Failed', ha='center', va='center', fontsize=14)
+    axes[1, 1].axis('off')
+    axes[1, 2].axis('off')
+
+plt.suptitle('FGSM Attack Results: Untargeted vs Targeted', fontsize=16, fontweight='bold')
 plt.tight_layout()
-plt.savefig('2_fgsm_complete.png', dpi=150, bbox_inches='tight')
-plt.close()
+plt.savefig('fgsm_comparison.png', dpi=150, bbox_inches='tight')
+plt.show()
 
-print("\n✓ Saved: 0_original_with_label.png, 1_perturbation.png, 2_fgsm_complete.png")
-print("\nNote: This uses the EXACT TensorFlow tutorial approach.")
-print("If this still doesn't work, the model/image combination may be robust to FGSM.")
+print("\n" + "="*80)
+print("FINAL SUMMARY")
+print("="*80)
+print(f"Original: {image_class} ({class_confidence*100:.1f}%)")
+if best_untargeted:
+    print(f"Untargeted Attack: ✓ Changed to {best_untargeted[2]} with ε={best_untargeted[0]}")
+else:
+    print("Untargeted Attack: ✗ Failed")
+if best_targeted:
+    print(f"Targeted Attack: ✓ Changed to {best_targeted[2]} with ε={best_targeted[0]}")
+else:
+    print("Targeted Attack: ✗ Failed")
+print("="*80)
