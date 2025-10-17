@@ -1,20 +1,18 @@
 """
-Improved FGSM Attack Implementation
-This version implements both targeted and untargeted attacks correctly
+Iterative FGSM Attack - More powerful than single-step FGSM
 """
 import tensorflow as tf
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
 
 print("="*80)
-print("IMPROVED FGSM ATTACK")
+print("ITERATIVE FGSM (I-FGSM) ATTACK")
 print("="*80)
 
-# Load pretrained model
-pretrained_model = tf.keras.applications.MobileNetV2(include_top=True, weights='imagenet')
-pretrained_model.trainable = False
+# Load model
+model = tf.keras.applications.MobileNetV2(include_top=True, weights='imagenet')
+model.trainable = False
 
-# ImageNet labels
 decode_predictions = tf.keras.applications.mobilenet_v2.decode_predictions
 
 def preprocess(image):
@@ -24,177 +22,190 @@ def preprocess(image):
     image = tf.expand_dims(image, 0)
     return image
 
-def get_imagenet_label(probs):
-    return decode_predictions(probs, top=1)[0][0]
-
 # Load image
 image_path = tf.keras.utils.get_file(
     'YellowLabradorLooking_new.jpg',
     'https://storage.googleapis.com/download.tensorflow.org/example_images/YellowLabradorLooking_new.jpg')
 image_raw = tf.io.read_file(image_path)
 image = tf.image.decode_image(image_raw)
-
 image = preprocess(image)
-image_probs = pretrained_model.predict(image)
 
-# Get initial label
-plt.figure(figsize=(8, 8))
-plt.imshow(image[0] * 0.5 + 0.5)  # To change [-1, 1] to [0,1]
-_, image_class, class_confidence = get_imagenet_label(image_probs)
-plt.title(f'{image_class}: {class_confidence*100:.2f}%')
-plt.axis('off')
-plt.savefig('0_original.png', bbox_inches='tight', dpi=150)
-plt.close()
+# Get original prediction
+orig_probs = model.predict(image)
+orig_class_idx = np.argmax(orig_probs)
+_, orig_class, orig_conf = decode_predictions(orig_probs, top=1)[0][0]
+print(f"Original: {orig_class} ({orig_conf*100:.1f}%)")
 
-print(f"\nOriginal prediction: {image_class} ({class_confidence*100:.2f}%)")
-predicted_class_idx = np.argmax(image_probs)
-
-# Method 1: Untargeted Attack (maximize loss for true class)
-def create_untargeted_pattern(input_image, true_class_idx):
-    with tf.GradientTape() as tape:
-        tape.watch(input_image)
-        prediction = pretrained_model(input_image)
-        # Use negative log likelihood of true class
-        loss = -tf.nn.softmax_cross_entropy_with_logits(
-            labels=tf.one_hot(true_class_idx, 1000),
-            logits=prediction
-        )
+def iterative_fgsm(model, image, eps, alpha, num_iter, targeted=False, target_class=None):
+    """
+    Iterative FGSM Attack
     
-    gradient = tape.gradient(loss, input_image)
-    signed_grad = tf.sign(gradient)
-    return signed_grad
-
-# Method 2: Targeted Attack (minimize loss for target class)
-def create_targeted_pattern(input_image, target_class_idx):
-    with tf.GradientTape() as tape:
-        tape.watch(input_image)
-        prediction = pretrained_model(input_image)
-        # Maximize probability of target class
-        loss = tf.nn.softmax_cross_entropy_with_logits(
-            labels=tf.one_hot(target_class_idx, 1000),
-            logits=prediction
-        )
+    Args:
+        model: Target model
+        image: Input image
+        eps: Maximum perturbation
+        alpha: Step size
+        num_iter: Number of iterations
+        targeted: If True, perform targeted attack
+        target_class: Target class for targeted attack
+    """
+    adv_image = tf.identity(image)
     
-    gradient = tape.gradient(loss, input_image)
-    signed_grad = tf.sign(gradient)
-    return signed_grad
+    for i in range(num_iter):
+        with tf.GradientTape() as tape:
+            tape.watch(adv_image)
+            prediction = model(adv_image)
+            
+            if targeted:
+                # Minimize loss for target class
+                loss = tf.keras.losses.sparse_categorical_crossentropy(
+                    [target_class], prediction
+                )
+            else:
+                # Maximize loss for true class
+                true_class = np.argmax(model.predict(image, verbose=0))
+                loss = -tf.keras.losses.sparse_categorical_crossentropy(
+                    [true_class], prediction
+                )
+        
+        # Get gradients
+        gradient = tape.gradient(loss, adv_image)
+        signed_grad = tf.sign(gradient)
+        
+        # Update adversarial image
+        if targeted:
+            adv_image = adv_image - alpha * signed_grad
+        else:
+            adv_image = adv_image + alpha * signed_grad
+        
+        # Clip to maintain L-infinity constraint
+        perturbation = tf.clip_by_value(adv_image - image, -eps, eps)
+        adv_image = image + perturbation
+        
+        # Clip to valid range
+        adv_image = tf.clip_by_value(adv_image, -1, 1)
+    
+    return adv_image
 
 print("\n" + "="*80)
-print("UNTARGETED ATTACK - Trying to change prediction from Labrador")
+print("TESTING I-FGSM WITH DIFFERENT PARAMETERS")
 print("="*80)
 
-# Create untargeted perturbation
-perturbations_untargeted = create_untargeted_pattern(image, [predicted_class_idx])
+# Test different configurations
+configs = [
+    {"eps": 0.03, "alpha": 0.01, "num_iter": 10},
+    {"eps": 0.05, "alpha": 0.01, "num_iter": 20},
+    {"eps": 0.07, "alpha": 0.005, "num_iter": 40},
+    {"eps": 0.1, "alpha": 0.01, "num_iter": 30},
+]
 
-# Test different epsilon values
-epsilons = [0.005, 0.01, 0.02, 0.03, 0.05, 0.07, 0.1, 0.15]
-print("\nTesting epsilon values...")
-print("-" * 60)
-
-best_untargeted = None
-for eps in epsilons:
-    # Apply perturbation in POSITIVE direction for untargeted attack
-    adv_x = image + eps * perturbations_untargeted
-    adv_x = tf.clip_by_value(adv_x, -1, 1)
+results = []
+for config in configs:
+    print(f"\nConfig: eps={config['eps']}, alpha={config['alpha']}, iterations={config['num_iter']}")
+    print("-" * 40)
     
-    adv_probs = pretrained_model.predict(adv_x, verbose=0)
-    _, adv_class, adv_confidence = get_imagenet_label(adv_probs)
+    # Untargeted attack
+    adv_image = iterative_fgsm(
+        model, image, 
+        eps=config['eps'], 
+        alpha=config['alpha'], 
+        num_iter=config['num_iter'],
+        targeted=False
+    )
     
-    if adv_class != image_class:
-        print(f"ε = {eps:.3f}: ✓ SUCCESS! Changed to: {adv_class} ({adv_confidence*100:.1f}%)")
-        if best_untargeted is None:
-            best_untargeted = (eps, adv_x, adv_class, adv_confidence)
-    else:
-        orig_conf = image_probs[0, predicted_class_idx]
-        adv_conf = adv_probs[0, predicted_class_idx]
-        print(f"ε = {eps:.3f}: Still {adv_class} (confidence: {orig_conf*100:.1f}% → {adv_conf*100:.1f}%)")
-
-print("\n" + "="*80)
-print("TARGETED ATTACK - Trying to make it predict 'tennis_ball' (class 852)")
-print("="*80)
-
-# Targeted attack to tennis ball (class 852)
-target_class = 852  # tennis_ball
-perturbations_targeted = create_targeted_pattern(image, [target_class])
-
-print("\nTesting epsilon values for targeted attack...")
-print("-" * 60)
-
-best_targeted = None
-for eps in epsilons:
-    # Apply perturbation in NEGATIVE direction for targeted attack
-    adv_x = image - eps * perturbations_targeted
-    adv_x = tf.clip_by_value(adv_x, -1, 1)
+    adv_probs = model.predict(adv_image, verbose=0)
+    _, adv_class, adv_conf = decode_predictions(adv_probs, top=1)[0][0]
     
-    adv_probs = pretrained_model.predict(adv_x, verbose=0)
-    _, adv_class, adv_confidence = get_imagenet_label(adv_probs)
-    target_conf = adv_probs[0, target_class]
+    success = adv_class != orig_class
+    print(f"Untargeted: {adv_class} ({adv_conf*100:.1f}%) - {'✓ SUCCESS' if success else '✗ Failed'}")
     
-    if adv_class == 'tennis_ball':
-        print(f"ε = {eps:.3f}: ✓ SUCCESS! Predicted tennis_ball ({adv_confidence*100:.1f}%)")
-        if best_targeted is None:
-            best_targeted = (eps, adv_x, adv_class, adv_confidence)
-    else:
-        print(f"ε = {eps:.3f}: {adv_class} ({adv_confidence*100:.1f}%), tennis_ball conf: {target_conf*100:.2f}%")
-
-# Create final visualization
-fig, axes = plt.subplots(2, 3, figsize=(15, 10))
-
-# Row 1: Untargeted Attack
-axes[0, 0].imshow(image[0] * 0.5 + 0.5)
-axes[0, 0].set_title(f'Original\n{image_class}\n{class_confidence*100:.1f}%', fontsize=12)
-axes[0, 0].axis('off')
-
-if best_untargeted:
-    eps_u, adv_x_u, adv_class_u, adv_conf_u = best_untargeted
-    axes[0, 1].imshow(perturbations_untargeted[0] * 0.5 + 0.5)
-    axes[0, 1].set_title(f'Untargeted Perturbation\nε = {eps_u}', fontsize=12)
-    axes[0, 1].axis('off')
+    # Targeted attack to goldfish (class 1)
+    target_class = 1  # goldfish
+    adv_image_targeted = iterative_fgsm(
+        model, image,
+        eps=config['eps'],
+        alpha=config['alpha'],
+        num_iter=config['num_iter'],
+        targeted=True,
+        target_class=target_class
+    )
     
-    axes[0, 2].imshow(adv_x_u[0] * 0.5 + 0.5)
-    axes[0, 2].set_title(f'Result: {adv_class_u}\n{adv_conf_u*100:.1f}%', 
-                        fontsize=12, color='green')
-    axes[0, 2].axis('off')
-else:
-    axes[0, 1].text(0.5, 0.5, 'Attack Failed', ha='center', va='center', fontsize=14)
-    axes[0, 1].axis('off')
-    axes[0, 2].axis('off')
-
-# Row 2: Targeted Attack
-axes[1, 0].imshow(image[0] * 0.5 + 0.5)
-axes[1, 0].set_title(f'Original\n{image_class}\n{class_confidence*100:.1f}%', fontsize=12)
-axes[1, 0].axis('off')
-
-if best_targeted:
-    eps_t, adv_x_t, adv_class_t, adv_conf_t = best_targeted
-    axes[1, 1].imshow(perturbations_targeted[0] * 0.5 + 0.5)
-    axes[1, 1].set_title(f'Targeted Perturbation\n(to tennis_ball, ε = {eps_t})', fontsize=12)
-    axes[1, 1].axis('off')
+    adv_probs_t = model.predict(adv_image_targeted, verbose=0)
+    _, adv_class_t, adv_conf_t = decode_predictions(adv_probs_t, top=1)[0][0]
     
-    axes[1, 2].imshow(adv_x_t[0] * 0.5 + 0.5)
-    axes[1, 2].set_title(f'Result: {adv_class_t}\n{adv_conf_t*100:.1f}%', 
-                        fontsize=12, color='green' if adv_class_t == 'tennis_ball' else 'orange')
-    axes[1, 2].axis('off')
-else:
-    axes[1, 1].text(0.5, 0.5, 'Attack Failed', ha='center', va='center', fontsize=14)
-    axes[1, 1].axis('off')
-    axes[1, 2].axis('off')
+    success_t = adv_class_t == 'goldfish'
+    print(f"Targeted (goldfish): {adv_class_t} ({adv_conf_t*100:.1f}%) - {'✓ SUCCESS' if success_t else '✗ Failed'}")
+    
+    results.append({
+        'config': config,
+        'untargeted': (adv_image, adv_class, adv_conf, success),
+        'targeted': (adv_image_targeted, adv_class_t, adv_conf_t, success_t)
+    })
 
-plt.suptitle('FGSM Attack Results: Untargeted vs Targeted', fontsize=16, fontweight='bold')
+# Find best result
+best_untargeted = max(results, key=lambda x: x['untargeted'][3])
+best_targeted = max(results, key=lambda x: x['targeted'][3])
+
+# Visualization
+fig, axes = plt.subplots(2, 4, figsize=(16, 8))
+
+# Original
+for i in range(2):
+    axes[i, 0].imshow(image[0] * 0.5 + 0.5)
+    axes[i, 0].set_title(f'Original\n{orig_class}\n{orig_conf*100:.1f}%', fontsize=11)
+    axes[i, 0].axis('off')
+
+# Untargeted results
+config = best_untargeted['config']
+adv_img, adv_cls, adv_cnf, success = best_untargeted['untargeted']
+
+axes[0, 1].imshow(adv_img[0] * 0.5 + 0.5)
+axes[0, 1].set_title(f'I-FGSM Untargeted\n{adv_cls}\n{adv_cnf*100:.1f}%', 
+                     fontsize=11, color='green' if success else 'red')
+axes[0, 1].axis('off')
+
+# Show perturbation
+perturbation = adv_img - image
+axes[0, 2].imshow(perturbation[0] * 0.5 + 0.5)
+axes[0, 2].set_title(f'Perturbation\neps={config["eps"]}', fontsize=11)
+axes[0, 2].axis('off')
+
+# Difference map
+diff = tf.abs(adv_img - image)
+axes[0, 3].imshow(tf.reduce_mean(diff, axis=-1)[0], cmap='hot')
+axes[0, 3].set_title('Difference Heatmap', fontsize=11)
+axes[0, 3].axis('off')
+
+# Targeted results
+config_t = best_targeted['config']
+adv_img_t, adv_cls_t, adv_cnf_t, success_t = best_targeted['targeted']
+
+axes[1, 1].imshow(adv_img_t[0] * 0.5 + 0.5)
+axes[1, 1].set_title(f'I-FGSM Targeted\n{adv_cls_t}\n{adv_cnf_t*100:.1f}%', 
+                     fontsize=11, color='green' if success_t else 'orange')
+axes[1, 1].axis('off')
+
+# Show perturbation
+perturbation_t = adv_img_t - image
+axes[1, 2].imshow(perturbation_t[0] * 0.5 + 0.5)
+axes[1, 2].set_title(f'Perturbation\neps={config_t["eps"]}', fontsize=11)
+axes[1, 2].axis('off')
+
+# Difference map
+diff_t = tf.abs(adv_img_t - image)
+axes[1, 3].imshow(tf.reduce_mean(diff_t, axis=-1)[0], cmap='hot')
+axes[1, 3].set_title('Difference Heatmap', fontsize=11)
+axes[1, 3].axis('off')
+
+plt.suptitle('Iterative FGSM Attack Results', fontsize=14, fontweight='bold')
 plt.tight_layout()
-plt.savefig('fgsm_comparison.png', dpi=150, bbox_inches='tight')
+plt.savefig('ifgsm_results.png', dpi=150, bbox_inches='tight')
 plt.show()
 
 print("\n" + "="*80)
-print("FINAL SUMMARY")
+print("ATTACK SUMMARY")
 print("="*80)
-print(f"Original: {image_class} ({class_confidence*100:.1f}%)")
-if best_untargeted:
-    print(f"Untargeted Attack: ✓ Changed to {best_untargeted[2]} with ε={best_untargeted[0]}")
-else:
-    print("Untargeted Attack: ✗ Failed")
-if best_targeted:
-    print(f"Targeted Attack: ✓ Changed to {best_targeted[2]} with ε={best_targeted[0]}")
-else:
-    print("Targeted Attack: ✗ Failed")
+print(f"Original: {orig_class} ({orig_conf*100:.1f}%)")
+print(f"Best Untargeted: {best_untargeted['untargeted'][1]} - {'✓' if best_untargeted['untargeted'][3] else '✗'}")
+print(f"Best Targeted: {best_targeted['targeted'][1]} - {'✓' if best_targeted['targeted'][3] else '✗'}")
 print("="*80)
