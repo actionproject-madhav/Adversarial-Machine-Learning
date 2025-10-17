@@ -79,8 +79,7 @@ for eps in epsilons:
     
     true_conf = adv_probs[0, true_class]
     
-    success = adv_class != true_class
-    
+    success = adv_class != true_class    
     print(f"    ε={eps:.2f}: {adv_pred[1]:20s} ({adv_pred[2]*100:5.1f}%) " + 
           f"| True class: {true_conf*100:5.1f}% {'✓ FOOLED!' if success else ''}")
     
@@ -98,7 +97,7 @@ for eps in epsilons:
 # Use best result
 adv_pred = decode_predictions(best_probs, top=1)[0][0]
 adv_class = int(np.argmax(best_probs))
-success = adv_class == target_class
+success = adv_class != true_class
 
 print(f"\n{'='*80}")
 print("RESULT:")
