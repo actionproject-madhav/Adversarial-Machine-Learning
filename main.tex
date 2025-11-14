@@ -1,0 +1,155 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{times}
+\usepackage{setspace}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{cite}
+
+\title{The Evolution of Adversarial Machine Learning Research}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction:}
+
+Machine learning systems have achieved remarkable success in various domains, including autonomous systems, healthcare, natural language processing, cybersecurity, and computer vision. However, this success has come with different vulnerabilities that challenge their reliability and security. Adversarial Machine Learning is an emerging field studying the attacks against machine learning models and defences to protect them. This is a critical field emerging at the intersection of machine learning and security. 
+
+The research has risen dramatically over the last decade, with numerous papers demonstrating powerful algorithmic attacks followed by papers discovering advanced defences. Yet, a troubling disconnect has emerged; while academic research has discovered sophisticated attacks mostly based on mathematical computations of gradients, real-world evidence suggests that attackers employ fairly simple tactics to subvert ML-driven driven due to the computational, knowledge and resource limitations \cite{apruzzese2023real, kumar2020adversarial}.
+
+We trace the evolution of adversarial machine learning research and establish a foundation understanding through increasingly complex attacks and defences, highlighting theoretical advancements, gradient-based methods, and shaping the research landscape. Understanding the trajectory helps us contextualise subsequent analysis of recent publications. Then, we evaluate the extent to which research has evolved and if it has addressed the practical security considerations relevant to industry deployments, revealing a critical gap between theoretical advancements and industry deployments.
+
+\section{The Emergence of Adversarial Examples:}
+
+The modern era of adversarial machine learning began with the discovery of intriguing properties of neural networks by Szegedy et al (2013) \cite{szegedy2013intriguing}. This revealed that imperceptible tiny perturbations in the input data could fool state-of-the-art deep learning models to produce incorrect outputs with high confidence. Importantly, these perturbations weren't random errors of ML systems, but rather a deep vulnerability that could transfer across different models, undermining the security of any machine learning system. This is a fundamental weakness of neural network architecture and drew a lot of attention and subsequent research.
+
+Goodfellow et al (2014, 2015) \cite{goodfellow2014explaining, goodfellow2015explaining} proposed that the linear nature of neural networks, rather than the non-linearity or overfitting, was the primary cause of adversarial vulnerability. They introduced a Fast Gradient Sign Method (FSGM), simplifying the process of adversarial input generation with just a single step. The simplicity and effectiveness of FSGM established a pattern that eventually dominated the subsequent research. Gradient-based attacks became the standard.
+
+These foundational works shaped the trajectory of adversarial ML research. They assumed that adversaries had a white box access to the modes, including architecture, details and gradients. Second, they focused on imperceptible perturbations. Third, they emphasised mathematical optimisation as a natural way of computing the gradient and the attack vector. While these frameworks enabled rigorous analysis, they shaped the research away from the messier realities of real-world attack scenarios.
+
+\section{The Arms Race: Increasingly Sophisticated Gradient Attacks}
+
+Following the initial ideas, researchers started to discover increasingly sophisticated gradient-based attacks, each one increasing in computational complexity and mathematical algorithms. 
+
+Moosavi-Deezfooli et al (2015, 2016) \cite{moosavi2015deepfool, moosavi2016deepfool} introduced DeepFool, which computed the minimum perturbations iteratively, making the classification cross decision boundaries. This is a great improvement to the FSGM as the DeepFool requires multiple computations, making the adversarial perturbations even smaller and precise. This approach further embeds gradient computation as a foundation for adversarial ML research.
+
+Carlini and Wagner (2017) \cite{carlini2017towards} discovered a C and W attack formulating adversarial examples as a complex optimisation problem tailored to distance metric (L0, L2 and Linf). This involved solving the optimisation problem: 
+
+This approach also required a significant gradient computation, hyperparameter tuning and computational resources. It achieved numerous successes. At that time, defensive distillation (Papernot et al, 2015, 2016) \cite{papernot2015distillation, papernot2016distillation} was the standard defence. Carlni and Wagner demonstrated that their attacks succeed against many proposed defence methods, including the defensive distillation.
+
+This led to an arms race between attacks and defence research. Defences were proposed and evaluated against known attacks, but were subsequently broken by sophisticated gradient-based adaptive attacks. This was a never-ending process of mathematical sophistication, with each iteration of research requiring a deeper gradient analysis and more computational resources. While theoretical frameworks became more robust and concrete, the adversarial ML research diverged from practical attack scenarios where adversaries face computational constraints, limited model access, and different cost-benefit calculations than assumed in academic threat models. 
+
+\section{Physical World Attacks:}
+
+Researchers extended gradient-based methods to physical world scenarios. Kurakin et al (2016) \cite{kurakin2016adversarial} demonstrated that adversarial examples printed and photographed could fool classifiers, but their approach still relied on gradient-based optimisation, modified to simulate camera capture and environment variables. 
+
+Jia et al (2022) \cite{jia2022fooling} advanced physical adversarial examples against autonomous vehicle traffic sign recognition systems. Their method was:
+\begin{itemize}
+\item Extend image transformation distributions with blur and resolution transformations
+\item Bounding box filters for perturbation efficiency
+\item gradient-based method for optimising perturbations
+\end{itemize}
+
+They demonstrated the real-world relevance by successfully fulfilling a 2021 vehicle's traffic sign recognition system. While the attack was successful, a natural question is would actual attackers targeting autonomous vehicles employ such computationally intensive gradient-based methods, or would simpler approaches like physically obscuring signs or using adversarial stickers suffice?
+
+Chahe et al (2023) \cite{chahe2023dynamic} introduced dynamic adversarial attacks using screens on moving vehicles employing a Screen Image Transformation Network trained through gradient-based optimisation. The approach assumed capabilities like extensive computational resources, gradient access, ability to train a specialised network that may not align with practical attackers' resources or motivations. 
+
+\section{Black Box Attacks}
+
+Realising that white-box attacks were unrealistic in many scenarios due to a lot of assumptions about the internal workings of the models, researchers developed black-box strategies. Papernot et al (2016, 2017) \cite{papernot2016practical, papernot2017practical} introduced substitute model training. The adversary queries the target model and receives output. Based on these outputs, the adversary trains a local substitute model on these labelled samples, and generates adversarial examples using gradients from the substitute network architecture and attacks the original system using these examples. 
+
+This approach showed a remarkable success, which misclassified 84\% for MetaMind's API, 96\% against Amazon and 89\% against Google. This demonstrates a high practical implication. However, the method still relied on the gradient computation. While more realistic than white box assumptions, this approach still assumed adversaries possessed significant technical sophistication and abundant resources. The question of whether real attackers without ML expertise might employ non-gradient-based approaches is still not answered well.
+
+\section{Defence Mechanisms: The Gradient Masking Trap}
+
+Numerous studies have shown powerful defences against adversarial attacks. They largely mirror gradient-based methods and advanced mathematics. 
+
+\subsection{Detection-Based Defences}
+
+Early research tried to detect adversarial examples through statistical properties or learned features. Metzen et al (2017) \cite{metzen2017detecting} suggested detector subnetworks. Grosse et al (2017) \cite{grosse2017statistical} explored statistical tests based on distributional differences. Meng and Cheng (2017) \cite{meng2017magnet} introduced MagNet, which combined detector and reformer networks. 
+
+Carlini and Wagner (2017) \cite{carlini2017adversarial} systematically failed existing 10 state-of-the-art defences, demonstrating that all could be bypassed through adaptive attacks with a modified loss function. This revealed a fundamental problem: defence evaluated only for known attacks failed when adversaries adapted their gradient-based optimisation to account for the defence mechanism. This established that detection-based defence was significantly harder to implement effectively than previously anticipated. 
+
+\subsection{Adversarial Training with Gradient-Based Framework:}
+
+Adversarial training emerged as an important defence direction. Goodfellow et al (2014, 2015) \cite{goodfellow2014explaining, goodfellow2015explaining} introduced the concept: augment training data with adversarially perturbed inputs generated via gradient-based methods. Madry et al (2017, 2018) \cite{madry2017towards, madry2018towards} reformulated the adversarial robustness problem through robust optimisation through a min-max framework:
+
+Min formula
+
+The formulation required finding the worst-case adversarial perturbation via gradient ascent for each sample during each training epoch. Tramer et al (2017) \cite{tramer2017ensemble} introduced Ensemble Adversarial Training, which improved black-box robustness by training on perturbations transferred from multiple models. 
+
+The pattern of research is clear: defences were designed to counter gradient-based attacks, evaluated against gradient-based attacks, and optimised assuming adversaries would use gradient-based methods. This created a self-reinforcing cycle where both attacks and defences revolved around the same gradient-based paradigm, potentially neglecting simpler attack vectors that real-world adversaries might implement. 
+
+\subsection{Certified Robustness}
+
+Research has actively looked for formal guarantees that models remain correct within specific perturbation bounds. Li et al (2020) \cite{li2020sok} systematically certified robustness. However, these methods came with severe accuracy-robustness tradeoffs and required significant computational resources.
+
+Weber et al (2020) \cite{weber2020rab} extended certification to blackdoor attacks through RAB, using randomised smoothing to provide provable guarantees. However, certified guarantees offer lower robust accuracy than empirical adversarial training. This makes it deployment challenging in resource-constrained environments. 
+
+Certified robustness was highly rigorous and theoretically complex. The question of whether such sophisticated guarantees were necessary or cost-effective for real-world deployment mostly remained unaddressed. 
+
+\section{Privacy Attacks}
+
+While evasion attacks were prominent in early research, the field expanded to capture that ML models could leak sensitive information about training data, representing distinct privacy violations. 
+
+\subsection{Membership Inference}
+
+Membership inference attacks test whether a given data point was used in model training. Ye et al (2021) \cite{ye2021enhanced} developed enhanced attacks based on comprehensive hypothesis testing. Carlini et al (2022) \cite{carlini2022membership} argued for evaluating attacks at very low false positive rates. Their likelihood ratio attack achieved 10x higher power by carefully combining statistical signals from reference models. The attacks assumed adversaries could query models extensively and possessed statistical expertise to interpret results, potentially overestimating attacker sophistication compared to real-world scenarios. 
+
+\subsection{Property Inference}
+
+Property inference attacks extract global training data statistics. Chase et al (2021) \cite{chase2021property} studied poisoning-enhanced property inference, demonstrating that adversaries controlling portions of training data could boost inference success. Chaudhary et al (2022) \cite{chaudhari2022snap} introduced SNAP for efficient property extraction through poisoning. 
+
+Balle et al (2022) \cite{balle2022reconstructing} study training data reconstruction by informed adversaries, deriving closed-form attacks for convex models and training reconstructor networks. Carlini et al (2023) \cite{carlini2023extracting} extracted over a thousand training examples from diffusion models, demonstrating that these models were substantially less private than previous generative models.
+
+\subsection{Federated Learning Privacy}
+
+Privacy concerns intensified in distributed learning. Pasquini et al (2021) \cite{pasquini2021eluding} showed that secure aggregation, designed specifically to protect privacy in federated learning, could be exploited by taking advantage of model inconsistencies. Pasquini et al (2022) \cite{pasquini2022insecurity} extended this to peer-to-peer decentralised learning, demonstrating that decentralisation also doesn't guarantee security advantages. Salem et al (2022) \cite{salem2022sok} provided unified game-based frameworks for systematising privacy attacks, bringing theoretical rigour to privacy analysis. 
+
+\section{Training Time Attacks: Poisoning and Backdoors}
+
+Training time attacks manipulate the learning process itself, representing threats distinct from test-time evasion attacks. 
+
+\subsection{Backdoor Attacks in Self-Supervised Learning}
+
+Jia et al (2021) \cite{jia2021badencoder} introduced BadEncoder, demonstrating backdoor injection into pre-trained encoders that propagated to downstream tasks. Their approach included:
+
+\begin{itemize}
+\item access to pre-training data or the ability to influence the pre-training process
+\item careful construction of poisoned samples and triggers
+\item optimisation to ensure backdoor persistence across fine-tuning
+\end{itemize}
+
+Tao et al (2024) \cite{tao2024distribution} advanced this approach with Drupe, a distribution-preserving backdoor attack that transformed poisoned samples to appear in distribution, evading detection based defences. Liu et al (2024) \cite{liu2024precurious} showed through PreCurios that pre-trained models could serve as privacy traps as they can propagate privacy risks when fine-tuned to downstream tasks based on the badly encoded model.
+
+\subsection{Advanced Poisoning Strategies}
+
+Tramer et a (2022) \cite{tramer2022truth} introduced "truth serum" attacks where just poisoning less than 0.1\% of training data boosted the inference attack performance by 1x or 2x. However, the practical implication of this is still a question. In what real-world scenario do adversaries control such a precise fraction of training data? What are the economic incentives of such attacks?
+
+\section{The Growing Disconnect with the Industry}
+
+Kumar et al. (2020) \cite{kumar2020adversarial} conducted interviews with 28 organisations, finding that practitioners lacked tactical and strategic tools for adversarial ML threats. Grosse et al. (2024) systematically quantified this disconnect by surveying 271 industrial practitioners, revealing that while academic threat models were theoretically applicable, research consistently overestimated attacker capabilities particularly regarding training data access and query budgets. Critically, they found that simpler attacks requiring fewer resources (e.g., <100 queries) could target 28.8-44.4\% of deployed models, yet received far less research attention than complex gradient-based methods. Mink et al. (2023) \cite{mink2023security} provided complementary insights through interviews with 21 data scientists and engineers, identifying three primary barriers to defence deployment: lack of institutional motivation and educational resources, inability to adequately assess AML risk, and organisational structures prioritising other objectives over security. Practitioners often viewed security as outside their expertise: ``Security is not my field, I'm a stats guy'' revealing fundamental misalignments between ML role definitions and security responsibilities.
+
+Apruzzese et al crystallised this gap in the 2023 paper ``Real Attackers Don't Compute Gradients'' \cite{apruzzese2023real}. Through real-world case studies and a comprehensive examination of adversarial ML papers from the top 4 security conferences, they documented a fundamental misalignment. Attackers use simple tactics to fool ML systems, while research focuses on sophisticated gradient attacks. Their case study reveals an important distinction about real-world ML system compromises:
+\begin{itemize}
+\item Simple input manipulation, like putting a false logo (without gradients)
+\item Exploiting system vulnerabilities rather than model-specific weaknesses
+\item Taking advantage of operational gaps more than algorithmic weaknesses
+\item Leveraging social engineering
+\end{itemize}
+
+This historical review reveals that adversarial machine learning is a field of substantial theoretical advancement but questionable practical implications. From foundational discoveries \cite{szegedy2013intriguing, goodfellow2014explaining, goodfellow2015explaining} through gradient attacks \cite{carlini2017towards, moosavi2015deepfool, moosavi2016deepfool} and defences \cite{madry2017towards, madry2018towards, li2020sok}. The field has grown to include privacy attacks \cite{carlini2022membership, ye2021enhanced}, training time threats \cite{jia2021badencoder, tao2024distribution, tramer2022truth}, and physical world scenarios \cite{jia2022fooling, chahe2023dynamic}. The major research has focused on gradient-based methodologies, algorithmic vulnerabilities, threat models, and evaluation paradigms, prioritising worst-case theoretical scenarios over realistic attack economics.
+
+Meanwhile, evidence from industry suggests that actual ML systems compromise follow different patterns, with attackers exploiting operational gaps and economic incentives over algorithmic sophistication. 
+
+This disconnect motivates the subsequent systematic analysis of recent adversarial ML publications. Building on this historical foundation, we examine papers published in top-tier conferences from 2022 to 2025 to evaluate where the current research is addressing the research-practice gap or is continuing the same historical patterns. Our analysis assesses the extent to which current work incorporates realistic threat models, providing insights into the direction it's heading towards. Through this examination, we aim to quantify the gap between adversarial ML research priorities and industry security needs, proposing directions for increasing the real-world impact of future research in this domain.
+
+\newpage
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}
