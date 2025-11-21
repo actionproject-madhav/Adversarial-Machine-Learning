@@ -1,6 +1,10 @@
-# Adversarial Machine Learning Research Paper
+# Adversarial Machine Learning Research
 
-**[📄 Read the Paper (PDF)](The_Evolution_of_Adversarial_Machine_Learning_Research.pdf)**
+## Papers
+
+### Research Papers
+- **[📄 The Evolution of Adversarial Machine Learning Research (PDF)](papers/The%20Evolution%20of%20Adversarial%20Machine%20Learning%20Research.pdf)**
+- **[📄 ACM Papers Recent (PDF)](papers/ACM%20Papers%20Recent.pdf)**
 
 ## LaTeX Source
 - `main.tex` - Paper content
