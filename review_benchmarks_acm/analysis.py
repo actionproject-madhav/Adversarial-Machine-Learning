@@ -46,8 +46,10 @@ BASELINE = {
 
 def load_data(csv_path):
     """Load data"""
-    df = pd.read_csv(csv_path)
-    print(f"Loaded {len(df)} papers")
+    # Convert Path object to string if needed
+    csv_path_str = str(csv_path)
+    df = pd.read_csv(csv_path_str)
+    print(f"Loaded {len(df)} papers from {csv_path_str}")
     return df
 
 def fig1_yearly_distribution(df, output_dir):
@@ -443,12 +445,19 @@ def generate_summary_stats(df, output_dir):
     print("="*60 + "\n")
 
 def main():
-    # Configuration
-    CSV_PATH = '/mnt/user-data/uploads/analysis_results_full_papers.csv'
-    OUTPUT_DIR = '/mnt/user-data/outputs/figures_clean'
+    # Get script directory for relative paths
+    script_dir = Path(__file__).parent
+    
+    # Configuration - use relative paths
+    CSV_PATH = script_dir / 'analysis_results_full_papers.csv'
+    # Fallback to other CSV files if the primary one doesn't exist
+    if not CSV_PATH.exists():
+        CSV_PATH = script_dir / 'analysis_results.csv'
+    
+    OUTPUT_DIR = script_dir / 'outputs' / 'figures'
     
     # Create output directory
-    Path(OUTPUT_DIR).mkdir(parents=True, exist_ok=True)
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     
     print("="*60)
     print("GENERATING PUBLICATION-QUALITY FIGURES")
