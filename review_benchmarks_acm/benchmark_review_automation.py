@@ -21,13 +21,13 @@ client = OpenAI(
     api_key=os.getenv("OPENAI_API_KEY")
 )
 
-def extract_text_from_pdf(pdf_path: str, max_pages: int = 5) -> Dict[str, str]:
+def extract_text_from_pdf(pdf_path: str, max_pages: int = None) -> Dict[str, str]:
     """
     Extract text from PDF file
     
     Args:
         pdf_path: Path to PDF file
-        max_pages: Maximum pages to extract (for cost control)
+        max_pages: Maximum pages to extract (None = all pages)
         
     Returns:
         dict with 'title', 'authors', 'abstract', 'full_text'
@@ -38,9 +38,9 @@ def extract_text_from_pdf(pdf_path: str, max_pages: int = 5) -> Dict[str, str]:
             
             total_pages = len(pdf_reader.pages)
             
-            # Extract first few pages (usually contains title, abstract, intro)
+            # Extract pages (all if max_pages is None)
             text_parts = []
-            pages_to_extract = min(max_pages, total_pages)
+            pages_to_extract = total_pages if max_pages is None else min(max_pages, total_pages)
             
             for page_num in range(pages_to_extract):
                 page = pdf_reader.pages[page_num]
@@ -87,7 +87,7 @@ def extract_text_from_pdf(pdf_path: str, max_pages: int = 5) -> Dict[str, str]:
                 'title': title,
                 'authors': authors,
                 'abstract': abstract if abstract else full_text[:1000],
-                'full_text': full_text[:4000]  # First 4000 chars for context
+                'full_text': full_text  # ENTIRE paper text, no truncation
             }
             
     except Exception as e:
@@ -119,7 +119,7 @@ def analyze_paper_openai(title: str, abstract: str, full_text: str = "") -> Dict
 PAPER:
 Title: {title}
 Abstract: {abstract}
-Text excerpt: {full_text[:2000]}
+Full Text: {full_text}
 
 ANSWER THESE 12 QUESTIONS WITH ONLY THE SPECIFIED OPTIONS:
 
@@ -331,7 +331,7 @@ def analyze_all_papers(base_path: str, output_csv: str, delay: float = 1.0, resu
         return
     
     # Confirm before proceeding
-    estimated_cost = total_papers * 0.05  # ~$0.05 per paper with GPT-4
+    estimated_cost = total_papers * 0.15  # ~$0.15 per paper with full text (higher estimate)
     print(f"\nEstimated cost: ${estimated_cost:.2f}")
     print(f"Estimated time: {total_papers * (delay + 2):.0f} seconds")
     
@@ -348,7 +348,7 @@ def analyze_all_papers(base_path: str, output_csv: str, delay: float = 1.0, resu
         
         # Extract text from PDF
         print("  - Extracting text from PDF...")
-        extracted = extract_text_from_pdf(paper['filepath'], max_pages=5)
+        extracted = extract_text_from_pdf(paper['filepath'], max_pages=None)  # Extract ALL pages
         
         # Analyze with OpenAI
         print("  - Analyzing with GPT-4...")
