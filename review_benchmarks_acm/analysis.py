@@ -34,8 +34,10 @@ APRUZZESE_BASELINE = {
 
 def load_data(csv_path):
     """Load and validate the analysis results"""
-    df = pd.read_csv(csv_path)
-    print(f"Loaded {len(df)} papers from {csv_path}")
+    # Convert Path object to string if needed
+    csv_path_str = str(csv_path)
+    df = pd.read_csv(csv_path_str)
+    print(f"Loaded {len(df)} papers from {csv_path_str}")
     print(f"Years: {sorted(df['Year'].unique())}")
     return df
 
