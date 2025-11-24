@@ -565,12 +565,19 @@ def generate_summary_table(df, stats, output_dir):
 def main():
     """Main execution function"""
     
-    # Configuration
-    CSV_PATH = '/mnt/user-data/uploads/analysis_results_full_papers.csv'
-    OUTPUT_DIR = '/mnt/user-data/outputs/figures'
+    # Get script directory for relative paths
+    script_dir = Path(__file__).parent
+    
+    # Configuration - use relative paths
+    CSV_PATH = script_dir / 'analysis_results_full_papers.csv'
+    # Fallback to other CSV files if the primary one doesn't exist
+    if not CSV_PATH.exists():
+        CSV_PATH = script_dir / 'analysis_results.csv'
+    
+    OUTPUT_DIR = script_dir / 'outputs' / 'figures'
     
     # Create output directory
-    Path(OUTPUT_DIR).mkdir(parents=True, exist_ok=True)
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     
     print("="*60)
     print("ADVERSARIAL ML RESEARCH-PRACTICE GAP ANALYSIS")
