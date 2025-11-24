@@ -490,7 +490,7 @@ if __name__ == "__main__":
     
     # Configuration
     BASE_PATH = "acm_papers_2022_2025"
-    OUTPUT_CSV = "analysis_results.csv"
+    OUTPUT_CSV = "analysis_results_full_papers.csv"
     DELAY = 1.0  # seconds between API calls
     
     # Check if path exists
