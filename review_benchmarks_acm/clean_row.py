@@ -7,7 +7,7 @@ with open('analysis_results.csv', 'r', encoding='utf-8') as infile:
 
 # Process each row (skip header)
 for i in range(1, len(rows)):
-    author_text = rows[i][4]  # Column index 3 is the Authors column
+    author_text = rows[i][3]  # Column index 3 is the Authors column
     
     # Remove leading numbers and period (e.g., "17. " becomes "")
     if author_text and author_text[0].isdigit():
@@ -20,7 +20,7 @@ for i in range(1, len(rows)):
         rows[i][3] = author_text[clean_start:]
 
 # Write back to file
-with open('analysis_results_cleaned.csv', 'w', encoding='utf-8', newline='') as outfile:
+with open('analysis_results_c.csv', 'w', encoding='utf-8', newline='') as outfile:
     writer = csv.writer(outfile)
     writer.writerows(rows)
 
