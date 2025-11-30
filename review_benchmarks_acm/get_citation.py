@@ -3,7 +3,7 @@ import requests
 import re
 from time import sleep
 
-CSV_FILE = "/mnt/data/analysis_results.csv"
+CSV_FILE = "analysis_results_clean.csv"
 
 # Read row 0 as header
 df = pd.read_csv(CSV_FILE, header=0)
