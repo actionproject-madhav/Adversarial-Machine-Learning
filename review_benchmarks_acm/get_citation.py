@@ -2,8 +2,11 @@ import pandas as pd
 import requests
 import re
 from time import sleep
+from pathlib import Path
 
-CSV_FILE = "analysis_results_clean.csv"
+# Get the directory where this script is located
+SCRIPT_DIR = Path(__file__).parent
+CSV_FILE = SCRIPT_DIR / "analysis_results_clean.csv"
 
 # Read row 0 as header
 df = pd.read_csv(CSV_FILE, header=0)
