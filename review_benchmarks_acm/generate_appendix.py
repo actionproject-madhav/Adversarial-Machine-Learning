@@ -8,6 +8,13 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from matplotlib.patches import Rectangle
 import numpy as np
+from pathlib import Path
+
+# Get script directory and set up paths
+SCRIPT_DIR = Path(__file__).parent
+CSV_FILE = SCRIPT_DIR / "analysis_results_clean.csv"
+OUTPUT_DIR = SCRIPT_DIR / "outputs"
+OUTPUT_DIR.mkdir(exist_ok=True)  # Create output directory if it doesn't exist
 
 # Set publication-quality style
 plt.rcParams['font.family'] = 'serif'
@@ -15,7 +22,9 @@ plt.rcParams['font.serif'] = ['Times New Roman']
 plt.rcParams['font.size'] = 7
 plt.rcParams['figure.dpi'] = 300
 
-def create_table_image_part1(df, output_path='/mnt/user-data/outputs/'):
+def create_table_image_part1(df, output_path=None):
+    if output_path is None:
+        output_path = str(OUTPUT_DIR) + '/'
     """
     Generate Part 1: Basic Info & Categories as image
     Columns: Year, Filename, Title, G1-G7
@@ -99,7 +108,9 @@ def create_table_image_part1(df, output_path='/mnt/user-data/outputs/'):
         print(f"✓ Generated {filename}")
         plt.close()
 
-def create_table_image_part2(df, output_path='/mnt/user-data/outputs/'):
+def create_table_image_part2(df, output_path=None):
+    if output_path is None:
+        output_path = str(OUTPUT_DIR) + '/'
     """
     Generate Part 2: Threat Model & Metrics as image
     Columns: Year, Filename, T1, T2, Q1-Q3, Flags, Score
@@ -294,7 +305,7 @@ def main():
     print("="*60 + "\n")
     
     # Load data
-    df = pd.read_csv('/mnt/user-data/uploads/analysis_results.csv')
+    df = pd.read_csv(str(CSV_FILE))
     print(f"Loaded {len(df)} papers\n")
     
     # Generate tables
@@ -309,7 +320,7 @@ def main():
     
     print("\n" + "="*60)
     print("All appendix table images generated successfully!")
-    print("Output directory: /mnt/user-data/outputs/")
+    print(f"Output directory: {OUTPUT_DIR}")
     print("="*60 + "\n")
     
     print("Generated files:")
