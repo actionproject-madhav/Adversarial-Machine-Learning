@@ -395,17 +395,18 @@ def figure7_dl_vs_traditional(df, output_path=None):
     bottom = np.zeros(len(ml_type_pct.index))
     for col in ml_type_pct.columns:
         if col in colors_ml:
-            ax.bar(x, ml_type_pct[col], width, label=col, bottom=bottom,
+            col_values = ml_type_pct[col].values  # Convert to numpy array
+            ax.bar(x, col_values, width, label=col, bottom=bottom,
                   color=colors_ml[col], edgecolor='black', linewidth=1.2)
             
             # Add percentage labels
-            for i, val in enumerate(ml_type_pct[col]):
+            for i, val in enumerate(col_values):
                 if val > 5:  # Only show if > 5%
                     ax.text(x[i], bottom[i] + val/2, f'{val:.1f}%',
                            ha='center', va='center', fontweight='bold', 
                            color='white', fontsize=10)
             
-            bottom += ml_type_pct[col]
+            bottom += col_values
     
     # Formatting
     ax.set_xlabel('Year', fontweight='bold')
