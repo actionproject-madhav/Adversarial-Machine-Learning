@@ -60,10 +60,22 @@ htmlcov/
 .dmypy.json
 dmypy.json
 
-# Large paper collections (selectively ignore untracked ones)
-ieee_papers_2022_2025/
-nds_papers_2022_2025/
-usenix_papers_2022_2025/
+# Large paper collections - ignore PDFs but allow scripts
+ieee_papers_2022_2025/**/*.pdf
+ieee_papers_2022_2025/**/__pycache__/
+ieee_papers_2022_2025/**/*.csv
+nds_papers_2022_2025/**/*.pdf
+nds_papers_2022_2025/**/__pycache__/
+usenix_papers_2022_2025/**/*.pdf
+usenix_papers_2022_2025/**/__pycache__/
+# But don't ignore the directories themselves or Python scripts
+!ieee_papers_2022_2025/**/*.py
+!ieee_papers_2022_2025/**/*.md
+!ieee_papers_2022_2025/**/*.txt
+!nds_papers_2022_2025/**/*.py
+!nds_papers_2022_2025/**/*.md
+!usenix_papers_2022_2025/**/*.py
+!usenix_papers_2022_2025/**/*.md
 
 # Generated analysis results
 review_benchmarks_acm/analysis_results*.csv
