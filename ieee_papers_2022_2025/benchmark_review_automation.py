@@ -393,6 +393,9 @@ def analyze_all_papers(base_path: str, output_csv: str, delay: float = 1.0, resu
         df_existing = pd.read_csv(output_csv)
         df_results = pd.concat([df_existing, df_results], ignore_index=True)
     
+    # Sort by Year (2022-2025) and then by Filename for consistent ordering
+    df_results = df_results.sort_values(['Year', 'Filename'], ascending=[True, True]).reset_index(drop=True)
+    
     # Save to CSV
     df_results.to_csv(output_csv, index=False)
     print(f"\n✓ Results saved to: {output_csv}")
