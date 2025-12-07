@@ -1,0 +1,13 @@
+Question_ID,Category,Question_Title,Question_Description,Options,Answer_Guidelines,Format_Example,Order
+G1,General,Focus,Main contribution?,"atk, def, both","atk for attack paper, def for defense paper, both for combined","G1: atk",1
+G2,General,Attack Type,What kind of attack/threat?,"Evasion, Poisoning, Privacy, Multiple, NA","Evasion=test-time, Poisoning=training-time, Privacy=membership/extraction, Multiple=several types, NA=defense only","G2: Evasion",2
+G3,General,ML Type,Machine learning approach?,"DL, Traditional, Both","DL=deep learning only, Traditional=classical ML, Both=both types","G3: DL",3
+G4,General,Data Type,What data is evaluated?,"Images, Text, Audio, Malware, Other","Pick one primary type","G4: Images",4
+G5,General,Economics,Cost/resources/economics mentioned?,"YES, NO","YES if ANY mention of cost/resources/economics, NO otherwise","G5: YES",5
+G6,General,Code Released,Source code publicly available?,"YES, NO","YES if code is available, NO if not mentioned or not available","G6: YES",6
+G7,General,Real System,Tested on real/commercial systems?,"YES, NO","YES if tested on deployed/commercial/production system, NO if only academic datasets/models","G7: NO",7
+T1,Threat Model,Model Knowledge,What does attacker know?,"White-box, Gray-box, Black-box","White-box=full access to model, Gray-box=partial knowledge/surrogate, Black-box=no model knowledge","T1: White-box",8
+T2,Threat Model,Training Data,Attacker's training data access?,"Full, Partial, None","Full=complete access, Partial=subset/surrogate data, None=no training data","T2: Full",9
+Q1,Query/Computation,Gradients,Requires computing gradients?,"YES, NO","YES if method requires gradient computation, NO if gradient-free","Q1: YES",10
+Q2,Query/Computation,Query Budget,How many queries needed?,"High, Low, None","High=>1000 queries, Low=<1000 queries, None=no queries needed","Q2: High",11
+Q3,Query/Computation,Computation,Computational resources needed?,"High, Low","High=needs GPU/significant time, Low=CPU ok/quick execution","Q3: Low",12

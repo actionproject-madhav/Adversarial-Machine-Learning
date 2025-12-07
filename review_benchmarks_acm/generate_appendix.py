@@ -214,7 +214,9 @@ def create_table_image_part2(df, output_path=None):
         print(f"✓ Generated {filename}")
         plt.close()
 
-def create_summary_table_image(df, output_path='/mnt/user-data/outputs/'):
+def create_summary_table_image(df, output_path=None):
+    if output_path is None:
+        output_path = str(OUTPUT_DIR) + '/'
     """
     Generate summary statistics table as image
     """

@@ -1,0 +1,89 @@
+# Environment variables
+.env
+.env*
+*.env
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+.ENV/
+virtualenv/
+.virtualenv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Distribution / packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Large paper collections (selectively ignore untracked ones)
+ieee_papers_2022_2025/
+nds_papers_2022_2025/
+usenix_papers_2022_2025/
+
+# Generated analysis results
+review_benchmarks_acm/analysis_results*.csv
+review_benchmarks_acm/analysis_results_*.csv
+
+# Incomplete downloads
+*.crdownload
+*.part
+*.tmp
+
+# Generated outputs (figures, PDFs from scripts)
+review_benchmarks_acm/outputs/
+
+# LaTeX auxiliary files
+*.aux
+*.log
+*.out
+*.toc
+*.bbl
+*.blg
+*.synctex.gz
+*.fdb_latexmk
+*.fls
