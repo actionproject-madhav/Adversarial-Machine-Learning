@@ -156,7 +156,7 @@ CRITICAL INSTRUCTIONS:
     try:
         # Call OpenAI API
         response = client.chat.completions.create(
-            model="gpt-4o",  # or "gpt-4o-mini" for lower cost
+            model="gpt-4o-mini",  # or "gpt-4o-mini" for lower cost
             messages=[
                 {"role": "system", "content": "You are a precise research paper analyzer. Answer only with exact specified options."},
                 {"role": "user", "content": prompt}

@@ -1,6 +1,6 @@
 """
-NDS (Network and Distributed Systems Security) Adversarial ML Paper Analysis - OpenAI Version
-Reads PDFs from NDS folder structure (2022-2025) and analyzes using GPT-4
+ACM Adversarial ML Paper Analysis - OpenAI Version
+Reads PDFs from ACM folder structure (2022-2025) and analyzes using GPT-4
 Uses standardized benchmark criteria from benchmark_criteria.csv
 """
 
@@ -227,7 +227,7 @@ def scan_pdf_folder(base_path: str) -> List[Dict]:
     Scan folder structure for PDFs and organize by year
     
     Args:
-        base_path: Path to nds_papers_2022_2025 folder (or current directory)
+        base_path: Path to acm_papers_2022_2025 folder (or current directory)
         
     Returns:
         List of dicts with paper info
@@ -270,14 +270,14 @@ def analyze_all_papers(base_path: str, output_csv: str, delay: float = 1.0, resu
     Analyze all PDFs in folder structure
     
     Args:
-        base_path: Path to nds_papers_2022_2025 folder (or current directory)
+        base_path: Path to acm_papers_2022_2025 folder (or current directory)
         output_csv: Path to save results CSV
         delay: Delay between API calls (seconds)
         resume: If True, skip already analyzed papers
     """
     
     print("="*80)
-    print("NDS ADVERSARIAL ML PAPER ANALYSIS (2022-2025)")
+    print("ACM ADVERSARIAL ML PAPER ANALYSIS (2022-2025)")
     print("="*80)
     
     # Load and display benchmark criteria being used
@@ -411,7 +411,7 @@ def print_statistics(df: pd.DataFrame):
     """Print comprehensive summary statistics based on benchmark criteria"""
     
     print("\n" + "="*80)
-    print("NDS PAPERS SUMMARY STATISTICS (2022-2025)")
+    print("ACM PAPERS SUMMARY STATISTICS (2022-2025)")
     print("="*80)
     
     total = len(df)
@@ -496,11 +496,11 @@ if __name__ == "__main__":
     1. Set OPENAI_API_KEY in .env file (in parent directory):
        OPENAI_API_KEY=sk-...
        
-    2. Run from the nds_papers_2022_2025/ directory:
+    2. Run from the acm_papers_2022_2025/ directory:
        python benchmark_review_automation.py
        
     OR from parent directory:
-       cd nds_papers_2022_2025 && python benchmark_review_automation.py
+       cd acm_papers_2022_2025 && python benchmark_review_automation.py
        
     The script will:
     - Scan all year folders (2022, 2023, 2024, 2025)
@@ -511,10 +511,10 @@ if __name__ == "__main__":
     """
     
     # Configuration
-    # BASE_PATH should be the script's directory (nds_papers_2022_2025)
+    # BASE_PATH should be the script's directory (acm_papers_2022_2025)
     script_dir = Path(__file__).parent.resolve()
     BASE_PATH = str(script_dir)  # Use script's directory as base path
-    OUTPUT_CSV = str(script_dir / "nds_analysis_results_2022_2025.csv")
+    OUTPUT_CSV = str(script_dir / "acm_analysis_results_2022_2025.csv")
     DELAY = 1.0  # seconds between API calls
     
     # Check if year folders exist
@@ -523,9 +523,9 @@ if __name__ == "__main__":
     if not year_folders:
         print(f"Error: No year folders (2022-2025) found in {script_dir}")
         print("\nCurrent directory:", os.getcwd())
-        print(f"\nPlease run from the nds_papers_2022_2025/ directory")
+        print(f"\nPlease run from the acm_papers_2022_2025/ directory")
         print("Expected structure:")
-        print("  nds_papers_2022_2025/")
+        print("  acm_papers_2022_2025/")
         print("    ├── 2022/")
         print("    ├── 2023/")
         print("    ├── 2024/")
