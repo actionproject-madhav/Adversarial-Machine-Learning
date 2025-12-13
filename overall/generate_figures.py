@@ -16,9 +16,10 @@ from pathlib import Path
 # CONFIGURATION
 # ============================================================================
 
-# File paths - UPDATE THIS TO YOUR CSV PATH
-INPUT_CSV = "all_conferences_analysis_results_2022_2025.csv"
-OUTPUT_DIR = Path("figures")
+# File paths - Use script's directory as base
+SCRIPT_DIR = Path(__file__).parent.resolve()
+INPUT_CSV = SCRIPT_DIR / "all_conferences_analysis_results_2022_2025.csv"
+OUTPUT_DIR = SCRIPT_DIR / "figures"
 OUTPUT_DIR.mkdir(exist_ok=True)
 
 # Style configuration
@@ -85,7 +86,9 @@ DOMAIN_COLORS = {
 def load_and_prepare_data(filepath):
     """Load CSV and prepare data for analysis."""
     print(f"Loading data from {filepath}...")
-    df = pd.read_csv(filepath)
+    # Convert Path object to string if needed
+    csv_path = str(filepath) if isinstance(filepath, Path) else filepath
+    df = pd.read_csv(csv_path)
     
     # Standardize conference names (handle NDS vs NDSS)
     df['Conference'] = df['Conference'].replace({'NDS': 'NDSS'})
@@ -239,9 +242,8 @@ def figure_1_dataset_overview(df):
     
     plt.tight_layout()
     plt.savefig(OUTPUT_DIR / 'fig1_dataset_overview.png')
-    plt.savefig(OUTPUT_DIR / 'fig1_dataset_overview.pdf')
     plt.close()
-    print("  Saved: fig1_dataset_overview.png/pdf")
+    print("  Saved: fig1_dataset_overview.png")
 
 # ============================================================================
 # FIGURE 2: Overall Gap Indicators
@@ -303,9 +305,8 @@ def figure_2_overall_gap(df):
     
     plt.tight_layout()
     plt.savefig(OUTPUT_DIR / 'fig2_overall_gap_indicators.png')
-    plt.savefig(OUTPUT_DIR / 'fig2_overall_gap_indicators.pdf')
     plt.close()
-    print("  Saved: fig2_overall_gap_indicators.png/pdf")
+    print("  Saved: fig2_overall_gap_indicators.png")
 
 # ============================================================================
 # FIGURE 3: Gap Indicators by Conference (Heatmap)
@@ -380,9 +381,8 @@ def figure_3_gap_by_conference_heatmap(df):
     
     plt.tight_layout()
     plt.savefig(OUTPUT_DIR / 'fig3_gap_by_conference_heatmap.png')
-    plt.savefig(OUTPUT_DIR / 'fig3_gap_by_conference_heatmap.pdf')
     plt.close()
-    print("  Saved: fig3_gap_by_conference_heatmap.png/pdf")
+    print("  Saved: fig3_gap_by_conference_heatmap.png")
 
 # ============================================================================
 # FIGURE 4: Practical Indicators Over Years (Line Chart)
@@ -443,9 +443,8 @@ def figure_4_practical_trends(df):
     
     plt.tight_layout()
     plt.savefig(OUTPUT_DIR / 'fig4_practical_indicators_trend.png')
-    plt.savefig(OUTPUT_DIR / 'fig4_practical_indicators_trend.pdf')
     plt.close()
-    print("  Saved: fig4_practical_indicators_trend.png/pdf")
+    print("  Saved: fig4_practical_indicators_trend.png")
 
 # ============================================================================
 # FIGURE 5: Threat Model Distribution by Conference
@@ -503,9 +502,8 @@ def figure_5_threat_model_distribution(df):
     
     plt.tight_layout()
     plt.savefig(OUTPUT_DIR / 'fig5_threat_model_distribution.png')
-    plt.savefig(OUTPUT_DIR / 'fig5_threat_model_distribution.pdf')
     plt.close()
-    print("  Saved: fig5_threat_model_distribution.png/pdf")
+    print("  Saved: fig5_threat_model_distribution.png")
 
 # ============================================================================
 # FIGURE 6: Gradient Requirement by Attack Type
@@ -565,9 +563,8 @@ def figure_6_gradient_by_attack_type(df):
     
     plt.tight_layout()
     plt.savefig(OUTPUT_DIR / 'fig6_gradient_by_attack_type.png')
-    plt.savefig(OUTPUT_DIR / 'fig6_gradient_by_attack_type.pdf')
     plt.close()
-    print("  Saved: fig6_gradient_by_attack_type.png/pdf")
+    print("  Saved: fig6_gradient_by_attack_type.png")
 
 # ============================================================================
 # FIGURE 7: Data Domain Distribution
@@ -611,9 +608,8 @@ def figure_7_domain_distribution(df):
     
     plt.tight_layout()
     plt.savefig(OUTPUT_DIR / 'fig7_domain_distribution.png')
-    plt.savefig(OUTPUT_DIR / 'fig7_domain_distribution.pdf')
     plt.close()
-    print("  Saved: fig7_domain_distribution.png/pdf")
+    print("  Saved: fig7_domain_distribution.png")
 
 # ============================================================================
 # FIGURE 8: Traditional Score by Conference (Box Plot)
@@ -668,9 +664,8 @@ def figure_8_gap_score_by_conference(df):
     
     plt.tight_layout()
     plt.savefig(OUTPUT_DIR / 'fig8_gap_score_by_conference.png')
-    plt.savefig(OUTPUT_DIR / 'fig8_gap_score_by_conference.pdf')
     plt.close()
-    print("  Saved: fig8_gap_score_by_conference.png/pdf")
+    print("  Saved: fig8_gap_score_by_conference.png")
 
 # ============================================================================
 # FIGURE 9: Traditional Score Over Time
@@ -721,9 +716,8 @@ def figure_9_gap_score_trend(df):
     
     plt.tight_layout()
     plt.savefig(OUTPUT_DIR / 'fig9_gap_score_trend.png')
-    plt.savefig(OUTPUT_DIR / 'fig9_gap_score_trend.pdf')
     plt.close()
-    print("  Saved: fig9_gap_score_trend.png/pdf")
+    print("  Saved: fig9_gap_score_trend.png")
 
 # ============================================================================
 # FIGURE 10: Attack vs Defense Practicality
@@ -779,9 +773,8 @@ def figure_10_attack_vs_defense(df):
     
     plt.tight_layout()
     plt.savefig(OUTPUT_DIR / 'fig10_attack_vs_defense.png')
-    plt.savefig(OUTPUT_DIR / 'fig10_attack_vs_defense.pdf')
     plt.close()
-    print("  Saved: fig10_attack_vs_defense.png/pdf")
+    print("  Saved: fig10_attack_vs_defense.png")
 
 # ============================================================================
 # BONUS FIGURE 11: Correlation Heatmap of Gap Flags
@@ -827,9 +820,8 @@ def figure_11_flag_correlation(df):
     
     plt.tight_layout()
     plt.savefig(OUTPUT_DIR / 'fig11_flag_correlation.png')
-    plt.savefig(OUTPUT_DIR / 'fig11_flag_correlation.pdf')
     plt.close()
-    print("  Saved: fig11_flag_correlation.png/pdf")
+    print("  Saved: fig11_flag_correlation.png")
 
 # ============================================================================
 # BONUS FIGURE 12: Gap Score Distribution Histogram
@@ -875,9 +867,8 @@ def figure_12_gap_score_histogram(df):
     
     plt.tight_layout()
     plt.savefig(OUTPUT_DIR / 'fig12_gap_score_histogram.png')
-    plt.savefig(OUTPUT_DIR / 'fig12_gap_score_histogram.pdf')
     plt.close()
-    print("  Saved: fig12_gap_score_histogram.png/pdf")
+    print("  Saved: fig12_gap_score_histogram.png")
 
 # ============================================================================
 # MAIN EXECUTION
