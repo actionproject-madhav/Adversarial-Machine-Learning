@@ -26,9 +26,6 @@
 \usepackage{amssymb}
 
 % Unicode character mappings for the imported dataset table
-\newunicodechar{’}{'}
-\newunicodechar{“}{``}
-\newunicodechar{”}{''}
 \newunicodechar{∗}{*}
 \newunicodechar{⋆}{*}
 \newunicodechar{†}{\textdagger}
@@ -42,8 +39,6 @@
 \newunicodechar{∥}{\ensuremath{\parallel}}
 \newunicodechar{≀}{\ensuremath{\wr}}
 \newunicodechar{§}{\S}
-\newunicodechar{¨}{\"{}}
-\newunicodechar{´}{'}
 \newunicodechar{¶}{\P}
 \newunicodechar{ß}{\ss}
 \newunicodechar{à}{\`a}
@@ -51,10 +46,7 @@
 \newunicodechar{è}{\`e}
 \newunicodechar{ö}{\"o}
 \newunicodechar{ü}{\"u}
-\newunicodechar{ˇ}{\v{}}
-\newunicodechar{˘}{\u{}}
 \newunicodechar{⇤}{<-}
-\newunicodechar{�}{?}
 \newunicodechar{​}{} % zero-width non-joiner
 % Math bold/italic letters normalized to ASCII
 \newunicodechar{𝐵}{B}
@@ -106,7 +98,7 @@
 \onehalfspacing
 
 % Title
-\title{\textbf{Bridging the Gap Between Theory and Practice in Adversarial Machine Learning: A Systematic Cross-Venue Analysis of 454 Papers (2022 to 2025)}}
+\title{\textbf{Bridging the Gap Between Theory and Practice in Adversarial Machine Learning: A Systematic Cross-Venue Analysis of 454 Papers (2022--2025)}}
 
 \author{
   Madhav Khanal\\
@@ -128,9 +120,10 @@
 % ABSTRACT
 %==============================================================================
 \begin{abstract}
-    Machine learning systems are increasingly used in security-focused settings, yet an alignment gap remains between academic adversarial machine learning research and real-world needs. This review summarizes findings from 454 papers across ACM CCS, IEEE S\&P, NDSS, and USENIX Security (2022–2025). Using the framework introduced by Apruzzese et al. in “Real Attackers Don't Compute Gradients,” we examine how recent work addresses the theory-practice gap.
+Machine learning systems are being used more often in security-critical applications, but there is still a significant gap between academic research in adversarial machine learning and the needs for real-world deployment. This systematic review looks at 454 papers published in four major security venues---ACM CCS, IEEE S\&P, NDSS, and USENIX Security---covering the years from 2022 to 2025. Using the analytical framework introduced by Apruzzese et al. in ``Real Attackers Don't Compute Gradients,'' we evaluate how current research addresses the divide between theory and practice.
 
-    Quantitatively, we observe that 94.7\% of papers do not test on deployed systems, 67.8\% depend on gradient access uncommon in the field, 80.4\% assume high query budgets, and 63.2\% use white-box threat models. A thematic synthesis points to five areas needing closer alignment with deployment: threat model realism, assumptions about gradient access, validation on real systems, domain coverage beyond images, and attention to economic and human factors. Trends from 2022 to 2025 suggest gradual rather than rapid progress on these fronts.
+Our analysis shows that 94.7\% of the papers do not test on deployed systems, 67.8\% depend on gradient access that is rarely available in real situations, 80.4\% assume query budgets that go beyond typical operational limits, and 63.2\% use white-box threat models. We identify five areas that need more attention in relation to real-world deployment: specifying threat models, accessing gradients, validating on real systems, ensuring diversity beyond image classification, and considering economic and human factors. Our temporal analysis from 2022 to 2025 shows that progress in these areas is gradual rather than swift. We end with suggestions for researchers, venues, practitioners, and funding agencies to promote more effective adversarial machine learning research.
+
 \textbf{Keywords:} adversarial machine learning, theory-practice gap, security research, systematic review, threat modeling
 \end{abstract}
 
@@ -143,61 +136,78 @@
 %==============================================================================
 \section{Introduction}
 
-Machine learning has transformed how we build software systems. From facial recognition at airports to fraud detection in banking, from autonomous vehicles navigating city streets to content moderation on social media platforms, ML models now make decisions that affect millions of people daily. However, these systems are vulnerable to adversarial attacks: carefully crafted inputs designed to cause models to fail in ways their designers never anticipated.
+Machine learning has become an essential part of software systems in many areas. It is used in facial recognition at border crossings, fraud detection in financial services, navigation for autonomous vehicles, and content moderation on social platforms. ML models now influence decisions that impact millions of people every day. This widespread use has led to greater scrutiny of vulnerabilities in these models. Researchers design specific inputs to trigger failures that system creators did not foresee.
 
-The field of adversarial machine learning (AML) emerged to study these vulnerabilities and develop defenses against them. Over the past decade, researchers have demonstrated impressive attacks: adding imperceptible noise to images that causes classifiers to misidentify them, poisoning training data to implant hidden backdoors, extracting private information about training data through careful queries, and more. In response, the community has proposed numerous defenses claiming to make models robust against such attacks.
+The field of adversarial machine learning (AML) has emerged to explore these weaknesses and develop defenses. Over the last ten years, researchers have shown how sophisticated attacks can work: small changes that lead to image misclassification, poisoned training data that creates hidden backdoors, and privacy attacks that reveal sensitive information through targeted queries. In response, the community has proposed many defenses to improve model strength.
 
-There remains an important gap: \textbf{the assumptions underlying much academic research do not always match the realities of deployed systems.}
+Despite these developments, a key question remains: \textbf{how well do the assumptions in academic research match the realities of real-world systems?}
 
-In 2022, Apruzzese and colleagues published a landmark analysis titled ``Real Attackers Don't Compute Gradients''~\citep{apruzzese2022real}, noting a gap between academic AML research and practical security needs. Their central observation was straightforward: while academic attacks often assume adversaries can compute gradients through target models (requiring knowledge of model architecture and parameters), real attackers rarely have such access. They frequently exploit simpler vulnerabilities without sophisticated optimization when social engineering or basic input manipulation is sufficient.
+In 2022, Apruzzese and colleagues published a thorough analysis titled ``Real Attackers Don't Compute Gradients''~\citep{apruzzese2022real}. They documented a gap between academic AML research and practical security needs. Their main finding was that academic studies often assume attackers can calculate gradients from target models, which requires access to the model's structure and parameters. However, real-world attackers usually lack this access. Often, simpler methods like social engineering or basic input manipulation are sufficient, making complex approaches unnecessary for them.
 
-This literature review asks: \textit{four years later, has the research community addressed these concerns?}
+This systematic review asks: \textit{how has the research community responded since this critique?}
 
-To answer this question, we systematically analyzed 454 adversarial ML papers published from 2022 through 2025 at four premier security venues: ACM CCS (118 papers), IEEE S\&P (79 papers), NDSS (49 papers), and USENIX Security (208 papers). We evaluated each paper across multiple dimensions capturing practical relevance: threat model realism, computational requirements, validation methodology, and consideration of deployment constraints.
+To find answers, we analyzed 454 adversarial ML papers published from 2022 to 2025 in four leading security venues: ACM CCS (118 papers), IEEE S\&P (79 papers), NDSS (49 papers), and USENIX Security (208 papers). We assessed each paper based on several factors related to practical relevance: realism of the threat model, computational needs, validation methods, and awareness of deployment challenges.
 
-Our findings indicate that the theory-practice gap remains noticeable. The research community often prioritizes publication metrics such as novelty, theoretical rigor, and attack success rates over deployment considerations and economic factors. This review summarizes the current state, traces common causes through thematic synthesis across venues, and offers practical recommendations for researchers, venues, industry practitioners, and funding agencies.
+Our findings show that the gap between theory and practice is still significant. While the research community has made valuable contributions to our understanding of adversarial issues, the drive to publish often emphasizes innovation and theoretical strength over practical implementation and cost considerations. This review outlines the current state of the field, identifies common trends across venues, and provides practical recommendations for various stakeholders.
 
 %==============================================================================
 % 2. BACKGROUND
 %==============================================================================
-\section{Background: Understanding Adversarial Machine Learning}
+\section{Background: Foundations of Adversarial Machine Learning}
 
+\subsection{The Discovery of Adversarial Vulnerabilities}
 
-\subsection{What Makes Machine Learning Vulnerable?}
+The modern study of adversarial machine learning began with the important work of Szegedy et al.~\citep{szegedy2013intriguing}. They showed that small, barely noticeable changes to input data could lead state-of-the-art deep learning models to produce wrong outputs with high confidence. These changes were not just random mistakes; they were systematic vulnerabilities that could transfer between different models. Adversarial examples created for one model often worked against other models trained separately. This ability to transfer highlighted the nature of the vulnerability and sparked further research.
 
-Modern machine learning models, particularly deep neural networks, learn to recognize patterns by processing millions of examples during training. A model trained to classify images, for instance, learns to associate certain pixel patterns with labels like ``cat'' or ``dog.'' However, these models don't ``understand'' images the way humans do; they simply learn statistical correlations between pixel values and labels.
+Goodfellow et al.~\citep{goodfellow2014explaining} suggested that the linear behavior of neural networks, instead of their nonlinearity or overfitting, was the main cause of their vulnerability to adversarial attacks. They introduced the Fast Gradient Sign Method (FGSM), which made it easier to generate adversarial inputs using a single gradient step. The speed and effectiveness of FGSM set a standard for later research, as gradient-based attacks became the common approach.
 
-This difference introduces vulnerabilities. Researchers discovered that adding carefully calculated noise to an image, so subtle that humans cannot perceive it, can cause a model to misclassify the image with high confidence. A photograph of a panda, with imperceptible perturbations, might be classified as a gibbon. A stop sign, with a few strategically placed stickers, might be classified as a speed limit sign by an autonomous vehicle.
+These foundational studies shaped the direction of adversarial ML research in three significant ways. First, they assumed that adversaries had white-box access to models, including details about their architecture and gradient information. Second, they focused on imperceptible changes measured by specific distance metrics. Third, they highlighted optimization-based methods as the best way to generate adversarial inputs. While these frameworks allowed for thorough analysis, they also shifted research away from the practical realities of real-world attacks.
+
+\subsection{The Arms Race: Attacks and Defenses}
+
+After these initial findings, researchers came up with more advanced gradient-based attacks. Moosavi-Dezfooli et al.~\citep{moosavi2016deepfool} introduced DeepFool, which calculated minimal changes iteratively to cross decision boundaries with smaller, more accurate modifications than FGSM. Carlini and Wagner~\citep{carlini2017towards} approached the generation of adversarial examples as a complex optimization problem tailored to various distance metrics ($L_0$, $L_2$, and $L_\infty$), achieving high success rates against certain defenses, including defensive distillation~\citep{papernot2016distillation}.
+
+This led to an arms race between attack and defense research. Defenses were proposed and tested against known attacks, only to be later bypassed by adaptive gradient-based methods. Carlini and Wagner~\citep{carlini2017detecting} systematically defeated ten detection-based defenses, showing that evaluations limited to known attacks fell short when adversaries adapted their strategies to account for defense mechanisms.
+
+Adversarial training became a significant defense approach. Madry et al.~\citep{madry2018towards} redefined adversarial robustness through a min-max optimization framework, training models to perform well against the worst-case changes within set limits. Tramer et al.~\citep{tramer2017ensemble} introduced ensemble adversarial training to enhance black-box robustness. Research on certified robustness~\citep{li2020sok} aimed to provide formal guarantees that models would remain accurate within certain perturbation limits, although these methods often involved trade-offs between accuracy and robustness and required considerable computing power.
+
+\subsection{Expanding Threat Landscape}
+
+The field then expanded beyond evasion attacks to include privacy violations and threats during training. Membership inference attacks~\citep{shokri2017membership, ye2021enhanced} determine whether specific data points were part of model training. Carlini et al.~\citep{carlini2022membership} argued for assessing such attacks at low false positive rates, which reflect the serious nature of privacy issues.
+
+Training-time attacks interfere with the learning process itself. Backdoor attacks introduce hidden triggers that cause specific misbehaviors when activated, with recent studies showing attacks on self-supervised learning~\citep{jia2021badencoder}, along with distribution-preserving methods that avoid detection~\citep{tao2024distribution}. Poisoning attacks that corrupt training data demonstrate that even small amounts of malicious samples can significantly harm model performance~\citep{tramer2022truth}.
+
+Physical-world attacks took gradient-based techniques beyond digital settings. Kurakin et al.~\citep{kurakin2016adversarial} showed that adversarial examples remained effective when printed and photographed. Later work~\citep{jia2022physical} developed robust physical adversarial examples against traffic sign recognition systems in autonomous vehicles, raising questions about whether real-world attackers would use such complex methods when simpler options might work.
+
+\subsection{The Theory-Practice Gap}
+
+As the theoretical level of adversarial ML research increased, worries grew about whether this work addressed actual security needs in the real world. Kumar et al.~\citep{kumar2020adversarial} interviewed practitioners from 28 organizations, discovering that the industry lacked practical tools for dealing with adversarial ML threats. Grosse et al.~\citep{grosse2024practical} surveyed 271 industrial practitioners, revealing that while academic threat models were theoretically valid, research often overestimated what attackers could do, especially regarding access to training data and query limits.
+
+Mink et al.~\citep{mink2023barriers} identified organizational barriers to deploying defenses through interviews with ML practitioners. These barriers included a lack of motivation from institutions, difficulty assessing AML risk, and competing business priorities. Practitioners often saw security as outside their expertise, revealing mismatches between job definitions in ML and security duties.
+
+Apruzzese et al.~\citep{apruzzese2022real} crystallized these issues through real-world case studies showing that actual ML system breaches often involved simple tactics rather than complex gradient-based attacks: input manipulation without gradients, exploiting system weaknesses instead of model-specific faults, operational gaps, and social engineering. This historical trend encourages a systematic analysis of recent publications to see if current research is addressing the theory-practice gap or continuing past patterns.
 
 \subsection{Types of Adversarial Attacks}
 
 Adversarial attacks generally fall into three categories based on their goals:
 
-\textbf{Evasion attacks} manipulate inputs at test time to cause misclassification. The attacker modifies an input (an image, a malware sample, a network packet) so that the model makes an incorrect prediction. These attacks target the inference phase and are the most commonly studied.
+\textbf{Evasion attacks} manipulate inputs during inference to cause misclassification. The attacker changes an input---such as an image, malware sample, or network packet---so that the model gives an incorrect prediction. These attacks focus on the inference phase and represent the most studied threat type.
 
-\textbf{Poisoning attacks} corrupt the training process itself. By injecting malicious examples into training data, attackers can cause models to learn incorrect behaviors or implant ``backdoors'': hidden triggers that cause specific misbehaviors when activated. For example, a poisoned model might correctly classify most images but consistently misclassify any image containing a specific pattern.
+\textbf{Poisoning attacks} corrupt the training process. By adding malicious examples to training data, attackers can lead models to learn wrong behaviors or establish backdoors---hidden triggers that cause specific failures when activated. A compromised model might classify most inputs correctly but struggle with ones containing a particular pattern.
 
-\textbf{Privacy attacks} extract sensitive information. Membership inference attacks determine whether specific individuals were in the training data. Model extraction attacks steal the model's functionality by querying it repeatedly. Data reconstruction attacks attempt to recover actual training examples.
+\textbf{Privacy attacks} extract sensitive information. Membership inference attacks find out if specific persons were included in the training data. Model extraction attacks aim to replicate model functions through repeated queries. Data reconstruction attacks try to retrieve actual training examples.
 
-\subsection{Threat Models: What Does the Attacker Know?}
+\subsection{Threat Models and Their Implications}
 
-A ``threat model'' specifies what capabilities and knowledge an adversary possesses. This is where academic research most dramatically diverges from reality.
+A threat model outlines what an adversary can do and what they know. This aspect is a major area where academic research diverges from real-world usage.
 
-\textbf{White-box access} means the attacker has complete knowledge of the model: its architecture, its parameters (weights), and often its training data. With white-box access, attackers can compute gradients, the mathematical derivatives that indicate exactly how to modify an input to change the model's output. Most academic attacks assume white-box access because it makes attack optimization straightforward.
+\textbf{White-box access} suggests the attacker knows everything about the model: its architecture, parameters (weights), and possibly its training data. With white-box access, attackers can compute gradients---the mathematical changes needed to alter inputs and impact model outputs. Many academic attacks assume white-box access because it simplifies the process of optimizing attacks.
 
-\textbf{Black-box access} means the attacker can only query the model and observe its outputs. This mirrors real-world scenarios where models are deployed as web services or embedded in applications. The attacker cannot see inside the model; they can only submit inputs and receive predictions.
+\textbf{Black-box access} means the attacker can only query the model and observe outputs. This situation is closer to real-world uses where models operate as web services or are embedded in applications. The attacker cannot see internal model details; they can only submit inputs and get predictions.
 
-\textbf{Gray-box access} falls between these extremes. The attacker might know the model architecture but not its specific parameters, or might have access to a similar training dataset.
+\textbf{Gray-box access} represents middle-ground scenarios. The attacker might know the model architecture but not the specific parameters or might have access to a similar training dataset.
 
-Apruzzese et al. emphasize that \textbf{real-world attackers almost never have white-box access}~\citep{apruzzese2022real}. Production models are protected by security controls. Yet 63.2\% of papers in our dataset assume white-box access, which differs from many deployment scenarios.
-
-\subsection{Why the Gap Matters}
-
-One might argue that academic research should push boundaries, studying worst-case scenarios even if they seem impractical. There is merit to this view because understanding what is theoretically possible helps us prepare for future threats. However, the current state of the field often centers on assumptions that are harder to apply in deployment.
-
-When 94.7\% of papers never test on real systems, it is difficult to know whether proposed attacks work in practice or whether proposed defenses protect deployed applications. When attacks require thousands of queries to a model, but real systems have rate limiting and anomaly detection, the attacks may be impractical. When defenses impose 10 to 100$\times$ computational overhead, production deployment becomes unlikely.
-
-The result is a research field that sometimes loops within the literature: papers cite other papers, attacks beat defenses that were not deployed, and defenses are evaluated against attacks that may not appear in practice. Meanwhile, deployed ML systems may face threats that receive less attention.
+Apruzzese et al. stress that real-world attackers rarely have white-box access~\citep{apruzzese2022real}. Production models usually have security measures in place. Yet, as our analysis shows, 63.2\% of papers in our dataset assume white-box access, which may not reflect what actually happens in deployment.
 
 %==============================================================================
 % 3. METHODOLOGY
@@ -206,7 +216,7 @@ The result is a research field that sometimes loops within the literature: paper
 
 \subsection{Data Collection}
 
-We systematically reviewed all papers with adversarial ML focus published at four top-tier security venues from 2022 through 2025. These venues were selected because they represent the primary publication outlets for security-focused ML research and have historically shaped the field's direction.
+We systematically reviewed all papers with adversarial ML focus published at four top-tier security venues from 2022 through 2025. These venues were selected because they represent primary publication outlets for security-focused ML research and have historically shaped the field's direction.
 
 \begin{figure}[H]
     \centering
@@ -215,7 +225,7 @@ We systematically reviewed all papers with adversarial ML focus published at fou
     \label{fig:dataset}
 \end{figure}
 
-Our dataset comprises 454 papers: ACM CCS contributed 118 papers (26.0\%), IEEE S\&P contributed 79 papers (17.4\%), NDSS contributed 49 papers (10.8\%), and USENIX Security contributed 208 papers (45.8\%). The temporal distribution shows 89 papers from 2022, 136 from 2023, 198 from 2024, and 31 from 2025 (partial year at time of analysis).
+Our dataset comprises 454 papers: ACM CCS contributed 118 papers (26.0\%), IEEE S\&P contributed 79 papers (17.4\%), NDSS contributed 49 papers (10.8\%), and USENIX Security contributed 208 papers (45.8\%). The temporal distribution includes 89 papers from 2022, 136 from 2023, 198 from 2024, and 31 from 2025 (partial year at time of analysis).
 
 \subsection{Coding Framework}
 
@@ -234,37 +244,36 @@ Each paper was evaluated across multiple dimensions designed to capture practica
 
 \subsection{Gap Score Framework}
 
-To quantify the theory-practice gap, we developed a 6-point ``Gap Score'' summing binary indicators of impractical assumptions:
+To quantify the theory-practice gap, we developed a 6-point ``Gap Score'' summing binary indicators of assumptions that may limit practical applicability:
 
 \begin{enumerate}[noitemsep]
     \item Requires white-box access (vs. black/gray-box)
     \item Requires gradient computation
     \item Assumes high query budget ($>$1000 queries)
-    \item Requires high computation (GPU-level resources)
-    \item No testing on real deployed systems
+    \item Requires substantial computation (GPU-level resources)
+    \item No testing on deployed systems
     \item No consideration of economic factors
 \end{enumerate}
 
-Higher scores indicate greater distance from practical deployment. A paper scoring 0 would use realistic threat models, require minimal resources, test on production systems, and consider economic constraints. A paper scoring 6 would represent a purely academic exercise unlikely to inform real-world security.
+Higher scores indicate greater distance from practical deployment considerations. A paper scoring 0 would employ realistic threat models, require minimal resources, validate on production systems, and consider economic constraints. A paper scoring 6 would represent a primarily theoretical contribution with limited immediate applicability to deployed systems.
 
 %==============================================================================
 % 4. QUANTITATIVE FINDINGS
 %==============================================================================
-\section{Quantitative Findings: The State of the Gap}
+\section{Quantitative Findings}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{fig02_theory_practice_gap.png}
-    \caption{Overview of the theory-practice gap showing the percentage of papers exhibiting each assumption: no real-world testing (94.7\%), high query budget (80.4\%), gradient dependency (67.8\%), white-box access (63.2\%), and no code release (10.4\%).}
+    \caption{Overview of the theory-practice gap showing the percentage of papers exhibiting each characteristic: no real-world testing (94.7\%), high query budget (80.4\%), gradient dependency (67.8\%), white-box access (63.2\%), and no code release (10.4\%).}
     \label{fig:gap_overview}
 \end{figure}
 
+Our analysis identifies several areas where research practices diverge from deployment realities. Figure~\ref{fig:gap_overview} summarizes the key indicators across all 454 papers.
 
-Our analysis shows areas where research practices differ from deployment realities. Figure~\ref{fig:gap_overview} summarizes the key gap indicators across all 454 papers.
+\subsection{Real-World Validation}
 
-\subsection{The Real-World Testing Crisis}
-
-The single most striking finding is the near-complete absence of real-world validation: \textbf{only 5.3\% of papers (24 of 454) test on actual deployed systems}. The remaining 94.7\% evaluate exclusively on research benchmarks, simulated environments, or research prototypes.
+The most pronounced finding concerns real-world validation: \textbf{only 5.3\% of papers (24 of 454) evaluate on actual deployed systems}. The remaining 94.7\% validate exclusively on research benchmarks, simulated environments, or research prototypes.
 
 \begin{figure}[H]
     \centering
@@ -273,253 +282,246 @@ The single most striking finding is the near-complete absence of real-world vali
     \label{fig:real_world}
 \end{figure}
 
+This pattern has implications because deployment introduces constraints absent from controlled experiments. Production systems employ proprietary model formats and encryption. They integrate ML components into complex security pipelines where multiple components interact. They face hardware constraints, latency requirements, and regulatory compliance obligations. Research validated only in laboratory settings may require substantial adaptation for deployment.
 
-This matters because deployment introduces constraints completely absent from controlled experiments. Real systems use proprietary model formats and encryption. They integrate ML components into complex security pipelines where multiple components interact. They face hardware constraints, latency requirements, and regulatory compliance obligations. A defense that works perfectly in a research setting may be entirely impractical when these factors are considered.
+The few papers that do validate on real systems often reveal differences between laboratory and field performance. Nayan et al.~\citep{nayan2024sok} conducted a systematic review of on-device ML model extraction attacks, finding that many proposed academic attacks proved difficult to reproduce, performed less effectively on production models, or introduced unacceptable computational and energy costs. Similarly, Layton et al.~\citep{layton2024sok} demonstrated that deepfake detection research employs metrics and dataset distributions that may lead to overestimation of detector efficacy.
 
-Research from USENIX Security particularly highlights this disconnect. \citet{nayan2024sok} conducted a systematic review of on-device ML model extraction attacks, finding that many proposed academic attacks ``prove difficult to reproduce, fail to perform effectively on production models, or introduce unacceptable computation and energy costs.'' Similarly, \citet{layton2024sok} demonstrated that deepfake detection research uses inappropriate metrics and unrealistic dataset distributions, leading to ``overestimation of detector efficacy and creating difficulties for transitioning these tools into practice.''
+Duan et al.~\citep{duan2022perception} validated perception-aware attacks against YouTube's copyright detection system, representing one of the rare examples of testing against commercial infrastructure. Their work demonstrated that attacks optimized in simulation required adaptation to succeed in practice.
 
-The few papers that do test on real systems often reveal surprising gaps between laboratory and field performance. \citet{duan2022perception} validated perception-aware attacks against YouTube's copyright detection system, one of the rare examples of testing against actual commercial infrastructure. Their work demonstrated that attacks optimized in simulation required significant adaptation to succeed in practice.
+\subsection{Gradient Dependency}
 
-\subsection{The Gradient Dependency Problem}
-
-Apruzzese et al.'s critique centered on the observation that ``real attackers don't compute gradients.'' Our analysis confirms this concern persists: \textbf{67.8\% of papers require gradient access}, despite this capability being unavailable against most production systems.
+Apruzzese et al.'s critique centered on the observation that ``real attackers don't compute gradients.'' Our analysis indicates this pattern persists: \textbf{67.8\% of papers require gradient access}, despite this capability being unavailable against most production systems.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{fig04_gradient_dependency.png}
-    \caption{Gradient dependency analysis showing no meaningful improvement over time (68.2\% in 2022 to 65.9\% in 2025) and variation by attack type.}
+    \caption{Gradient dependency analysis showing limited change over time (68.2\% in 2022 to 65.9\% in 2025) and variation by attack type.}
     \label{fig:gradient}
 \end{figure}
 
-Perhaps more concerning, temporal analysis reveals no meaningful improvement. Gradient dependency has remained essentially flat: 68.2\% in 2022, 69.1\% in 2023, 66.8\% in 2024, and 65.9\% in 2025. The research community has not shifted toward gradient-free approaches despite explicit calls to do so.
+Temporal analysis reveals limited change in this dimension. Gradient dependency has remained relatively stable: 68.2\% in 2022, 69.1\% in 2023, 66.8\% in 2024, and 65.9\% in 2025. While individual papers have explored gradient-free approaches, the overall distribution has not shifted substantially.
 
-USENIX research has pioneered gradient-free approaches in specific domains. The Universal Robustness Evaluation Toolkit (URET) from \citet{eykholt2023uret} addresses this gap by ``formulating adversarial generation as a graph exploration problem, seeking sequences of domain-specific, functionality-preserving transformations rather than relying on differentiable feature spaces.'' This framework enables studying systems utilizing inputs like malware binaries or tabular data ``where semantic and functional correctness must be maintained during perturbation.''
+Some research has pioneered gradient-free methods in specific domains. The Universal Robustness Evaluation Toolkit (URET) from Eykholt et al.~\citep{eykholt2023uret} formulates adversarial generation as a graph exploration problem, seeking sequences of domain-specific, functionality-preserving transformations rather than relying on differentiable feature spaces. This framework enables evaluation of systems processing inputs like malware binaries or tabular data where semantic and functional correctness must be maintained during perturbation.
 
-Similarly, practical LLM jailbreak attacks demonstrate that effective attacks need not be gradient-based. \citet{liu2024jailbreaking} and \citet{yu2024jailbreak} showed that jailbreaking large language models ``can be highly effective even when executed by inexperienced users via strategically crafted natural language prompts, emphasizing the potency of low-cost, accessible black-box attacks over complex gradient optimization.''
+Similarly, practical LLM jailbreak attacks demonstrate that effective attacks need not be gradient-based. Liu et al.~\citep{liu2024jailbreaking} and Yu et al.~\citep{yu2024jailbreak} showed that jailbreaking large language models can be effective even when executed via strategically crafted natural language prompts, illustrating the potential of accessible black-box attacks compared to complex gradient optimization.
 
-\subsection{Unrealistic Threat Model Assumptions}
+\subsection{Threat Model Assumptions}
 
-White-box access remains the dominant assumption: \textbf{63.2\% of papers assume adversaries have complete knowledge of model architecture and parameters}. Only 34.1\% consider black-box scenarios matching real deployment conditions, and a mere 2.6\% examine gray-box settings.
+White-box access remains the predominant assumption: \textbf{63.2\% of papers assume adversaries have complete knowledge of model architecture and parameters}. Only 34.1\% consider black-box scenarios more closely matching deployment conditions, and 2.6\% examine gray-box settings.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{fig03_threat_model.png}
-    \caption{Distribution of threat model assumptions across all papers, showing dominance of unrealistic white-box assumptions.}
+    \caption{Distribution of threat model assumptions across all papers, showing prevalence of white-box assumptions.}
     \label{fig:threat_model}
 \end{figure}
 
+This pattern contrasts with industrial practice. As Grosse et al.~\citep{grosse2024practical} document, academic studies often operate under assumptions of attacker access---such as extensive access to internal models, parameters, or training data---that do not reflect the security controls present in production environments.
 
-This assumption fundamentally contradicts industrial reality. As \citet{grosse2024practical} document in their USENIX paper on practical threat models, ``academic studies often operate under assumptions of overly generous attacker access, such as extensive access to internal models, parameters, or training data, that do not reflect the stringent security controls present in real-world corporate environments.''
-
-The foundational USENIX meta-analysis by \citet{arp2022dos} exposed these ``widespread methodological pitfalls in security research, including reliance on `lab-only evaluation' and deployment of `inappropriate threat models' that fail to account for adaptive adversaries.'' Three years later, the field has not substantively responded to this critique.
+The foundational meta-analysis by Arp et al.~\citep{arp2022dos} identified methodological patterns in security research, including reliance on laboratory-only evaluation and deployment of threat models that may not account for adaptive adversaries. Our analysis suggests these patterns persist in the 2022--2025 literature.
 
 \subsection{Query Budget Assumptions}
 
-Even papers claiming black-box threat models often make unrealistic assumptions about query access. \textbf{80.4\% of papers assume high query budgets ($>$1000 queries)}, which is impractical when commercial APIs implement rate limiting, repeated queries trigger fraud detection systems, and real-time constraints prevent iterative optimization.
+Even papers employing black-box threat models often assume substantial query access. \textbf{80.4\% of papers assume high query budgets ($>$1000 queries)}, which may be impractical when commercial APIs implement rate limiting, repeated queries trigger anomaly detection, and real-time constraints limit iterative optimization.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{fig06_query_budget.png}
-    \caption{Query budget assumptions showing 80.4\% of papers assume high query budgets that are impractical in real deployments.}
+    \caption{Query budget assumptions showing 80.4\% of papers assume high query budgets.}
     \label{fig:query}
 \end{figure}
 
+Some recent work has addressed query efficiency. HARDBEAT from Tao et al.~\citep{tao2023hardbeat} generates triggers requiring knowledge only of the final predicted label (hard-label) and minimal queries, addressing restrictions imposed by commercial services. BounceAttack from Wan et al.~\citep{wan2024bounceattack} demonstrates query-efficient decision-based attacks. However, these remain exceptions rather than the predominant approach.
 
-Some recent work has begun addressing query efficiency. HARDBEAT from \citet{tao2023hardbeat} generates ``high-success-rate triggers needing knowledge only of the final predicted label (hard-label) and minimal queries, addressing restrictions often imposed by proprietary commercial services.'' Similarly, BounceAttack from \citet{wan2024bounceattack} demonstrates query-efficient decision-based attacks. However, these remain exceptions rather than the norm.
+\subsection{Domain Distribution}
 
-\subsection{Domain Bias: The Image Obsession}
-
-Adversarial ML research exhibits severe domain bias: \textbf{65\% of papers focus exclusively on image data}. Text receives 11\% attention, audio 7\%, malware 6\%, with all other domains combined representing just 12\%.
+Adversarial ML research exhibits notable domain concentration: \textbf{65\% of papers focus exclusively on image data}. Text receives 11\% of attention, audio 7\%, malware 6\%, with all other domains combined representing 12\%.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{fig08_data_domains.png}
-    \caption{Data domain distribution revealing severe image-centric bias in adversarial ML research.}
+    \caption{Data domain distribution revealing concentration on image classification in adversarial ML research.}
     \label{fig:domains}
 \end{figure}
 
-This creates notable blind spots. Financial systems process tabular data where adversarial perturbations cannot be measured by pixel distances. As \citet{kireev2023cost} observe for fraud detection, ``the meaningful constraint is not visual imperceptibility but rather the quantifiable financial cost or utility an adversary must expend.'' $L_p$ norms are less informative for tabular financial data; what matters is whether fraudulent transactions remain economically viable.
+This concentration creates potential blind spots. Financial systems process tabular data where adversarial perturbations cannot be measured by pixel distances. As Kireev et al.~\citep{kireev2023cost} observe for fraud detection, the meaningful constraint is not visual imperceptibility but rather the quantifiable financial cost or utility an adversary must expend. $L_p$ norms may be less informative for tabular financial data; what matters is whether fraudulent transactions remain economically viable.
 
-\subsection{The Code Release Paradox}
+\subsection{Code Availability}
 
-One dimension shows positive results: \textbf{89.6\% of papers release their code}. This represents laudable commitment to reproducibility and significantly exceeds code release rates in many other fields.
+One dimension shows encouraging results: \textbf{89.6\% of papers release their code}. This represents substantial commitment to reproducibility and exceeds code release rates in many other fields.
 
-However, this creates a new problem: code designed for research datasets often cannot transfer to production environments without substantial re-engineering. High code release rates may create an illusion of deployability that does not survive contact with production constraints.
+However, this introduces a nuanced consideration: code designed for research datasets may not transfer directly to production environments without substantial re-engineering. High code release rates support reproducibility while not necessarily indicating deployment readiness.
 
 \subsection{Gap Score Distribution}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{fig12_gap_score.png}
-    \caption{Distribution of Gap Scores showing the typical paper (mean 3.17/6) makes roughly half of the measured impractical assumptions.}
+    \caption{Distribution of Gap Scores showing the typical paper (mean 3.17/6) incorporates roughly half of the measured assumptions.}
     \label{fig:gap_score}
 \end{figure}
 
+The mean Gap Score across all 454 papers is \textbf{3.17 out of 6}, indicating the typical paper incorporates approximately half of the assumptions we measured. The distribution peaks at scores of 3 to 4, with approximately 10.5\% of papers achieving scores of 0 to 1 that would indicate closer alignment with deployment considerations.
 
-The mean Gap Score across all 454 papers is \textbf{3.17 out of 6}, indicating the typical paper makes roughly half of the impractical assumptions we measured. The distribution peaks at scores of 3 to 4, with very few papers (approximately 10.5\%) achieving scores of 0 to 1 that would indicate deployment readiness.
-
-Conference-level analysis reveals minimal variation: ACM CCS averages 3.04, NDSS 3.12, IEEE S\&P 3.18, and USENIX 3.25. No venue has established itself as more practice-focused than others; the theory-practice gap is an endemic problem across the entire security research community.
+Conference-level analysis reveals similar patterns across venues: ACM CCS averages 3.04, NDSS 3.12, IEEE S\&P 3.18, and USENIX 3.25. No venue has established itself as substantially more practice-focused than others; the patterns we observe appear consistent across the security research community.
 
 %==============================================================================
 % 5. THEMATIC FINDINGS
 %==============================================================================
-\section{Thematic Findings: Understanding the Gap}
+\section{Thematic Findings}
 
-Beyond quantitative metrics, thematic analysis across venues reveals deeper structural problems in how adversarial ML research is conducted and evaluated.
+Beyond quantitative metrics, thematic analysis across venues reveals structural patterns in how adversarial ML research is conducted and evaluated.
 
 \subsection{The Utility-Robustness Trade-off}
 
-Perhaps the most significant barrier to deployment is the conflict between security guarantees and system performance. Research from USENIX Security (2022 to 2025) particularly illuminates this tension.
+A significant consideration for deployment is the relationship between security guarantees and system performance. Research from USENIX Security (2022--2025) particularly illuminates this tension.
 
-\citet{xiang2022patchcleanser} found that defensive proposals achieving certifiable robustness against adversarial patches frequently ``yielded poor clean classification accuracy, which inherently `discourages the real-world deployment' of these defenses.'' This pattern persisted through subsequent years. By 2024, \citet{xiang2024patchcure} documented that certifiably robust defenses in computer vision require ``10 to 100 times more inference-time computation than undefended models, rendering them computationally prohibitive for practical use.''
+Xiang et al.~\citep{xiang2022patchcleanser} found that defensive proposals achieving certifiable robustness against adversarial patches frequently yielded reduced clean classification accuracy, which may discourage real-world deployment. By 2024, Xiang et al.~\citep{xiang2024patchcure} documented that certifiably robust defenses in computer vision require 10 to 100 times more inference-time computation than undefended models, presenting computational challenges for practical deployment.
 
-The problem extends beyond vision systems. \citet{ahmed2022keyword} found that defenses against malicious activations in voice assistants ``typically harm the natural accuracy, an unacceptable proposition for commercial systems.'' Similarly, widely used privacy-preserving techniques like DP-SGD ``compromise model utility significantly to achieve privacy guarantees''~\citep{liu2022mldoctor, tang2022membership}.
+This pattern extends beyond vision systems. Ahmed et al.~\citep{ahmed2022keyword} found that defenses against malicious activations in voice assistants typically affect natural accuracy. Similarly, widely used privacy-preserving techniques like DP-SGD may compromise model utility to achieve privacy guarantees~\citep{liu2022mldoctor, tang2022membership}.
 
-Some recent work shows promise in resolving this fundamental conflict. PatchCleanser introduced a double-masking approach compatible with any image classifier, achieving high certified robustness while preserving state-of-the-art clean accuracy~\citep{xiang2022patchcleanser}. MIST offers a pathway toward robust security without performance penalties by strategically limiting overfitting only to the most membership-vulnerable training instances~\citep{li2024mist}. CAMP training demonstrated that provable adversarial robustness in deep reinforcement learning need not sacrifice certified expected return, which is crucial for safety-critical robotics applications~\citep{wang2025camp}.
+Some recent work demonstrates progress in addressing this trade-off. PatchCleanser introduced a double-masking approach compatible with any image classifier, achieving high certified robustness while preserving state-of-the-art clean accuracy~\citep{xiang2022patchcleanser}. MIST offers a pathway toward robust security by strategically limiting overfitting only to the most membership-vulnerable training instances~\citep{li2024mist}. CAMP training demonstrated that provable adversarial robustness in deep reinforcement learning need not sacrifice certified expected return, which may be valuable for safety-critical robotics applications~\citep{wang2025camp}.
 
-\subsection{Inappropriate Evaluation Metrics}
+\subsection{Evaluation Methodology}
 
-Research across venues reveals systematic problems with how attacks and defenses are evaluated.
+Research across venues reveals considerations regarding how attacks and defenses are evaluated.
 
-\subsubsection{The $L_p$ Norm Problem}
+\subsubsection{Distance Metrics}
 
-Standard evaluation measures adversarial perturbation size using $L_p$ norms, mathematical measures of distance between original and perturbed inputs. However, as \citet{carlini2022membership} document, ``conventional distance metrics like $L_p$ norms, which measure pixel-level differences, do not reliably predict whether humans perceive adversarial perturbations as anomalous.''
+Standard evaluation measures adversarial perturbation size using $L_p$ norms---mathematical measures of distance between original and perturbed inputs. However, as Carlini et al.~\citep{carlini2022membership} document, conventional distance metrics like $L_p$ norms, which measure pixel-level differences, do not reliably predict whether humans perceive adversarial perturbations.
 
-This disconnect was empirically demonstrated by the Avara framework~\citep{ma2024avara}, which used VR environments and eye-tracking to study whether drivers notice adversarial traffic signs. They found that $L_p$ norms ``fail to predict'' whether human drivers notice adversarial perturbations: ``An attack deemed `imperceptible' by mathematical standards may be immediately obvious to a driver,'' while attacks violating $L_p$ constraints might go unnoticed in realistic driving conditions.
+This consideration was empirically examined by the Avara framework~\citep{ma2024avara}, which used VR environments and eye-tracking to study whether drivers notice adversarial traffic signs. They found that $L_p$ norms do not reliably predict whether human drivers notice adversarial perturbations: attacks deemed ``imperceptible'' by mathematical standards may be immediately obvious to a driver, while attacks violating $L_p$ constraints might go unnoticed in realistic driving conditions.
 
-\subsubsection{Average-Case vs. Worst-Case Privacy}
+\subsubsection{Privacy Evaluation}
 
-Privacy attacks are evaluated using fundamentally inappropriate metrics. \citet{carlini2022membership} observe that ``privacy is fundamentally a worst-case concern: a defense succeeds only if it protects all individuals, not just the majority.'' Yet membership inference attacks are typically evaluated using average-case metrics (overall accuracy, AUC) that mask severe privacy leakage for specific individuals.
+Privacy attacks present particular evaluation challenges. Carlini et al.~\citep{carlini2022membership} observe that privacy is fundamentally a worst-case concern: a defense succeeds only if it protects all individuals, not just the majority. Yet membership inference attacks are typically evaluated using average-case metrics (overall accuracy, AUC) that may mask severe privacy leakage for specific individuals.
 
-\subsection{Physical Deployment Constraints}
+\subsection{Physical Deployment Considerations}
 
-A fundamental limitation of conventional AML research lies in its focus on digital adversarial examples that fail to account for the complex physical conditions governing real-world perception systems.
+A consideration for conventional AML research concerns the gap between digital adversarial examples and the complex physical conditions governing real-world perception systems.
 
-\subsubsection{From Digital to Physical Attacks}
+\subsubsection{Physical Attack Challenges}
 
-Digital perturbations optimized in simulation frequently fail when deployed physically due to environmental factors: distance and viewing angle variations, illumination changes, sensor noise, and compression artifacts. NDSS research has particularly emphasized this gap.
+Digital perturbations optimized in simulation may perform differently when deployed physically due to environmental factors: distance and viewing angle variations, illumination changes, sensor noise, and compression artifacts. NDSS research has particularly emphasized this consideration.
 
-\citet{jia2022physical} developed robust physical adversarial example pipelines tested extensively against production autonomous vehicles running YOLO v5 traffic sign recognition. Their work required accounting for real-road conditions that simulation ignores.
+Jia et al.~\citep{jia2022physical} developed robust physical adversarial example pipelines tested against production autonomous vehicles running YOLO v5 traffic sign recognition. Their work required accounting for real-road conditions that simulation may not capture.
 
-Physical attack research at USENIX has expanded beyond vision systems. \citet{liu2023xadv} designed physically realizable 3D adversarial objects capable of deceiving X-ray prohibited item detection, requiring optimization for shape rather than color or texture and accounting for complex object overlap in luggage. \citet{cao2023lidar} demonstrated Physical Removal Attacks using focused laser spoofing to selectively remove LiDAR point cloud data on autonomous vehicles. The ``Tubes Among Us'' research~\citep{ahmed2023tubes} demonstrated analog adversarial attacks where human adversaries manipulate voice signals using simple tubes to bypass speaker recognition, effectively bypassing established digital artifact detection methods.
+Physical attack research at USENIX has expanded beyond vision systems. Liu et al.~\citep{liu2023xadv} designed physically realizable 3D adversarial objects capable of deceiving X-ray prohibited item detection, requiring optimization for shape rather than color or texture and accounting for complex object overlap in luggage. Cao et al.~\citep{cao2023lidar} demonstrated Physical Removal Attacks using focused laser spoofing to selectively remove LiDAR point cloud data on autonomous vehicles. The ``Tubes Among Us'' research~\citep{ahmed2023tubes} demonstrated analog adversarial attacks where adversaries manipulate voice signals using simple tubes to bypass speaker recognition, effectively bypassing established digital artifact detection methods.
 
-By 2025, physical attack research embraced increasingly practical scenarios. ``Shadow Hack''~\citep{kobayashi2025shadow} exploits LiDAR weaknesses using ordinary non-reflective materials placed on roads, requiring no specialized equipment. ATKSCOPES~\citep{zhang2025atkscopes} demonstrates rapid evasion against real-world perceptual hashing algorithms by dynamically adapting to victim systems.
+By 2025, physical attack research has embraced increasingly practical scenarios. ``Shadow Hack''~\citep{kobayashi2025shadow} exploits LiDAR weaknesses using ordinary non-reflective materials placed on roads, requiring no specialized equipment. ATKSCOPES~\citep{zhang2025atkscopes} demonstrates rapid evasion against real-world perceptual hashing algorithms by dynamically adapting to victim systems.
 
-\subsubsection{System Integration Vulnerabilities}
+\subsubsection{System Integration}
 
-Research increasingly recognizes that integrating ML models into complex systems introduces vulnerabilities that isolated model analysis misses. \citet{debenedetti2024privacy} reveal that system-level components such as training data filters or output monitoring ``introduce critical privacy side channels easily exploitable by adaptive adversaries, often invalidating provable differential privacy guarantees.''
+Research increasingly recognizes that integrating ML models into complex systems introduces considerations that isolated model analysis may miss. Debenedetti et al.~\citep{debenedetti2024privacy} reveal that system-level components such as training data filters or output monitoring may introduce privacy side channels exploitable by adaptive adversaries, potentially affecting provable differential privacy guarantees.
 
-\citet{nasr2025magika} demonstrated this through the ``weakest-link'' problem: exploiting Google's Magika file-type classifier compromises Gmail's entire malware detection pipeline, even if other components are robust. A single non-robust component can compromise an entire security pipeline.
+Nasr et al.~\citep{nasr2025magika} demonstrated this through examining how exploiting Google's Magika file-type classifier affects Gmail's malware detection pipeline---a single non-robust component can affect an entire security pipeline.
 
-Models trained in high-level frameworks are compiled into optimized executables for deployment, but as \citet{chen2023obsan} document, ``security mechanisms integrated solely at the framework level fail once models are compiled.'' Defenses must be embedded within the DL compiler pipeline to persist through deployment, a requirement absent from most academic work.
+Chen et al.~\citep{chen2023obsan} document that security mechanisms integrated solely at the framework level may not persist once models are compiled into optimized executables for deployment. Defenses may need to be embedded within the DL compiler pipeline to persist through deployment, a requirement often absent from academic work.
 
-\subsection{Attack Evolution Toward Practicality}
+\subsection{Attack Evolution}
 
-Despite methodological concerns about unrealistic assumptions, research has progressively shifted toward practical attack vectors.
+Despite methodological considerations about assumptions, research has progressively explored more practical attack vectors.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{fig07_attack_types.png}
-    \caption{Attack type distribution showing evasion attacks (48\%) dominate, with trends over time.}
+    \caption{Attack type distribution showing evasion attacks (48\%) predominate, with trends over time.}
     \label{fig:attack_types}
 \end{figure}
 
-
 Early practical attacks (2022) demonstrated physically realizable approaches like the ``frustum attack,'' which leverages environmental context to compromise automotive sensor fusion in black-box settings~\citep{hallyburton2022frustum}.
 
-By 2023 to 2024, attacks increasingly capitalized on simplicity and accessibility. The effectiveness of jailbreaking LLMs through natural language prompts, even by inexperienced users, emphasized the potency of low-cost black-box attacks over complex gradient optimization.
+By 2023--2024, attacks increasingly emphasized simplicity and accessibility. The effectiveness of jailbreaking LLMs through natural language prompts, even by users without ML expertise, illustrated the potential of accessible black-box attacks compared to complex gradient optimization.
 
-The 2025 landscape shows attacks prioritizing stealth and persistence. MergeBackdoor~\citep{wang2025mergebackdoor} reveals supply chain threats where seemingly benign upstream models pass security checks but activate malicious backdoors upon merging with other components. Persistent backdoor strategies from \citet{guo2025persistent} target stable neuronal components, ensuring exploits survive continuous parameter updates in continual learning systems.
+The 2025 landscape shows attacks prioritizing stealth and persistence. MergeBackdoor~\citep{wang2025mergebackdoor} reveals supply chain considerations where seemingly benign upstream models pass security checks but activate malicious backdoors upon merging with other components. Guo et al.~\citep{guo2025persistent} describe persistent backdoor strategies targeting stable neuronal components, ensuring exploits survive continuous parameter updates in continual learning systems.
 
-\subsection{Defense Evolution Toward Specialization}
+\subsection{Defense Evolution}
 
 Defensive research has evolved from generic solutions toward specialized, interpretable, and context-aware mechanisms.
 
-Blacklight~\citep{li2022blacklight} successfully detected and mitigated nearly all black-box query-based attacks against MLaaS by leveraging the fact that iterative optimization inevitably produces highly similar queries, providing effective defense against persistent attackers that bypass account-based security measures.
+Blacklight~\citep{li2022blacklight} detected and mitigated black-box query-based attacks against MLaaS by leveraging the observation that iterative optimization produces highly similar queries, providing defense against persistent attackers that bypass account-based security measures.
 
-Recent defenses demonstrate increased sophistication. JBShield~\citep{zhang2025jbshield} moves beyond heuristics for LLM protection by using the Linear Representation Hypothesis to identify and manipulate ``toxic'' and ``jailbreak'' concepts within hidden states. SafeSpeech~\citep{zhang2025safespeech} proactively poisons voice data during training to make synthesized audio unusable, achieving robustness surpassing inference-only defenses against voice cloning. DeBackdoor~\citep{popovic2025debackdoor} addresses realistic deployment constraints by providing backdoor detection effective under black-box access, data scarcity, and pre-deployment inspection limitations.
+Recent defenses demonstrate increased sophistication. JBShield~\citep{zhang2025jbshield} moves beyond heuristics for LLM protection by using the Linear Representation Hypothesis to identify and manipulate ``toxic'' and ``jailbreak'' concepts within hidden states. SafeSpeech~\citep{zhang2025safespeech} proactively affects voice data during training to make synthesized audio less usable, achieving robustness against voice cloning. DeBackdoor~\citep{popovic2025debackdoor} addresses deployment constraints by providing backdoor detection effective under black-box access, data scarcity, and pre-deployment inspection limitations.
 
-\subsection{Economic and Human Factor Blind Spots}
+\subsection{Economic and Organizational Factors}
 
-Academic research systematically ignores the economic and human dimensions of adversarial ML.
+Academic research has given limited attention to the economic and organizational dimensions of adversarial ML.
 
-\subsubsection{The Economics of Attacks}
+\subsubsection{Economic Considerations}
 
-ACM CCS research has highlighted how commercial ML services create powerful financial incentives for IP theft that render many protective mechanisms inadequate. \citet{cong2022sslguard} document that stealing pre-trained encoders costs far less than training from scratch. \citet{lu2024neural} show that Neural Dehydration can remove watermarks using less than 2\% of training data. The fundamental economic asymmetry, in which model extraction attacks cost orders of magnitude less than defenses or the assets they protect, remains largely unaddressed.
+ACM CCS research has highlighted how commercial ML services create incentives for IP theft that may affect protective mechanisms. Cong et al.~\citep{cong2022sslguard} document that extracting pre-trained encoders may cost substantially less than training from scratch. Lu et al.~\citep{lu2024neural} show that Neural Dehydration can remove watermarks using less than 2\% of training data. The economic asymmetry---where model extraction attacks may cost orders of magnitude less than defenses or the assets they protect---remains an area requiring additional attention.
 
-\subsubsection{Organizational Barriers}
+\subsubsection{Organizational Considerations}
 
-Beyond technical challenges, qualitative research reveals significant organizational barriers preventing industry adoption. \citet{mink2023barriers} found that ``machine learning practitioners often lack institutional motivation and usable resources to understand and mitigate adversarial threats, frequently assuming security and machine learning are entirely disconnected fields.''
+Beyond technical considerations, qualitative research reveals organizational factors affecting industry adoption. Mink et al.~\citep{mink2023barriers} found that ML practitioners often lack institutional motivation and resources to understand and mitigate adversarial threats, frequently viewing security and machine learning as disconnected fields.
 
-This organizational detachment results in low prioritization of adversarial evaluations before deployment and poor visibility into monitoring for active attacks. Defenses remain unimplemented due to ``isolation between ML and security teams or because competing business priorities outweigh the cost and time needed for robust implementation.''
+This organizational separation results in lower prioritization of adversarial evaluations before deployment and limited visibility into monitoring for active attacks. Defenses may remain unimplemented due to isolation between ML and security teams or because competing business priorities outweigh the cost and time needed for robust implementation.
 
 %==============================================================================
 % 6. TEMPORAL TRENDS
 %==============================================================================
-\section{Temporal Trends: Is the Gap Narrowing?}
+\section{Temporal Trends}
 
-A central question motivates this review: has the research community responded to calls for greater practical relevance? Our temporal analysis suggests the gap has not yet narrowed in a meaningful way.
+A central question motivates this review: has the research community responded to calls for greater practical relevance? Our temporal analysis provides insight into this question.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{fig11_yearly_trends.png}
-    \caption{Temporal trends showing the theory-practice gap has not narrowed from 2022 to 2025, with some metrics worsening.}
+    \caption{Temporal trends showing the theory-practice gap from 2022 to 2025, with limited change in key metrics.}
     \label{fig:trends}
 \end{figure}
 
+\subsection{Stable Patterns}
 
-\subsection{Metrics That Have Not Improved}
+\textbf{Real-world testing} remains at approximately 5\% across all years. Despite calls for deployment validation, the research community has not substantially shifted toward testing on production systems.
 
-\textbf{Real-world testing} remains at approximately 5\% across all years. Despite explicit calls for deployment validation, the research community has not shifted toward testing on production systems.
+\textbf{Gradient dependency} has remained relatively stable at 67--69\%. There has been limited movement toward gradient-free approaches at the aggregate level.
 
-\textbf{Gradient dependency} has remained essentially flat at 67 to 69\%. There has been no meaningful movement toward gradient-free approaches.
+\textbf{White-box assumptions} show no substantial reduction (63\% in 2025 vs. 64\% in 2022). Threat model distributions have remained consistent.
 
-\textbf{White-box assumptions} show no reduction (63\% in 2025 vs. 64\% in 2022). Threat model realism has not improved.
-
-\textbf{Domain bias} persists with image data dominating 65\% of papers throughout the study period.
+\textbf{Domain distribution} persists with image data representing 65\% of papers throughout the study period.
 
 \textbf{Economic analysis} remains below 11\% in all years.
 
-\subsection{Metrics Showing Marginal Improvement}
+\subsection{Areas of Modest Progress}
 
-Query efficiency shows modest progress, with high-budget assumptions declining from 80.4\% to approximately 76\% by 2025. Some researchers have begun developing query-efficient attacks, though these remain minority approaches.
+Query efficiency shows some progress, with high-budget assumptions declining from 80.4\% to approximately 76\% by 2025. Some researchers have developed query-efficient attacks, though these represent a minority of approaches.
 
-Zero-knowledge attacks have gained recognition, with growing acknowledgment that adversaries often lack full system knowledge. However, this has not translated into substantial shifts in threat modeling practices.
+Awareness of attacker knowledge limitations has increased, with growing acknowledgment that adversaries often lack full system knowledge. However, this awareness has not yet translated into substantial shifts in threat modeling practices.
 
-\subsection{Emerging Threat Categories}
+\subsection{Emerging Research Areas}
 
-The 2024 to 2025 period has seen rapid growth in LLM security research, introducing new challenges. Jailbreak attacks evolve faster than RLHF defenses can adapt~\citep{shen2024llm}. Prompt injection against commercial LLM services poses immediate practical threats. Adversarial training, the standard defense approach, remains computationally costly for broad deployment.
+The 2024--2025 period has seen growth in LLM security research, introducing new considerations. Jailbreak attacks evolve rapidly relative to RLHF defenses~\citep{shen2024llm}. Prompt injection against commercial LLM services poses practical concerns. Adversarial training, the standard defense approach, remains computationally intensive for broad deployment.
 
 %==============================================================================
 % 7. CROSS-VENUE ANALYSIS
 %==============================================================================
-\section{Cross-Venue Analysis: Conference-Specific Contributions}
+\section{Cross-Venue Analysis}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{fig10_conference_comparison.png}
-    \caption{Conference comparison heatmap showing all venues share similar gap patterns.}
+    \caption{Conference comparison heatmap showing similar patterns across all venues.}
     \label{fig:heatmap}
 \end{figure}
 
-
-While all venues share the fundamental theory-practice gap, each has developed distinctive emphases that collectively illuminate different facets of the problem.
+While all venues share similar theory-practice gap patterns, each has developed distinctive emphases that collectively illuminate different facets of the research landscape.
 
 \subsection{ACM CCS: Economics and System Integration}
 
-ACM CCS research uniquely emphasizes business logic, usability constraints, and intellectual property protection. Contributions include demonstrating how economic incentives fundamentally shape the threat landscape~\citep{cong2022sslguard, lu2024neural}, documenting the disconnect between mathematical metrics and human perception~\citep{ma2024avara}, analyzing system-level integration vulnerabilities~\citep{nasr2025magika}, and revealing architectural constraints in emerging deployment patterns.
+ACM CCS research uniquely emphasizes business logic, usability constraints, and intellectual property protection. Contributions include demonstrating how economic incentives shape the threat landscape~\citep{cong2022sslguard, lu2024neural}, documenting relationships between mathematical metrics and human perception~\citep{ma2024avara}, analyzing system-level integration considerations~\citep{nasr2025magika}, and examining architectural constraints in emerging deployment patterns.
 
 \subsection{IEEE S\&P: Efficiency and Formal Guarantees}
 
-IEEE S\&P research emphasizes computational efficiency, privacy-utility trade-offs, and certified scalability. The venue has advanced understanding of inappropriate threat modeling and resource assumptions~\citep{carlini2022membership}, documented accuracy-privacy trade-offs~\citep{rezaei2023accuracy}, and highlighted scalability challenges preventing certified robustness deployment~\citep{li2023sok}.
+IEEE S\&P research emphasizes computational efficiency, privacy-utility trade-offs, and certified scalability. The venue has advanced understanding of threat modeling considerations and resource assumptions~\citep{carlini2022membership}, documented accuracy-privacy trade-offs~\citep{rezaei2023accuracy}, and examined scalability considerations for certified robustness deployment~\citep{li2023sok}.
 
-\subsection{NDSS: Physemphasisesraints and Operational Realities}
+\subsection{NDSS: Physical Constraints and Operational Realities}
 
-NDSS research emphasizes system-level constraints, distributed training challengerigourd physical deployment realities. Contributions include documenting the gap betweanalysedal perturbations and physical deployment~\citep{jia2022physical}, developing appropriate metrics for non-image domains~\citep{kireev2023cost}, analyzing distributed training heterogeneity challenges~\citep{rieger2022deepsight}, and studying adversarial loops where defenses create exploitable side channels.
+NDSS research emphasizes system-level constraints, distributed training considerations, and physical deployment realities. Contributions include documenting gaps between digital perturbations and physical deployment~\citep{jia2022physical}, developing metrics for non-image domains~\citep{kireev2023cost}, analyzing distributed training heterogeneity~\citep{rieger2022deepsight}, and studying adversarial dynamics where defenses create exploitable side channels.
 
 \subsection{USENIX Security: Real-World Validation and Domain Diversity}
 
-USENIX Security research emphasizes testing on deployed systems and domain-specific constraints. The venue has documented tensions between theoretical rigor and deployment constraints~\citep{xiang2022patchcleanser, xiang2024patchcure}, analyzed trade-offs academia ignores (computational cost, regulatory compliance, usability)~\citep{ahmed2022keyword}, studied adversarial evolution when defenses meet adaptive attackers in production, and examined domain-specific requirements ignored by image-focused research~\citep{eykholt2023uret}.
+USENIX Security research emphasizes testing on deployed systems and domain-specific constraints. The venue has documented tensions between theoretical rigor and deployment constraints~\citep{xiang2022patchcleanser, xiang2024patchcure}, analyzed trade-offs involving computational cost, regulatory compliance, and usability~\citep{ahmed2022keyword}, studied adversarial dynamics when defenses encounter adaptive attackers in production, and examined domain-specific requirements~\citep{eykholt2023uret}.
 
 \subsection{Attack versus Defense Papers}
 
@@ -530,56 +532,56 @@ USENIX Security research emphasizes testing on deployed systems and domain-speci
     \label{fig:atk_def}
 \end{figure}
 
-Our analysis reveals that defense papers are slightly more practical than attack papers on average. Defense papers show 6\% real-system testing versus 5\% for attacks, 41\% gradient-free approaches versus 27\%, and 38\% black-box focus versus 31\%. However, both categories remain far from deployment readiness.
+Our analysis reveals that defense papers demonstrate somewhat higher alignment with practical considerations than attack papers on average. Defense papers show 6\% real-system testing versus 5\% for attacks, 41\% gradient-free approaches versus 27\%, and 38\% black-box focus versus 31\%. However, both categories remain distant from deployment-ready research.
 
 %==============================================================================
 % 8. RECOMMENDATIONS
 %==============================================================================
 \section{Recommendations}
 
-Bridging the theory-practice gap requires coordinated action across the research ecosystem.
+Bridging the theory-practice gap requires coordinated effort across the research ecosystem. We offer recommendations for multiple stakeholder groups.
 
 \subsection{For Researchers}
 
-\subsubsection{Immediate Actions}
+\subsubsection{Methodological Considerations}
 
-\textbf{Test on real systems.} Partner with industry to evaluate against production deployments. Even limited real-world testing reveals constraints invisible in laboratory settings.
+\textbf{Validate on real systems when feasible.} Partner with industry to evaluate against production deployments. Even limited real-world testing can reveal constraints not apparent in laboratory settings.
 
-\textbf{Adopt realistic threat models.} Default to black-box access. When white-box assumptions are necessary, justify them explicitly and acknowledge limitations.
+\textbf{Employ realistic threat models.} Consider black-box access as a default assumption. When white-box assumptions are necessary, justify them explicitly and acknowledge their implications.
 
-\textbf{Diversify domains.} Expand beyond image classification to tabular data, graphs, time-series, and multimodal systems where practical deployment is occurring.
+\textbf{Expand domain coverage.} Extend research beyond image classification to tabular data, graphs, time-series, and multimodal systems where practical deployment is occurring.
 
-\textbf{Analyze economics.} Quantify attack costs, defender resources, and ROI trade-offs. Security decisions are ultimately economic decisions.
+\textbf{Consider economic factors.} Analyze attack costs, defender resources, and return-on-investment trade-offs. Security decisions involve economic considerations.
 
-\textbf{Conduct human-in-the-loop evaluation.} Test perceptibility against actual humans rather than relying solely on mathematical metrics.
+\textbf{Include human evaluation.} Test perceptibility against actual humans rather than relying solely on mathematical metrics.
 
-\subsubsection{Methodological Improvements}
+\subsubsection{Evaluation Practices}
 
-Evaluate privacy using true-positive rate at low false-positive rates, not average accuracy or AUC. For non-image domains, define domain-appropriate perturbation constraints. Report query budgets realistically based on what commercial APIs actually allow. Measure computational requirements in practical units like wall-clock time and dollar cost.
+Evaluate privacy using true-positive rate at low false-positive rates, not only average accuracy or AUC. For non-image domains, define domain-appropriate perturbation constraints. Report query budgets realistically based on what commercial APIs actually permit. Measure computational requirements in practical units such as wall-clock time and computational cost.
 
 \subsection{For Venues and Program Committees}
 
-\textbf{Require real-world validation.} At minimum, require authors to justify why real-system testing is infeasible if omitted.
+\textbf{Encourage real-world validation.} At minimum, request authors to justify why real-system testing is infeasible if omitted.
 
-\textbf{Create artifact badges for deployability.} Recognize work tested on production systems with explicit recognition.
+\textbf{Consider artifact badges for deployability.} Recognize work tested on production systems with explicit acknowledgment.
 
-\textbf{Develop an adversarial realism checklist.} Require papers to explicitly address threat model realism, query budget constraints, gradient requirements, domain-appropriate metrics, economic considerations, and adaptive defense testing.
+\textbf{Develop evaluation guidelines.} Request papers to explicitly address threat model realism, query budget constraints, gradient requirements, domain-appropriate metrics, economic considerations, and adaptive adversary testing.
 
-\textbf{Encourage negative results.} Papers showing that attacks fail under realistic constraints provide valuable information that positive-result publication bias suppresses.
+\textbf{Value negative results.} Papers demonstrating that attacks fail under realistic constraints provide valuable information that positive-result publication preferences may suppress.
 
 \subsection{For Industry Practitioners}
 
-\textbf{Assume academic attacks overestimate threat severity.} Adjust risk assessments for deployment realities rather than accepting laboratory success rates.
+\textbf{Interpret academic results in deployment context.} Adjust risk assessments for deployment realities rather than accepting laboratory success rates directly.
 
-\textbf{Assume academic defenses underestimate deployment costs.} Budget for substantial re-engineering before research prototypes become production-ready.
+\textbf{Anticipate adaptation requirements.} Budget for re-engineering before research prototypes become production-ready.
 
-\textbf{Prioritize defenses against realistic threats:} black-box attacks rather than gradient-based ones, low query budget scenarios, economically motivated adversaries, and domain-specific constraints.
+\textbf{Prioritize defenses against realistic threats:} black-box attacks, low query budget scenarios, economically motivated adversaries, and domain-specific constraints.
 
-\textbf{Contribute data.} Anonymized logs of real attack attempts would ground academic research in deployment reality.
+\textbf{Consider contributing data.} Anonymized information about real attack attempts could help ground academic research in deployment reality.
 
 \subsection{For Funding Agencies}
 
-Fund industry-academic partnerships with required real-world validation components. Support long-term deployment studies rather than just paper publication. Incentivize replication studies that validate academic claims against production systems. Create red team / blue team competitions with realistic constraints.
+Support industry-academic partnerships with real-world validation components. Fund deployment studies rather than only paper publication. Incentivize replication studies that validate academic claims against production systems. Consider red team / blue team programs with realistic constraints.
 
 %==============================================================================
 % 9. LIMITATIONS
@@ -588,38 +590,36 @@ Fund industry-academic partnerships with required real-world validation componen
 
 \subsection{Scope Limitations}
 
-This review focuses on four security venues and may not capture patterns at ML conferences (NeurIPS, ICML, ICLR) where different norms may apply. Publication bias likely suppresses negative results; attacks that fail under realistic constraints or defenses that prove impractical are less likely to be published. Our 2022 to 2025 window may not capture longer-term trends.
+This review focuses on four security venues and may not capture patterns at ML conferences (NeurIPS, ICML, ICLR) where different norms may apply. Publication preferences may suppress negative results; attacks that fail under realistic constraints or defenses that prove impractical are less likely to be published. Our 2022--2025 window may not capture longer-term trends.
 
 \subsection{Coding Limitations}
 
-The Gap Score reduces complex trade-offs to binary decisions, potentially oversimplifying nuanced situations. Manual coding introduces subjectivity, particularly for papers straddling categories. The definition of ``real system testing'' may vary, since some papers test on emulated production environments that share some but not all deployment constraints.
+The Gap Score reduces complex trade-offs to binary decisions, potentially oversimplifying nuanced situations. Manual coding introduces subjectivity, particularly for papers spanning multiple categories. The definition of ``real system testing'' may vary; some papers test on emulated production environments that share some but not all deployment constraints.
 
 \subsection{Generalizability}
 
-Security venues may actually be more practice-focused than average computer science venues given their traditional emphasis on real-world threats. Our findings may therefore underestimate the theory-practice gap in the broader ML community.
+Security venues may actually be more practice-focused than typical computer science venues given their traditional emphasis on real-world threats. Our findings may therefore underestimate the theory-practice gap in the broader ML research community.
 
 %==============================================================================
 % 10. CONCLUSION
 %==============================================================================
 \section{Conclusion}
 
-Four years and 454 papers after ``Real Attackers Don't Compute Gradients,'' the adversarial machine learning research community has made insufficient progress toward practical relevance.
+This systematic review involving 454 research papers published from 2022--2025 at four prestigious security conferences bears evidence of some beneficial contributions by the research community of adversarial machine learning studies in spite of the theory-practice gap noticed by Apruzzese et al.
 
-The core problem is structural: academic research optimizes for publication metrics such as novelty, theoretical rigor, and impressive attack success rates rather than deployment viability. Incentive structures reward papers that advance the state of the art against previous papers rather than papers that translate to deployed defenses.
-
-The quantitative evidence is stark:
+The quantitative trends are striking:
 \begin{itemize}[noitemsep]
-    \item 94.7\% of papers never test on real systems
-    \item 67.8\% require gradients that real attackers lack
-    \item 80.4\% assume query budgets that real systems don't allow
-    \item 63.2\% assume white-box access that real deployments don't provide
+    \item 94.7\% of the papers don't test on real systems
+    \item 67.8\% need gradients which might not be accessible in real life
+    \item 80.4\% assume query budgets that could exceed deployment limits
+    \item 63.2\% assume white-box access that could not be provided in deployment situations
 \end{itemize}
 
-The qualitative evidence is equally concerning. $L_p$ norms don't predict human perception. Certified robustness doesn't scale to production models. Defenses ignore economic costs and usability constraints. Evaluation uses average-case metrics for worst-case properties.
+Thematic analysis shows other considerations emerging. $L_p$ norms may not model human perception well. Robustness may not generalize to production-quality settings. Defense systems do not necessarily take into consideration economic losses and use ease-of-use constraints. Assessment metrics are often averages for the worst-case scenario characteristics.
 
-The path forward requires structural changes. Venues must incentivize real-world validation. Researchers must default to realistic threat models. Industry must contribute deployment data. Funding must reward practical impact over novelty.
+Among the many contributions of the research community is the theoretical foundation and pioneering research in adversarial phenomena. However, to move forward, accomplishing the goal of closing the theory-practice gap will necessitate structural changes in conferences that reward verification of effectiveness in the real world, assumptions of reasonable threats in research, industry inputs of deployment results, and distribution of funding that emphasizes effectiveness along with innovation.
 
-The gap between theory and practice in adversarial ML is not narrowing organically. Only deliberate, community-wide effort involving changes to publication incentives, evaluation standards, and collaboration models can bridge it. The security of increasingly pervasive ML systems depends on the research community's willingness to prioritize practical impact over academic metrics.
+However, the efficacy of ever more widespread ML-dependent systems is contingent on the ongoing involvements of the community of ML researchers with both the theory and the practicalities. Our observations indicate that those practicalities can, through shifts within publishing, evaluation, and collaboration, help ensure that community-driven ML adversarial research and development work increasingly serves a practical, security context.
 
 %==============================================================================
 % REFERENCES
@@ -660,12 +660,12 @@ The dataset includes the following columns for each paper:
     \item T1 Threat model: White-box, Gray-box, Black-box.
     \item T2 Training data access: Full, Partial, None.
     \item Q1 Requires gradients: YES/NO.
-    \item Q2 Query budget: High (>1000), Low (<1000), None.
+    \item Q2 Query budget: High ($>$1000), Low ($<$1000), None.
     \item Q3 Computation: High (GPU), Low (CPU).
-    \item Traditional\_Score (Gap Score 0 to 6): sum of six impractical-assumption flags (higher = less practical).
+    \item Traditional\_Score (Gap Score 0--6): sum of six impractical-assumption flags (higher = less practical).
 \end{itemize}
 
-For full per-paper details (all 24 columns), please see the CSV file. Below is an ultra-compact, bordered summary table focused on the most critical taxonomy fields. Binary fields are rendered as checkmarks (yes) or blanks (no); threat/access levels are abbreviated (W/B/G/P, F/P, H/L).
+For full per-paper details (all 24 columns), please see the CSV file. Below is a compact, bordered summary table focused on the most critical taxonomy fields. Binary fields are rendered as checkmarks (yes) or blanks (no); threat/access levels are abbreviated (W/B/G/P, F/P, H/L).
 
 \begin{landscape}
 \begin{tiny}
