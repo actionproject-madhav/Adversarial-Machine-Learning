@@ -120,13 +120,7 @@
 % ABSTRACT
 %==============================================================================
 \begin{abstract}
-Machine learning systems are being used more often in security-critical applications, but there is still a significant gap between academic research in adversarial machine learning and the needs for real-world deployment. This systematic review looks at 454 papers published in four major security venues (ACM CCS, IEEE S\&P, NDSS, and USENIX Security) covering the years from 2022 to 2025. Using the analytical framework introduced by Apruzzese et al. in ``Real Attackers Don't Compute Gradients,'' we evaluate how current research addresses the divide between theory and practice.
-
-Our analysis shows that 94.7\% of the papers do not test on deployed systems, 67.8\% depend on gradient access that is rarely available in real situations, 80.4\% assume query budgets that go beyond typical operational limits, and 63.2\% use white-box threat models. We identify five areas that need more attention in relation to real-world deployment: specifying threat models, accessing gradients, validating on real systems, ensuring diversity beyond image classification, and considering economic and human factors. Our temporal analysis from 2022 to 2025 shows that progress in these areas is gradual rather than swift.
-
-In addition to our quantitative analysis, we examine real-world adversarial incidents—including
-
-We also examine how these gaps manifest in the emerging domain of large language models and multimodal foundation models. Despite operating in discrete token spaces with fundamentally different attack surfaces, these systems exhibit the same theory-practice disconnect: impractical gradient-based attacks, unrealistic query budgets, evaluation instability, and insufficient real-world validation. The systemic deployment of foundation models, where single systems serve numerous downstream applications, amplifies the practical importance of closing these gaps. We end with suggestions for researchers, venues, practitioners, and funding agencies to promote more effective adversarial machine learning research.
+Machine learning systems are increasingly used in security critical environments, yet research on adversarial machine learning often diverges from the needs of real deployments. This systematic review examines 454 papers published between 2022 and 2025 in four leading security venues (ACM CCS, IEEE S\&P, NDSS and USENIX Security) and applies the framework of Apruzzese et al. to assess how well current work addresses the gap between theory and practice. We find that most papers do not test their methods on deployed systems (94.7 per cent), rely on gradient access that is seldom available in practice (67.8 per cent), assume query budgets that exceed typical operational limits (80.4 per cent) and adopt white box threat models (63.2 per cent). Five critical dimensions—clear threat modelling, accounting for limited gradient access, validation on real systems, diversification beyond image classification and incorporation of economic and human factors—remain largely overlooked, and progress across these dimensions is slow. We also synthesise documented adversarial incidents where attackers exploited system integration, extracted training data, cloned proprietary models, poisoned generative model training data and used deepfake audio and video, and we discuss similar challenges in large language and multimodal models. We conclude by offering recommendations for researchers, conference organisers, industry practitioners and funding agencies to align adversarial machine learning research with operational realities.
 
 \textbf{Keywords:} adversarial machine learning, theory-practice gap, security research, systematic review, threat modeling
 \end{abstract}
@@ -710,17 +704,11 @@ Support industry-academic partnerships with real-world validation components. Fu
 %==============================================================================
 \section{Limitations and Threats to Validity}
 
-\subsection{Scope Limitations}
+This review has several limitations that warrant consideration. First, our analysis focuses exclusively on four security venues (ACM CCS, IEEE S\&P, NDSS, and USENIX Security) and may not reflect patterns at machine learning conferences such as NeurIPS, ICML, or ICLR, where different methodological norms and evaluation standards may apply. Second, publication bias may suppress negative results, meaning that attacks which fail under realistic constraints or defenses which prove impractical in deployment are less likely to be published, potentially skewing our view of the field's progress. Third, our temporal window from 2022 to 2025 may not capture longer-term trends or reflect the full impact of recent methodological shifts. 
 
-This review focuses on four security venues and may not capture patterns at ML conferences (NeurIPS, ICML, ICLR) where different norms may apply. Publication preferences may suppress negative results; attacks that fail under realistic constraints or defenses that prove impractical are less likely to be published. Our 2022--2025 window may not capture longer-term trends.
+Our quantitative framework, while systematic, introduces its own limitations. The Gap Score reduces complex trade-offs to binary indicators, potentially oversimplifying nuanced situations where papers exhibit partial alignment with practical considerations. Manual coding introduces subjectivity, particularly for papers that span multiple categories or employ hybrid approaches. Additionally, the definition of ``real system testing'' may vary across papers, with some testing on emulated production environments that share some but not all deployment constraints.
 
-\subsection{Coding Limitations}
-
-The Gap Score reduces complex trade-offs to binary decisions, potentially oversimplifying nuanced situations. Manual coding introduces subjectivity, particularly for papers spanning multiple categories. The definition of ``real system testing'' may vary; some papers test on emulated production environments that share some but not all deployment constraints.
-
-\subsection{Generalizability}
-
-Security venues may actually be more practice-focused than typical computer science venues given their traditional emphasis on real-world threats. Our findings may therefore underestimate the theory-practice gap in the broader ML research community.
+Finally, security venues may be more practice-focused than typical computer science venues given their traditional emphasis on real-world threats. If this is the case, our findings may underestimate the theory-practice gap in the broader machine learning research community, suggesting that the disconnect we document could be even more pronounced when considering adversarial ML research published outside security conferences.
 
 %==============================================================================
 % 11. CONCLUSION
