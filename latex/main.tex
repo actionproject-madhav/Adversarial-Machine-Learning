@@ -120,7 +120,7 @@
 % ABSTRACT
 %==============================================================================
 \begin{abstract}
-Machine learning systems are increasingly used in security critical environments, yet research on adversarial machine learning often diverges from the needs of real deployments. This systematic review examines 454 papers published between 2022 and 2025 in four leading security venues (ACM CCS, IEEE S\&P, NDSS and USENIX Security) and applies the framework of Apruzzese et al. to assess how well current work addresses the gap between theory and practice. We find that most papers do not test their methods on deployed systems (94.7 per cent), rely on gradient access that is seldom available in practice (67.8 per cent), assume query budgets that exceed typical operational limits (80.4 per cent) and adopt white box threat models (63.2 per cent). Five critical dimensions—clear threat modelling, accounting for limited gradient access, validation on real systems, diversification beyond image classification and incorporation of economic and human factors—remain largely overlooked, and progress across these dimensions is slow. We also synthesise documented adversarial incidents where attackers exploited system integration, extracted training data, cloned proprietary models, poisoned generative model training data and used deepfake audio and video, and we discuss similar challenges in large language and multimodal models. We conclude by offering recommendations for researchers, conference organisers, industry practitioners and funding agencies to align adversarial machine learning research with operational realities.
+Machine learning systems are increasingly used in security-critical contexts, yet research on adversarial machine learning often diverges from the needs of real deployments. This systematic review covers 454 papers published from 2022 to 2025 in four leading security conferences (ACM CCS, IEEE S\&P, NDSS, and USENIX Security) and applies the framework of Apruzzese et al. (2022) to evaluate how well current work bridges the gap between theory and practice. We find that only a small minority of papers test their methods on deployed systems (5.3\%), while the majority make assumptions that rarely hold in operational settings—for example, relying on access to model gradients (67.8\% of papers), allowing query budgets that far exceed realistic limits (80.4\%), or assuming a white-box threat model (63.2\%). We identify five critical dimensions that remain insufficiently addressed in the literature: clear threat modeling, accounting for limited attacker knowledge (no gradient access), validation on real systems, diversification beyond image classification, and consideration of economic and human factors. Progress in these areas has been limited. We also review real-world adversarial incidents in which attackers exploited system integration flaws, extracted or cloned model information, poisoned training data for generative models, and leveraged deepfake media, and we discuss parallel challenges in large language and multi-modal models. We conclude with recommendations for researchers, conference organizers, industry practitioners, and funding agencies to help align adversarial ML research with operational realities.
 
 \textbf{Keywords:} adversarial machine learning, theory-practice gap, security research, systematic review, threat modeling
 \end{abstract}
@@ -134,19 +134,19 @@ Machine learning systems are increasingly used in security critical environments
 %==============================================================================
 \section{Introduction}
 
-Machine learning has become an essential part of software systems in many areas. It is used in facial recognition at border crossings, fraud detection in financial services, navigation for autonomous vehicles, and content moderation on social platforms. Large language models now power customer service chatbots, code generation tools, and medical assistants. ML models now influence decisions that impact millions of people every day. This widespread use has led to greater scrutiny of vulnerabilities in these models. Researchers design specific inputs to trigger failures that system creators did not foresee.
+Machine learning has become an essential part of software systems in many areas. It is used in facial recognition at border crossings, fraud detection in financial services, navigation for autonomous vehicles, and content moderation on social platforms. Large language models now power customer service chatbots, code generation tools, and medical assistants. ML models influence decisions that impact millions of people every day. This widespread use has led to greater scrutiny of vulnerabilities in these models. Researchers have shown that even subtle, carefully crafted inputs can trigger failures in ML systems that were not anticipated by their designers.
 
-The field of adversarial machine learning (AML) has emerged to explore these weaknesses and develop defenses. Over the last ten years, researchers have shown how sophisticated attacks can work: small changes that lead to image misclassification, poisoned training data that creates hidden backdoors, and privacy attacks that reveal sensitive information through targeted queries. In response, the community has proposed many defenses to improve model strength.
+The field of adversarial machine learning (AML) has emerged to explore these weaknesses and develop defenses. Over the last ten years, researchers have demonstrated a range of attacks: imperceptible perturbations that cause image misclassification, poisoned training data that implants hidden backdoors, and privacy attacks that extract sensitive information through query access. In parallel, the community has proposed many defenses to strengthen models against such attacks.
 
-Despite these developments, a key question remains: \textbf{how well do the assumptions in academic research match the realities of real-world systems?}
+Despite these developments, a key question remains: \textbf{How well do the assumptions in academic research match the realities of real-world systems?}
 
-In 2022, Apruzzese and colleagues published a thorough analysis titled ``Real Attackers Don't Compute Gradients''~\citep{apruzzese2022real}. They documented a gap between academic AML research and practical security needs. Their main finding was that academic studies often assume attackers can calculate gradients from target models, which requires access to the model's structure and parameters. However, real-world attackers usually lack this access. Often, simpler methods like social engineering or basic input manipulation are sufficient, making complex approaches unnecessary for them.
+In 2022, Apruzzese and colleagues published a notable analysis titled “Real Attackers Don’t Compute Gradients”~\citep{apruzzese2022real}. They documented a gap between academic AML research and practical security needs. A central observation was that academic studies often assume attackers can calculate gradients of the target model—requiring full access to the model’s internals—whereas real-world attackers usually lack that level of access. Often, simpler methods like social engineering or basic input manipulation suffice for attackers, making complex gradient-based techniques unnecessary outside the lab.
 
-This systematic review asks: \textit{how has the research community responded since this critique?}
+This systematic review asks: \textit{How has the research community responded since this critique?}
 
-To find answers, we analyzed 454 adversarial ML papers published from 2022 to 2025 in four leading security venues: ACM CCS (118 papers), IEEE S\&P (79 papers), NDSS (49 papers), and USENIX Security (208 papers). We assessed each paper based on several factors related to practical relevance: realism of the threat model, computational needs, validation methods, and awareness of deployment challenges.
+To find answers, we analyzed 454 adversarial ML papers published from 2022 through 2025 in four top-tier security venues: ACM CCS (118 papers), IEEE S\&P (79 papers), NDSS (49 papers), and USENIX Security (208 papers). We evaluated each paper on factors related to practical relevance: the realism of its threat model, the computational and knowledge assumptions it makes about adversaries, its evaluation methodology, and its awareness of deployment challenges.
 
-Our findings show that the gap between theory and practice is still significant. While the research community has made valuable contributions to our understanding of adversarial issues, the drive to publish often emphasizes innovation and theoretical strength over practical implementation and cost considerations. This review outlines the current state of the field, identifies common trends across venues, and provides practical recommendations for various stakeholders.
+Our findings show that the gap between theory and practice is still significant. While the research community has made valuable contributions to our understanding of adversarial issues, many studies prioritize novel attacks and defenses under idealized conditions, often overlooking issues of practical implementation and cost. This review outlines the current state of the field, identifies common trends across venues, and provides practical recommendations for various stakeholders.
 
 %==============================================================================
 % 2. BACKGROUND
@@ -155,97 +155,87 @@ Our findings show that the gap between theory and practice is still significant.
 
 \subsection{The Discovery of Adversarial Vulnerabilities}
 
-The modern study of adversarial machine learning began with the important work of Szegedy et al.~\citep{szegedy2013intriguing}. They showed that small, barely noticeable changes to input data could lead state-of-the-art deep learning models to produce wrong outputs with high confidence. These changes were not just random mistakes; they were systematic vulnerabilities that could transfer between different models. Adversarial examples created for one model often worked against other models trained separately. This ability to transfer highlighted the nature of the vulnerability and sparked further research.
+The modern study of adversarial machine learning began with the influential work of Szegedy et al.~\citep{szegedy2013intriguing}. They showed that small, barely noticeable changes to input data could lead state-of-the-art deep learning models to produce incorrect outputs with high confidence. These were not random errors but systematic vulnerabilities: adversarial examples crafted for one model often transferred to other models trained independently. This transferability highlighted a fundamental blind spot in how models generalize and sparked widespread interest in adversarial phenomena.
 
-Goodfellow et al.~\citep{goodfellow2014explaining} suggested that the linear behavior of neural networks, instead of their nonlinearity or overfitting, was the main cause of their vulnerability to adversarial attacks. They introduced the Fast Gradient Sign Method (FGSM), which made it easier to generate adversarial inputs using a single gradient step. The speed and effectiveness of FGSM set a standard for later research, as gradient-based attacks became the common approach.
+Goodfellow et al.~\citep{goodfellow2014explaining} attributed these vulnerabilities to the linear nature of neural networks, rather than their nonlinearity or overfitting. They introduced the Fast Gradient Sign Method (FGSM), which generates adversarial inputs efficiently using a single gradient step. FGSM’s speed and effectiveness set the template for many subsequent attacks—gradient-based approaches became standard in evaluating model robustness.
 
-These foundational studies shaped the direction of adversarial ML research in three significant ways. First, they assumed that adversaries had white-box access to models, including details about their architecture and gradient information. Second, they focused on imperceptible changes measured by specific distance metrics. Third, they highlighted optimization-based methods as the best way to generate adversarial inputs. While these frameworks allowed for thorough analysis, they also shifted research away from the practical realities of real-world attacks.
+These early studies established three key norms in adversarial ML research. First, they assumed adversaries with white-box access to models (complete knowledge of architecture and parameters), enabling direct gradient computations. Second, they focused on perturbations that are nearly imperceptible, measured under specific norm constraints. Third, they framed adversarial example generation as an optimization problem solvable by gradient-based methods. While these assumptions facilitated systematic exploration, they also began to diverge from the realities of practical attacks.
 
 \subsection{The Arms Race: Attacks and Defenses}
 
-The discovery of adversarial vulnerabilities triggered an ongoing cycle of proposed defenses and increasingly sophisticated attacks designed to circumvent them. This pattern has come to characterize adversarial machine learning research as an ``arms race'' between attackers and defenders~\citep{carlini2019evaluating}. Each new defense mechanism motivated adaptive attacks that exploited weaknesses in the defense strategy, which in turn motivated new defensive approaches. This adversarial co-evolution has shaped both the technical landscape and methodological standards of the field.
+The discovery of adversarial vulnerabilities triggered an ongoing cycle of defenses and adaptive attacks designed to break them. This pattern, often described as an “arms race” between attackers and defenders~\citep{carlini2019evaluating}, has defined much of adversarial ML research. Each new defense proposal prompted the development of attacks that circumvented it, which in turn inspired new defensive strategies.
 
-\subsubsection{Advanced Gradient-Based Attacks}
+One area of advancement was the development of more sophisticated \textbf{gradient-based attack methods} that optimized adversarial perturbations more precisely. A core challenge in crafting adversarial attacks is to balance two objectives: maximizing the model’s output error while minimizing the perceptibility of the input change. Researchers formalized this as a constrained optimization problem using distance metrics that quantify how much an adversarial example deviates from the original input.
 
-Building on the foundational work of Szegedy et al.~\citep{szegedy2013intriguing} and Goodfellow et al.~\citep{goodfellow2014explaining}, researchers developed more sophisticated attack methods that optimized adversarial perturbations more precisely. A central challenge in designing adversarial attacks is balancing two competing objectives: maximizing the probability of misclassification while minimizing the perceptibility of the perturbation. To formalize this trade-off, researchers employ \textbf{distance metrics} that quantify how much an adversarial example differs from the original input.
-
-The most commonly used distance metrics in adversarial ML are $L_p$ norms, which measure the magnitude of perturbations applied to inputs:
+The most commonly used distance metrics in adversarial ML are $L_p$ norms, which measure perturbation magnitude in different ways:
 
 \begin{itemize}[noitemsep]
-    \item \textbf{$L_0$ norm} counts the number of features modified. For an image with pixel values $x$ and adversarial image $x'$, $\|x - x'\|_0$ equals the count of pixels that differ between the two images. An $L_0$ attack might change only a small number of pixels but by arbitrary amounts. This metric is relevant when adversaries can precisely manipulate specific features (e.g., changing a few critical pixels in an image or specific words in text).
-
-    \item \textbf{$L_2$ norm} (Euclidean distance) measures the root-mean-square deviation: $\|x - x'\|_2 = \sqrt{\sum_i (x_i - x'_i)^2}$. This metric treats perturbations as vectors in high-dimensional space and measures their geometric length. $L_2$ perturbations tend to apply small changes across many features, producing smoother, more diffuse modifications that may appear as slight blurring or color shifts in images.
-
-    \item \textbf{$L_\infty$ norm} (maximum norm or Chebyshev distance) measures the largest single perturbation across all features: $\|x - x'\|_\infty = \max_i |x_i - x'_i|$. This bounds the maximum change to any individual feature, ensuring that no single pixel (in images) or feature (in other domains) changes by more than a specified threshold. $L_\infty$ constraints are commonly used because they provide intuitive bounds on per-pixel modifications.
+    \item \textbf{$L_0$ norm} counts the number of features (e.g., pixels) that are altered. For an image with original pixel values $x$ and adversarial pixel values $x'$, $\|x - x'\|_0$ is the number of pixels that differ. An $L_0$ attack might change only a few critical pixels (possibly by large amounts). This metric is relevant when attackers are limited in how many features they can modify.
+    \item \textbf{$L_2$ norm} (Euclidean distance) measures the root-mean-square difference: $\|x - x'\|_2 = \sqrt{\sum_i (x_i - x'_i)^2}$. It treats the perturbation as a vector in the input space and measures its length. $L_2$-based attacks tend to distribute small changes over many features, producing a smoother perturbation (e.g., a slight blur or noise across an image).
+    \item \textbf{$L_\infty$ norm} (maximum norm) measures the largest single-component change: $\|x - x'\|_\infty = \max_i |x_i - x'_i|$. It bounds the maximum perturbation to any one feature. $L_\infty$ is widely used in adversarial image research because it directly limits how conspicuous any individual pixel change can be.
 \end{itemize}
 
-Understanding these metrics is essential because different attack methods optimize for different norms, and defenses effective against one type of perturbation may fail against others.
+Understanding these metrics is essential because different attack algorithms optimize for different norms, and a defense that is effective against $L_\infty$ attacks might still be vulnerable to $L_2$ or $L_0$ attacks, and vice versa.
 
-Moosavi-Dezfooli et al.~\citep{moosavi2016deepfool} introduced DeepFool, which frames adversarial example generation as finding the minimal perturbation required to cross the model's \textbf{decision boundary}, which is the geometric surface in input space that separates different classification regions. A classifier assigns class labels by determining which side of this boundary an input falls on; DeepFool iteratively computes the shortest path to cross it. By linearizing the decision boundary locally and solving for the minimal perturbation, DeepFool produces adversarial examples with smaller $L_2$ norms than FGSM, making them less perceptible while remaining effective.
+Building on these foundations, researchers proposed more powerful attack algorithms. Moosavi-Dezfooli et al.~\citep{moosavi2016deepfool} introduced DeepFool, which formulates adversarial example generation as finding the minimal perturbation required to cross the model’s decision boundary—the hypersurface in input space that separates different output classes. A classifier labels an input based on which side of this boundary it falls; DeepFool iteratively computes the closest distance from the input to the boundary. By approximating the model’s decision boundary as locally linear and moving the input across it, DeepFool finds adversarial examples with smaller $L_2$ norms than FGSM, making them harder to detect.
 
-Carlini and Wagner~\citep{carlini2017towards} developed a family of optimization-based attacks (known as C\&W attacks) that reformulate adversarial example generation as a constrained optimization problem. Their approach jointly optimizes two objectives: (1) minimizing the distance between the original and adversarial example according to a chosen $L_p$ norm, and (2) maximizing the confidence of misclassification. By carefully designing the optimization objective and using iterative gradient-based solvers, C\&W attacks achieve state-of-the-art attack success rates across $L_0$, $L_2$, and $L_\infty$ distance metrics. Notably, C\&W attacks successfully defeated several defenses that had previously resisted simpler attacks, including \textbf{defensive distillation}~\citep{papernot2016distillation}, a technique that trains models on softened probability outputs rather than hard labels to smooth the loss surface and make gradient-based attacks less effective.
+Carlini and Wagner~\citep{carlini2017towards} developed a family of optimization-based attacks (often called C\&W attacks) that fine-tune adversarial examples by directly minimizing a weighted combination of perturbation size and classification error. Their approach yields state-of-the-art attack success rates across $L_0$, $L_2$, and $L_\infty$ norms. Notably, C\&W attacks defeated several defenses that were previously thought to be robust, including \textbf{defensive distillation}~\citep{papernot2016distillation} (a method that trained models on softened outputs to obscure gradients). This highlighted the pitfall of “security through obscurity” in gradient obfuscation defenses.
 
-\subsubsection{The Breakdown of Early Defenses}
+As attackers became more adept, early defense mechanisms often proved brittle. Carlini and Wagner~\citep{carlini2017detecting} conducted a systematic evaluation of ten proposed defense techniques that aimed to detect or pre-process adversarial inputs. They found that all ten could be circumvented by attackers who adjusted their methods with knowledge of the defense. This established a crucial principle: defenses should be evaluated against \textit{adaptive} adversaries aware of the defense, not just against the original attacks.
 
-The proposal and subsequent failure of early defenses illustrated the challenge of defending against adaptive adversaries. Carlini and Wagner~\citep{carlini2017detecting} conducted a systematic evaluation of ten detection-based defenses, which are methods designed to identify and reject adversarial inputs before they reach the classifier. They demonstrated that all ten defenses could be circumvented by adaptive attacks that account for the detection mechanism. This work established an important methodological principle: defenses must be evaluated against adaptive adversaries who know the defense strategy and can optimize attacks accordingly, not just against fixed attack methods developed before the defense was proposed.
+This pattern repeated across numerous defense proposals. Methods based on input transformations (like JPEG compression, bit-depth reduction, or feature squeezing) were broken by attacks that incorporated those transformations into their optimization~\citep{athalye2018obfuscated}. Defenses that attempted to hide or randomize model gradients (to confound attackers) often provided only a false sense of security, as stronger attacks could approximate the gradients or exploit other information~\citep{athalye2018obfuscated}.
 
-This pattern repeated across numerous defense proposals. Defenses based on input transformations (such as JPEG compression, bit-depth reduction, or spatial smoothing) were bypassed by attacks optimized to remain effective after the transformation~\citep{athalye2018obfuscated}. Defenses that obfuscated gradients by making it difficult for attackers to compute useful gradient information were shown to provide a false sense of security, as attackers could use gradient-free methods, approximate gradients, or exploit the defense mechanism itself~\citep{athalye2018obfuscated}.
+As detection and gradient-masking defenses fell short, the research community increasingly focused on two more principled approaches to robustness: adversarial training and certified defenses.
 
-\subsubsection{Adversarial Training and Certified Defenses}
-
-As detection-based and gradient-masking defenses failed, the research community increasingly focused on two more principled approaches: adversarial training and certified robustness.
-
-\textbf{Adversarial training} directly incorporates adversarial examples into the training process, teaching models to correctly classify both natural and adversarially perturbed inputs. Madry et al.~\citep{madry2018towards} formalized this approach as a \textbf{min-max optimization problem}:
+\textbf{Adversarial training} incorporates adversarial examples into the training process itself, training models to be correct on both natural and adversarial inputs. Madry et al.~\citep{madry2018towards} formalized adversarial training as a \textbf{min-max optimization problem}:
 \[
-\min_\theta \mathbb{E}_{(x,y) \sim D} \left[ \max_{\|\delta\| \leq \epsilon} \mathcal{L}(f_\theta(x + \delta), y) \right]
+\min_{\theta} \;\mathbb{E}_{(x,y) \sim D} \Big[ \max_{\|\delta\| \leq \epsilon} \mathcal{L}(f_{\theta}(x + \delta), y) \Big]
 \]
-where $\theta$ represents model parameters, $(x, y)$ are training examples from distribution $D$, $\delta$ is the adversarial perturbation bounded by radius $\epsilon$, and $\mathcal{L}$ is the loss function. The inner maximization finds the worst-case perturbation within the allowed threat model, while the outer minimization trains the model to minimize loss even against these worst-case perturbations. This formulation provides a theoretically grounded framework for robustness, though adversarially trained models often exhibit reduced accuracy on clean (non-adversarial) inputs, a phenomenon known as the robustness-accuracy trade-off~\citep{tsipras2019robustness, zhang2019tradeoff}.
+where $\theta$ are the model parameters, $(x, y)$ are drawn from the data distribution $D$, $\delta$ is a bounded adversarial perturbation (e.g., $\|\delta\|_\infty \leq \epsilon$), and $\mathcal{L}$ is the loss function. The inner maximization finds the worst-case adversarial perturbation within the allowed norm, and the outer minimization trains $\theta$ to minimize loss even against these worst-case inputs. This approach significantly improved robustness, though at the cost of some accuracy on clean data (the \textit{robustness–accuracy trade-off}~\citep{tsipras2019robustness, zhang2019tradeoff}).
 
-Tram\`er et al.~\citep{tramer2017ensemble} introduced \textbf{ensemble adversarial training}, which augments training data with adversarial examples generated from multiple source models (an ensemble) rather than only the model being trained. This approach improves robustness against black-box transfer attacks, where adversarial examples crafted for one model are used to attack a different model. By exposing the model to adversarial examples from diverse architectures during training, ensemble adversarial training reduces the model's susceptibility to transferred perturbations.
+Tram\`er et al.~\citep{tramer2017ensemble} introduced \textbf{ensemble adversarial training}, augmenting the training set with adversarial examples transferred from other models (an ensemble) to improve robustness against attacks that generalize. By exposing the model to a wider variety of adversarial patterns, this method reduced vulnerability to black-box attacks that use surrogate models.
 
-\textbf{Certified robustness} takes a fundamentally different approach by providing mathematical guarantees that a model's prediction cannot be changed by any perturbation within a specified radius, regardless of the attack method used~\citep{li2020sok}. Rather than empirically testing defenses against known attacks, certified defenses use formal verification techniques, randomized smoothing~\citep{cohen2019certified}, or interval bound propagation~\citep{gowal2018effectiveness} to prove that no adversarial example exists within a defined threat model. For instance, a certifiably robust classifier might guarantee that for a given input, any perturbation with $L_2$ norm less than 0.5 will not change the predicted class. While certified robustness offers strong security guarantees, these methods face scalability challenges: certification becomes computationally expensive for large models and high-dimensional inputs, and the radius of certifiable robustness is often smaller than what adversarial training can achieve empirically. The choice between empirical robustness (adversarial training) and certified robustness represents a trade-off between practical effectiveness and theoretical guarantees.
+In parallel, researchers developed \textbf{certified defenses} that offer mathematical guarantees of robustness within a given threat model~\citep{li2020sok}. Instead of trying to anticipate every attack, these methods formally prove that no attack can succeed within a certain perturbation bound. For example, randomized smoothing~\citep{cohen2019certified} adds noise to inputs and uses averaging to produce a provably robust classifier for $L_2$ perturbations up to a radius. Other techniques use interval bound propagation or abstract interpretation~\citep{gowal2018effectiveness} to compute bounds on a network’s outputs. While certified defenses can guarantee security, they usually come with drawbacks: increased computational cost, limited model size, and often smaller certified radii than the perturbations empirical attacks can achieve. Thus, practitioners face a trade-off between theoretical guarantees and model performance or flexibility.
 
 \subsection{Expanding Threat Landscape}
 
-The field then expanded beyond evasion attacks to include privacy violations and threats during training. Membership inference attacks~\citep{shokri2017membership, ye2021enhanced} determine whether specific data points were part of model training. Carlini et al.~\citep{carlini2022membership} argued for assessing such attacks at low false positive rates, which reflect the serious nature of privacy issues.
+As research progressed, the focus expanded beyond test-time evasion attacks to include threats to privacy and attacks during training. \textbf{Membership inference attacks}~\citep{shokri2017membership, ye2021enhanced} aim to determine whether a specific data sample was part of a model’s training set—potentially violating privacy. Carlini et al.~\citep{carlini2022membership} argued that evaluations of such attacks should report performance at very low false-positive rates (e.g., $10^{-5}$), since even rare incorrect inferences can be problematic when privacy is at stake.
 
-Training-time attacks interfere with the learning process itself. Backdoor attacks introduce hidden triggers that cause specific misbehaviors when activated, with recent studies showing attacks on self-supervised learning~\citep{jia2021badencoder}, along with distribution-preserving methods that avoid detection~\citep{tao2024distribution}. Poisoning attacks that corrupt training data demonstrate that even small amounts of malicious samples can significantly harm model performance~\citep{tramer2022truth}.
+Meanwhile, \textbf{training-time attacks} attracted attention. In \textbf{backdoor attacks}, an adversary introduces a trigger pattern into some training inputs, causing the model to learn a hidden malicious behavior: the model functions normally on clean data but misclassifies inputs containing the trigger~\citep{gu2017badnets}. Recent work extended backdoors to self-supervised learning~\citep{jia2021badencoder} and developed techniques to make poisoned data look inconspicuous~\citep{tao2024distribution}. More generally, \textbf{poisoning attacks} aim to compromise the overall training process by injecting even a small fraction of corrupted samples, which can distort the model’s decisions or degrade its accuracy~\citep{tramer2022truth}.
 
-Physical-world attacks took gradient-based techniques beyond digital settings. Kurakin et al.~\citep{kurakin2016adversarial} showed that adversarial examples remained effective when printed and photographed. Later work~\citep{jia2022physical} developed robust physical adversarial examples against traffic sign recognition systems in autonomous vehicles, raising questions about whether real-world attackers would use such complex methods when simpler options might work.
+Researchers also looked at threats beyond the digital environment. \textbf{Physical-world attacks} adapt adversarial examples for real-world conditions such as varying angles, lighting, or sensor noise. Kurakin et al.~\citep{kurakin2016adversarial} confirmed that adversarial images remain effective when printed and re-captured with a camera, proving that these attacks are not just digital artifacts. Later, Jia et al.~\citep{jia2022physical} demonstrated robust physical adversarial stop signs that fooled actual road sign classifiers in an autonomous driving system. These works showed it is possible to execute adversarial attacks in the wild—though they also raise the question of whether real attackers would choose such technically complex methods when simpler means (tampering with signs, using tape, etc.) might achieve similar ends.
 
-\subsection{The Theory-Practice Gap}
+\subsection{The Theory–Practice Gap}
 
-As the theoretical level of adversarial ML research increased, worries grew about whether this work addressed actual security needs in the real world. Kumar et al.~\citep{kumar2020adversarial} interviewed practitioners from 28 organizations, discovering that the industry lacked practical tools for dealing with adversarial ML threats. Grosse et al.~\citep{grosse2024practical} surveyed 271 industrial practitioners, revealing that while academic threat models were theoretically valid, research often overestimated what attackers could do, especially regarding access to training data and query limits.
+As adversarial ML research became increasingly abstract and benchmark-driven, concerns grew about its relevance to real-world security. Kumar et al.~\citep{kumar2020adversarial} interviewed professionals at 28 organizations and found a lack of practical tools and procedures to counter adversarial ML threats—many practitioners were uncertain how to assess the risk or deploy defenses. Grosse et al.~\citep{grosse2024practical} surveyed 271 industry practitioners, revealing that while adversarial scenarios studied in academia were theoretically possible, researchers often overestimated what attackers could realistically do (especially in assuming access to proprietary training data or unlimited model queries).
 
-Mink et al.~\citep{mink2023barriers} identified organizational barriers to deploying defenses through interviews with ML practitioners. These barriers included a lack of motivation from institutions, difficulty assessing AML risk, and competing business priorities. Practitioners often saw security as outside their expertise, revealing mismatches between job definitions in ML and security duties.
+Mink et al.~\citep{mink2023barriers} identified organizational barriers to deploying adversarial defenses. Through interviews with ML engineers, they noted obstacles such as unclear responsibility (security teams vs. ML teams), lack of institutional incentives to prioritize adversarial robustness, and difficulty integrating adversarial testing into development pipelines. Practitioners tended to view model security as outside their immediate scope, highlighting a disconnect between academic research and industry practice.
 
-Apruzzese et al.~\citep{apruzzese2022real} crystallized these issues through real-world case studies showing that actual ML system breaches often involved simple tactics rather than complex gradient-based attacks: input manipulation without gradients, exploiting system weaknesses instead of model-specific faults, operational gaps, and social engineering. This historical trend encourages a systematic analysis of recent publications to see if current research is addressing the theory-practice gap or continuing past patterns.
+Apruzzese et al.~\citep{apruzzese2022real} brought these issues into focus with case studies of actual ML attacks. They observed that real incidents often involved straightforward tactics rather than the elaborate attacks seen in papers. Attackers rarely had access to model internals or gradients; instead, they exploited system weaknesses, integration flaws, and human elements. For example, instead of crafting imperceptible pixel changes to fool an image classifier, an attacker might find a way to feed obviously malicious input that bypasses checks, or simply trick someone into misusing the system. This historical perspective motivates our present work: a comprehensive analysis of whether recent research has moved closer to practical needs or still operates under idealized assumptions.
 
 \subsection{Types of Adversarial Attacks}
 
-Understanding the landscape of adversarial threats requires a taxonomy of attack objectives and methodologies. The adversarial ML community has identified distinct categories of attacks based on when they occur in the machine learning pipeline and what adversarial goals they serve~\citep{biggio2018wild}. These categories differ fundamentally in their threat models, required adversarial capabilities, and real-world implications for deployed systems.
+Adversarial attacks can be categorized by when they occur in the ML pipeline and what the adversary’s goals are~\citep{biggio2018wild}. Clarifying attack types helps in understanding their assumptions and impacts, as defenses often target specific categories.
 
-Adversarial attacks generally fall into three primary categories based on their goals and the phase of the ML pipeline they target:
+\textbf{Evasion attacks} occur at inference time. The attacker manipulates an input to cause a trained model to misclassify it~\citep{szegedy2013intriguing, goodfellow2014explaining}. For example, altering pixels in an image or words in a text can lead a model to an incorrect output while the input still looks legitimate to humans. Evasion attacks have been the primary focus of adversarial ML, though their prevalence in real settings remains an open question (attacks may be possible but not always the easiest path for an adversary).
 
-\textbf{Evasion attacks} manipulate inputs during inference to cause misclassification~\citep{szegedy2013intriguing, goodfellow2014explaining}. The attacker changes an input (such as an image, malware sample, or network packet) so that the model gives an incorrect prediction while the model itself remains unchanged. These attacks target the inference phase and represent the most extensively studied threat type in adversarial ML literature. Early demonstrations by Szegedy et al.~\citep{szegedy2013intriguing} and subsequent refinements~\citep{carlini2017towards, moosavi2016deepfool} established evasion attacks as the canonical adversarial threat, though their prevalence in academic research may not reflect their occurrence in real-world deployments.
+\textbf{Poisoning attacks} (including backdoors) take place during the training phase. The adversary introduces malicious data into the training set to influence the model’s behavior~\citep{biggio2012poisoning}. This can degrade the model’s general performance or embed specific biases. A backdoor poisoning might involve adding a “trigger” pattern to some training images (labeled as a target class); the model then learns to misclassify any input containing that trigger as the target class~\citep{gu2017badnets}. Other poisoning strategies might aim to simply cause the model to fail more often or to steer errors toward benefiting the attacker (e.g., causing a spam filter to accept certain spam emails).
 
-\textbf{Poisoning attacks} corrupt the training process by injecting malicious data~\citep{biggio2012poisoning}. By adding carefully crafted malicious examples to training data, attackers can lead models to learn incorrect behaviors or establish backdoors, which are hidden triggers that cause specific failures when activated~\citep{gu2017badnets}. A poisoned model might classify most inputs correctly but systematically fail on inputs containing a particular pattern or trigger. Unlike evasion attacks that affect individual predictions, poisoning attacks compromise the model itself, potentially affecting all future inferences. Recent work has demonstrated poisoning attacks against federated learning~\citep{bagdasaryan2020backdoor}, self-supervised learning~\citep{jia2021badencoder}, and even distribution-preserving poisoning that evades detection~\citep{tao2024distribution}.
-
-\textbf{Privacy attacks} extract sensitive information from trained models~\citep{shokri2017membership}. Membership inference attacks determine if specific individuals were included in the training data~\citep{shokri2017membership, ye2021enhanced}, potentially violating privacy even when models do not explicitly memorize training examples. Model extraction attacks aim to replicate model functionality through repeated queries~\citep{tramer2016stealing}, threatening intellectual property and enabling subsequent attacks. Data reconstruction attacks attempt to retrieve actual training examples from model parameters~\citep{carlini2021extracting}, with recent work demonstrating extraction of training data from large language models. These attacks raise fundamental questions about the privacy guarantees of machine learning systems and have motivated research into differential privacy~\citep{abadi2016deep} and other privacy-preserving training methods.
+\textbf{Privacy attacks} exploit trained models to extract sensitive information about their training data or internal parameters. In a membership inference attack, given a data sample and black-box access to a model, the attacker tries to infer whether the sample was in the model’s training set~\citep{shokri2017membership, carlini2022membership}. \textbf{Model extraction attacks} involve an attacker repeatedly querying a black-box model to approximate its decision boundary or replicate its functionality, effectively “stealing” the model~\citep{tramer2016stealing, jagielski2020high}. The extracted model can then be analyzed or used for further attacks. \textbf{Data reconstruction attacks} go even further, attempting to recover actual training samples (or similar data) from a model’s parameters or outputs~\citep{carlini2021extracting}. These privacy threats raise concerns for ML applications that train on confidential data (like personal user data or proprietary datasets).
 
 \subsection{Threat Models and Their Implications}
 
-A critical dimension for evaluating adversarial ML research is the threat model, which formally specifies an adversary's capabilities, knowledge, and objectives~\citep{carlini2019evaluating}. The threat model determines what the attacker knows about the target system, what actions they can perform, and what constraints they face. This aspect represents a major area where academic research assumptions diverge from real-world deployment realities, as the adversarial capabilities assumed in research often exceed what attackers have in practice~\citep{apruzzese2022real, grosse2024practical}.
+In any security research, the \textbf{threat model}—assumptions about the adversary’s knowledge, capabilities, and goals—is critical~\citep{carlini2019evaluating}. In adversarial ML, threat models generally differ by what the attacker knows about the model:
 
-The security community traditionally categorizes adversarial access along a spectrum from complete knowledge to query-only interaction:
+\textbf{White-box} models assume the attacker has complete information about the model (architecture, parameters, and possibly training data). This scenario might occur if an insider threat is present or if the model’s details are public. White-box access allows attackers to calculate exact gradients and is the worst case for many defenses. Many foundational studies (FGSM, C\&W, etc.) operate in the white-box setting for this reason.
 
-\textbf{White-box access} assumes the attacker possesses complete knowledge of the model: its architecture, all parameters (weights and biases), training procedures, and possibly the training data itself~\citep{carlini2017towards, madry2018towards}. With white-box access, attackers can compute gradients (the mathematical derivatives indicating how changes to inputs affect model outputs), enabling efficient optimization-based attacks. Many seminal academic attacks assume white-box access~\citep{szegedy2013intriguing, goodfellow2014explaining, carlini2017towards} because it simplifies the mathematical formulation and enables rigorous worst-case analysis. However, this assumption provides adversaries with capabilities rarely available against production systems, where models are deployed as black-box services or protected by intellectual property measures.
+\textbf{Black-box} models assume the attacker can only query the model and get outputs (labels or confidence scores), with no internal details revealed~\citep{papernot2017practical}. This aligns with attacking ML-as-a-service APIs or proprietary models accessible only through a prediction interface. Black-box attackers must use strategies like querying to train a surrogate model (to approximate the target) or rely on transferability of adversarial examples from known models.
 
-\textbf{Black-box access} constrains the attacker to query-only interaction: they can submit inputs and observe outputs (predictions, confidence scores, or rankings) but cannot inspect internal model components~\citep{papernot2017practical}. This scenario more closely reflects real-world deployments where models operate as web services, mobile applications, or embedded systems with no internal visibility. Black-box attackers must rely on query-based optimization, transfer attacks from surrogate models~\citep{papernot2017practical}, or input transformations that do not require gradient information~\citep{eykholt2023uret}. Commercial ML services typically implement rate limiting, query costs, and anomaly detection that further constrain black-box attack feasibility.
+\textbf{Gray-box} models assume partial knowledge. The attacker might know the model architecture but not the weights, or have access to some training data but not the full set, etc. Gray-box scenarios bridge the gap between the extremes and can simulate situations like attacking a competitor’s model that was trained on a similar dataset.
 
-\textbf{Gray-box access} represents intermediate scenarios where attackers possess partial knowledge~\citep{papernot2017practical}. They might know the model architecture but not the trained parameters, have access to a similar (but not identical) training dataset, or understand the training procedure without accessing the final model. Gray-box settings attempt to bridge the gap between white-box theoretical analysis and black-box deployment realities, though they remain less studied than the two extremes.
+Another aspect is the attacker’s \textbf{capabilities and limitations}, like how many queries they can make (query budget), whether they can perturb any feature of input or only certain features, and what constitutes success.
 
-The choice of threat model profoundly affects research conclusions. Apruzzese et al.~\citep{apruzzese2022real} stress that real-world attackers rarely have white-box access to production systems, which typically employ API abstractions, model encryption, and restricted query interfaces. Similarly, Grosse et al.~\citep{grosse2024practical} document through practitioner surveys that academic assumptions about attacker knowledge, particularly regarding training data access and unlimited queries, systematically overestimate real-world adversarial capabilities. Yet, as our analysis shows, 63.2\% of papers in our dataset assume white-box access, suggesting that research priorities may emphasize theoretical worst-case analysis over empirically grounded threat modeling.
+Apruzzese et al.~\citep{apruzzese2022real} emphasized that academic research often assumes overly powerful attackers (especially with white-box access) compared to what defenders typically face. Grosse et al.~\citep{grosse2024practical} similarly found that practitioners worry more about realistic threat models (someone stealing their model or poisoning their data) than about worst-case $L_p$-bounded perturbations on images. Getting the threat model right is important: an elegant defense against a white-box adversary might be irrelevant if real attackers are black-box and target a different weakness altogether.
 
 %==============================================================================
 % 3. METHODOLOGY
@@ -254,46 +244,51 @@ The choice of threat model profoundly affects research conclusions. Apruzzese et
 
 \subsection{Data Collection}
 
-We systematically reviewed all papers with adversarial ML focus published at four top-tier security venues from 2022 through 2025. These venues were selected because they represent primary publication outlets for security-focused ML research and have historically shaped the field's direction.
+We conducted a systematic review of adversarial ML papers in four top security research conferences over the years 2022 through 2025. These venues—ACM CCS, IEEE Symposium on Security \& Privacy (S\&P), NDSS, and USENIX Security—are leading outlets for work at the intersection of machine learning and security, and they frequently set research trends.
+
+Our dataset includes 454 papers: ACM CCS contributed 118 papers (26.0\%), IEEE S\&P 79 papers (17.4\%), NDSS 49 papers (10.8\%), and USENIX Security 208 papers (45.8\%). By publication year, there were 89 papers from 2022, 136 from 2023, 198 from 2024, and 31 from 2025 (partial year). We identified these papers by searching proceedings and digital libraries for relevant keywords (e.g., “adversarial,” “backdoor,” “poisoning,” “robustness”) and by cross-referencing the list of papers in Apruzzese et al.~\citep{apruzzese2022real} for continuity. Each candidate paper was manually verified to ensure it primarily addressed an adversarial ML topic.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{fig01_dataset_overview.png}
-    \caption{Dataset overview showing the distribution of 454 papers across four security conferences (ACM CCS, IEEE S\&P, NDSS, USENIX Security) from 2022 to 2025.}
+    \caption{Dataset overview: distribution of the 454 adversarial ML papers across four security conferences (ACM CCS, IEEE S\&P, NDSS, USENIX Security) from 2022 through 2025.}
     \label{fig:dataset}
 \end{figure}
 
-Our dataset comprises 454 papers: ACM CCS contributed 118 papers (26.0\%), IEEE S\&P contributed 79 papers (17.4\%), NDSS contributed 49 papers (10.8\%), and USENIX Security contributed 208 papers (45.8\%). The temporal distribution includes 89 papers from 2022, 136 from 2023, 198 from 2024, and 31 from 2025 (partial year at time of analysis).
-
 \subsection{Coding Framework}
 
-Each paper was evaluated across multiple dimensions designed to capture practical relevance:
+We coded each paper on several dimensions, drawing on the taxonomy of Apruzzese et al.~\citep{apruzzese2022real} and adding practical considerations:
 
 \begin{itemize}[noitemsep]
-    \item \textbf{Research Focus (G1):} Whether the paper primarily proposes attacks (60\%), defenses (39\%), or both (2\%).
-    \item \textbf{Attack Type (G2):} Classification as evasion (48\%), poisoning (20\%), privacy (23\%), or multiple types (9\%).
-    \item \textbf{Data Domain (G4):} The input modality: images (65\%), text (11\%), audio (7\%), malware (6\%), or other (12\%).
-    \item \textbf{Threat Model (T1):} Assumed adversary access: white-box (63.2\%), black-box (34.1\%), or gray-box (2.6\%).
-    \item \textbf{Gradient Requirements (Q1):} Whether the approach requires gradient access.
-    \item \textbf{Query Budget (Q2):} High ($>$1000 queries), low, or none.
-    \item \textbf{Real System Testing (G7):} Whether validation occurred on deployed systems.
-    \item \textbf{Code Release (G6):} Whether code was released publicly.
+    \item \textbf{Research Focus (G1):} Is the paper primarily about \textit{attacks} or \textit{defenses}? (A few papers cover both.)
+    \item \textbf{Attack Type (G2):} Does it address evasion, poisoning/backdoor, privacy, or multiple types?
+    \item \textbf{Data Domain (G4):} What kind of data or application is involved (images, text, audio, malware, other)?
+    \item \textbf{Threat Model (T1):} What level of adversary knowledge is assumed (white-box, black-box, gray-box)?
+    \item \textbf{Gradient Access (Q1):} Does the method require computing gradients of the target model?
+    \item \textbf{Query Budget (Q2):} If the attack/defense involves queries, are a very large number required (high budget) or relatively few (low budget)?
+    \item \textbf{Real System Testing (G7):} Was the method tested on a deployed or production system (even in a limited way), or only on offline datasets and models?
+    \item \textbf{Code Release (G6):} Did the authors release code or artifacts for their work?
+    \item \textbf{Consideration of Economics (G5):} Does the paper discuss costs, incentives, or other economic factors related to the attack or defense?
 \end{itemize}
 
-\subsection{Gap Score Framework}
+We used binary flags or categorical labels for each of these. Coding was done by the authors, cross-checked on a random 10\% subset for consistency. In ambiguous cases (e.g., whether a test environment counts as “real system testing”), we erred on the side of giving credit if the paper at least moved beyond standard benchmarks.
 
-To quantify the theory-practice gap, we developed a 6-point ``Gap Score'' summing binary indicators of assumptions that may limit practical applicability:
+\subsection{Gap Score}
 
-\begin{enumerate}[noitemsep]
-    \item Requires white-box access (vs. black/gray-box)
-    \item Requires gradient computation
-    \item Assumes high query budget ($>$1000 queries)
-    \item Requires substantial computation (GPU-level resources)
-    \item No testing on deployed systems
-    \item No consideration of economic factors
+To quantify how far a paper’s setup is from practical conditions, we devised a “Gap Score” composed of six yes/no factors:
+
+\begin{enumerate}[noitemsep,label=(\arabic*)]
+    \item Assumes a white-box adversary (as opposed to black/gray-box).
+    \item Requires gradient computations from the target model.
+    \item Assumes a high query budget ($>$1000 queries).
+    \item Requires significant computational resources (e.g., multiple GPUs, lengthy runtime).
+    \item Does not include any testing on a real system or deployment.
+    \item Does not discuss economic or organizational factors (e.g., attack cost, defender cost, human elements).
 \end{enumerate}
 
-Higher scores indicate greater distance from practical deployment considerations. A paper scoring 0 would employ realistic threat models, require minimal resources, validate on production systems, and consider economic constraints. A paper scoring 6 would represent a primarily theoretical contribution with limited immediate applicability to deployed systems.
+Each paper received a score from 0 (none of these factors present) to 6 (all factors present). A score of 0 would mean the paper’s assumptions and evaluation are very aligned with real-world constraints, whereas 6 would mean it is largely a theoretical exploration with idealized assumptions at every level.
+
+This Gap Score is a simple heuristic and not all factors are equally critical, but it provides a rough measure of a paper’s practical orientation. We will examine both individual factors and this aggregate score in our analysis.
 
 %==============================================================================
 % 4. QUANTITATIVE FINDINGS
@@ -303,274 +298,360 @@ Higher scores indicate greater distance from practical deployment considerations
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{fig02_theory_practice_gap.png}
-    \caption{Overview of the theory-practice gap showing the percentage of papers exhibiting each characteristic: no real-world testing (94.7\%), high query budget (80.4\%), gradient dependency (67.8\%), white-box access (63.2\%), and no code release (10.4\%).}
+    \caption{Key indicators of the theory–practice gap across our dataset. Percentages of papers exhibiting each characteristic: no real-world testing (94.7\%), high assumed query budget (80.4\%), gradient dependency (67.8\%), white-box threat model (63.2\%), and no code release (10.4\%).}
     \label{fig:gap_overview}
 \end{figure}
 
-Our analysis identifies several areas where research practices diverge from deployment realities. Figure~\ref{fig:gap_overview} summarizes the key indicators across all 454 papers.
+Our analysis identifies several areas where current research practices diverge from real-world considerations.
 
-\subsection{Real-World Validation}
+\subsection{Real-World Evaluation}
 
-The most pronounced finding concerns real-world validation: \textbf{only 5.3\% of papers (24 of 454) evaluate on actual deployed systems}. The remaining 94.7\% validate exclusively on research benchmarks, simulated environments, or research prototypes.
+The most striking observation is how rarely papers validate their methods on production systems or real deployments. Only \textbf{5.3\%} of papers (24 out of 454) included any experiment on an operational system or in a realistic production setting. In other words, 94.7\% of works were evaluated solely on offline datasets, in simulated environments, or on research prototypes.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{fig05_real_world_testing.png}
-    \caption{Real-world testing rate: 5.3\% of papers validate on deployed systems.}
+    \caption{Rate of real-world testing: only 5.3\% of papers had any evaluation on a deployed system.}
     \label{fig:real_world}
 \end{figure}
 
-This pattern has implications because deployment introduces constraints absent from controlled experiments. Production systems employ proprietary model formats and encryption. They integrate ML components into complex security pipelines where multiple components interact. They face hardware constraints, latency requirements, and regulatory compliance obligations. Research validated only in laboratory settings may require substantial adaptation for deployment.
+This matters because deploying ML systems involves complexities that controlled experiments often ignore. Production models might be part of a larger pipeline (with filtering, ensemble, or human-in-the-loop components), might be compressed or optimized in ways that affect robustness, and typically run under constraints (latency, memory, etc.) and monitoring that can thwart naive attacks. A method that performs well on MNIST or CIFAR-10 might not translate to an industry setting without substantial adaptation.
 
-The few papers that do validate on real systems often reveal differences between laboratory and field performance. Nayan et al.~\citep{nayan2024sok} conducted a systematic review of on-device ML model extraction attacks, finding that many proposed academic attacks proved difficult to reproduce, performed less effectively on production models, or introduced unacceptable computational and energy costs. Similarly, Layton et al.~\citep{layton2024sok} demonstrated that deepfake detection research employs metrics and dataset distributions that may lead to overestimation of detector efficacy.
+The few papers that did attempt real-world testing often revealed gaps that purely laboratory evaluations miss. Nayan et al.~\citep{nayan2024sok}, in a systematization of model extraction attacks on deployed ML APIs, noted that many academic attacks were difficult to reproduce on actual services, performed far worse than reported in constrained settings, or incurred costs and detection risks that would deter real adversaries. Similarly, Layton et al.~\citep{layton2024sok} examined deepfake detection algorithms and found that when evaluated on real-world data distributions (as opposed to balanced academic datasets) and against adaptive deepfake generation, the detectors’ performance often dropped significantly.
 
-Duan et al.~\citep{duan2022perception} validated perception-aware attacks against YouTube's copyright detection system, representing one of the rare examples of testing against commercial infrastructure. Their work demonstrated that attacks optimized in simulation required adaptation to succeed in practice.
+Duan et al.~\citep{duan2022perception} provide a notable example by directly targeting a commercial system: they crafted adversarial audio examples to evade YouTube’s copyright content ID. To succeed, they had to account for YouTube’s audio compression and content matching, which required additional constraints beyond those in typical lab settings. Their success—circumventing a real content protection mechanism—underscores both the feasibility of some attacks in practice and the additional challenges (like platform-specific processing) that researchers must consider.
 
-\subsection{Gradient Dependency}
+\subsection{Reliance on Gradients}
 
-Apruzzese et al.'s critique centered on the observation that ``real attackers don't compute gradients.'' Our analysis indicates this pattern persists: \textbf{67.8\% of papers require gradient access}, despite this capability being unavailable against most production systems.
+Apruzzese et al.’s critique highlighted that “real attackers don’t compute gradients”~\citep{apruzzese2022real}. Our data shows that this pattern largely persists: \textbf{67.8\%} of papers rely on gradient information from the target model. This could be explicit (assuming white-box access for attacks or requiring differentiability for defenses) or implicit (evaluating robustness primarily against gradient-based attacks).
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{fig04_gradient_dependency.png}
-    \caption{Gradient dependency analysis showing limited change over time (68.2\% in 2022 to 65.9\% in 2025) and variation by attack type.}
+    \caption{Trend of gradient dependency: overall 67.8\% of papers required gradient access. This percentage changed only slightly from 2022 (68.2\%) to early 2025 (65.9\%) and varied by attack type (e.g., most evasion attacks assumed gradient access, whereas some privacy and black-box studies did not).}
     \label{fig:gradient}
 \end{figure}
 
-Temporal analysis reveals limited change in this dimension. Gradient dependency has remained relatively stable: 68.2\% in 2022, 69.1\% in 2023, 66.8\% in 2024, and 65.9\% in 2025. While individual papers have explored gradient-free approaches, the overall distribution has not shifted substantially.
+Over time, there is a modest decrease in gradient dependency, but nothing dramatic. Many researchers continue to favor white-box threat models for their analytic tractability and worst-case coverage.
 
-Some research has pioneered gradient-free methods in specific domains. The Universal Robustness Evaluation Toolkit (URET) from Eykholt et al.~\citep{eykholt2023uret} formulates adversarial generation as a graph exploration problem, seeking sequences of domain-specific, functionality-preserving transformations rather than relying on differentiable feature spaces. This framework enables evaluation of systems processing inputs like malware binaries or tabular data where semantic and functional correctness must be maintained during perturbation.
+However, some recent works have deliberately embraced gradient-free approaches. Eykholt et al.~\citep{eykholt2023uret} developed the Universal Robustness Evaluation Toolkit (URET), which evaluates adversarial robustness without direct gradients. Instead, it applies domain-specific transformations (like image filters, translations, or content-preserving mutations of malware) to search for inputs that cause model errors, reflecting a more realistic black-box strategy. This approach acknowledges that real attackers might exploit transformations or invariances rather than computing exact gradients.
 
-Similarly, practical LLM jailbreak attacks demonstrate that effective attacks need not be gradient-based. Liu et al.~\citep{liu2024jailbreaking} and Yu et al.~\citep{yu2024jailbreak} showed that jailbreaking large language models can be effective even when executed via strategically crafted natural language prompts, illustrating the potential of accessible black-box attacks compared to complex gradient optimization.
+In the domain of large language models (LLMs), notable attacks have been entirely gradient-free. For example, “jailbreak” attacks on LLMs—where cleverly designed prompts cause a model like ChatGPT to violate its safety rules—require no knowledge of model internals. Liu et al.~\citep{liu2024jailbreaking} and Yu et al.~\citep{yu2024jailbreak} demonstrate that by constructing sequences of instructions or role-play scenarios, an adversary can coax an LLM into producing disallowed content. These attacks operate via natural language interfaces and highlight how high-impact adversarial behavior can be achieved with minimal technical assumptions (just the ability to query the model).
 
 \subsection{Threat Model Assumptions}
 
-White-box access remains the predominant assumption: \textbf{63.2\% of papers assume adversaries have complete knowledge of model architecture and parameters}. Only 34.1\% consider black-box scenarios more closely matching deployment conditions, and 2.6\% examine gray-box settings.
+We found that \textbf{63.2\%} of papers assume a white-box adversary with complete model knowledge. Only 34.1\% consider black-box scenarios, and a mere 2.6\% explicitly explore gray-box settings.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{fig03_threat_model.png}
-    \caption{Distribution of threat model assumptions across all papers, showing prevalence of white-box assumptions.}
+    \caption{Threat model assumptions in the reviewed papers. White-box scenarios dominate, appearing in 63.2\% of papers. Black-box scenarios appear in about one-third of papers, while gray-box scenarios are rare.}
     \label{fig:threat_model}
 \end{figure}
 
-This pattern contrasts with industrial practice. As Grosse et al.~\citep{grosse2024practical} document, academic studies often operate under assumptions of attacker access (such as extensive access to internal models, parameters, or training data) that do not reflect the security controls present in production environments.
+This distribution underscores the gap noted by practitioners. In real deployments, one usually does not assume an attacker has access to model parameters (unless the model is leaked or reverse-engineered). Security teams often operate under black-box threat models (with added complications like rate limiting and anomaly detection on queries).
 
-The foundational meta-analysis by Arp et al.~\citep{arp2022dos} identified methodological patterns in security research, including reliance on laboratory-only evaluation and deployment of threat models that may not account for adaptive adversaries. Our analysis suggests these patterns persist in the 2022--2025 literature.
+Our findings are in line with Arp et al.’s meta-analysis~\citep{arp2022dos}, which observed that security research frequently uses simplified lab setups that don’t account for adaptive adversaries or realistic constraints. Here, the prevalence of white-box assumptions suggests that the community still often prioritizes theoretical worst-case analysis (which is valuable for testing limits) over scenario-driven analysis (which might be more immediately actionable for defenders).
 
-\subsection{Query Budget Assumptions}
+\subsection{Query Budget and Efficiency}
 
-Even papers employing black-box threat models often assume substantial query access. \textbf{80.4\% of papers assume high query budgets ($>$1000 queries)}, which may be impractical when commercial APIs implement rate limiting, repeated queries trigger anomaly detection, and real-time constraints limit iterative optimization.
+Among papers that consider black-box attacks or defenses, many assume the attacker can issue an extremely large number of queries to the target model. \textbf{80.4\%} of the papers (overall) fell into a high query budget category (on the order of thousands or more queries). In realistic settings, query rates are often limited (either by cost or by system safeguards), and excessive querying could itself trigger alarms.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{fig06_query_budget.png}
-    \caption{Query budget assumptions showing 80.4\% of papers assume high query budgets.}
+    \caption{Assumed query budgets for methods involving model queries. Over 80\% of relevant papers assumed a high budget ($>$1000 queries). Only about 19.6\% focused on low-budget (stealthy or limited) query scenarios.}
     \label{fig:query}
 \end{figure}
 
-Some recent work has addressed query efficiency. HARDBEAT from Tao et al.~\citep{tao2023hardbeat} generates triggers requiring knowledge only of the final predicted label (hard-label) and minimal queries, addressing restrictions imposed by commercial services. BounceAttack from Wan et al.~\citep{wan2024bounceattack} demonstrates query-efficient decision-based attacks. However, these remain exceptions rather than the predominant approach.
+It’s encouraging to note a few recent works aiming for query efficiency, reflecting more realistic constraints. Tao et al.~\citep{tao2023hardbeat} proposed \textbf{HARDBEAT}, a hard-label (only final decision, no probabilities) black-box attack that achieves high success with very few queries by strategically estimating gradients from binary feedback. Wan et al.~\citep{wan2024bounceattack} developed \textbf{BounceAttack}, a decision-based evasion attack that finds adversarial inputs in a low number of queries by effectively “bouncing” along the decision boundary.
 
-\subsection{Domain Distribution}
+Nonetheless, such efforts are the exception rather than the rule. The typical black-box attack paper might still use tens of thousands of queries to achieve a result, which, while demonstrating a concept, might be impractical against a protected system that charges per query or bans excessive activity.
 
-Adversarial ML research exhibits notable domain concentration: \textbf{65\% of papers focus exclusively on image data}. Text receives 11\% of attention, audio 7\%, malware 6\%, with all other domains combined representing 12\%.
+\subsection{Dominant Data Domains}
+
+Adversarial ML research shows a clear concentration on certain data modalities. Approximately \textbf{65\%} of papers focus on image-based tasks (classification, detection, etc.), reflecting the field’s roots in computer vision benchmarks. Text-based tasks account for 11\%, audio for 7\%, malware for 6\%, and other domains (including multi-modal, network traffic, or tabular data) together for about 12\%.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{fig08_data_domains.png}
-    \caption{Data domain distribution revealing concentration on image classification in adversarial ML research.}
+    \caption{Data domains studied in the papers. Image-focused research dominates (65\%), with text, audio, and malware making up much smaller shares. “Other” includes domains like network traffic, tabular data, or multi-modal systems.}
     \label{fig:domains}
 \end{figure}
 
-This concentration creates potential blind spots. Financial systems process tabular data where adversarial perturbations cannot be measured by pixel distances. As Kireev et al.~\citep{kireev2023cost} observe for fraud detection, the meaningful constraint is not visual imperceptibility but rather the quantifiable financial cost or utility an adversary must expend. $L_p$ norms may be less informative for tabular financial data; what matters is whether fraudulent transactions remain economically viable.
+This imbalance suggests potential blind spots. Many security-critical ML applications involve data beyond images—financial fraud detection (tabular data), intrusion detection (network data), recommendation systems (graph or user data), etc. These domains have constraints that aren’t well captured by $L_p$ norm perturbations. For instance, Kireev et al.~\citep{kireev2023cost} argue that in financial models, the “cost” of an adversarial perturbation (e.g., the monetary cost to manipulate a credit score) is more meaningful than a pixel norm. If research remains heavily image-centric, defenses and insights may not directly carry over to these other fields.
 
-\subsection{Code Availability}
+We do note an uptick in adversarial studies on text and multi-modal models in late 2023 and 2024, likely driven by the surge in LLM deployment. But relative to vision, these are still emerging areas.
 
-One dimension shows encouraging results: \textbf{89.6\% of papers release their code}. This represents substantial commitment to reproducibility and exceeds code release rates in many other fields.
+\subsection{Reproducibility and Code Release}
 
-However, this introduces a nuanced consideration: code designed for research datasets may not transfer directly to production environments without substantial re-engineering. High code release rates support reproducibility while not necessarily indicating deployment readiness.
+On a positive note, \textbf{89.6\%} of papers provided public code or stated they would. This high rate of code release is commendable and likely contributes to the rapid progress in the field, as researchers can build on each other’s work more easily.
+
+However, releasing code for research purposes is not the same as releasing something deployable. Often the code is tailored to a specific dataset and environment. It might not be trivial for a practitioner to apply it to their system without significant modification. Still, the culture of open research is strong in adversarial ML, which bodes well for transparency and verification.
 
 \subsection{Gap Score Distribution}
+
+Finally, we look at the combined Gap Score (0–6). The average score was \textbf{3.17}, with most papers scoring in the 3–4 range. Only about 10.5\% of papers scored 0 or 1 (meaning they address nearly all practical concerns).
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{fig12_gap_score.png}
-    \caption{Distribution of Gap Scores showing the typical paper (mean 3.17/6) incorporates roughly half of the measured assumptions.}
+    \caption{Distribution of Gap Scores across papers. The typical paper (score 3) incorporates about half of the impractical assumptions we tracked. Only a small fraction of papers scored 0–1 (closely aligned with deployment realities), while the rest incorporate multiple idealized assumptions.}
     \label{fig:gap_score}
 \end{figure}
 
-The mean Gap Score across all 454 papers is \textbf{3.17 out of 6}, indicating the typical paper incorporates approximately half of the assumptions we measured. The distribution peaks at scores of 3 to 4, with approximately 10.5\% of papers achieving scores of 0 to 1 that would indicate closer alignment with deployment considerations.
-
-Conference-level analysis reveals similar patterns across venues: ACM CCS averages 3.04, NDSS 3.12, IEEE S\&P 3.18, and USENIX 3.25. No venue has established itself as substantially more practice-focused than others; the patterns we observe appear consistent across the security research community.
+Comparing venues, the averages were fairly close: CCS ~3.04, NDSS ~3.12, S\&P ~3.18, USENIX ~3.25. No single conference stood out as significantly more practically oriented than the others by this metric. All of them had a similar distribution of highly theoretical vs. more practical works.
 
 %==============================================================================
 % 5. THEMATIC FINDINGS
 %==============================================================================
-\section{Thematic Findings}
+\section{Qualitative and Thematic Findings}
 
-Beyond the quantitative metrics, our thematic analysis across venues reveals several recurring patterns and emerging directions in adversarial machine learning research.
+Beyond the raw numbers, our review surfaced recurring themes and trends that shed light on how the field is evolving and where gaps remain.
 
-\paragraph{Utility and robustness trade-off.} Practical deployment often requires balancing security guarantees against system performance. Studies from USENIX Security highlight that defenses offering certifiable robustness can reduce clean accuracy and increase inference cost by an order of magnitude \citep{xiang2022patchcleanser, xiang2024patchcure}. This tension extends beyond vision: defenses against malicious activations in voice assistants degrade natural accuracy \citep{ahmed2022keyword}, and differential privacy techniques reduce model utility \citep{liu2022mldoctor,tang2022membership}. Recent work shows progress: PatchCleanser masks images without harming state-of-the-art accuracy \citep{xiang2022patchcleanser}; MIST limits overfitting on the most vulnerable training instances \citep{li2024mist}; and CAMP demonstrates that adversarially robust reinforcement learning can preserve expected returns \citep{wang2025camp}.
+\paragraph{Utility versus robustness trade-offs.} A consistent theme is the tension between making models robust and maintaining their accuracy and efficiency. Many defenses come at a cost to model utility or performance. For instance, certified defenses often reduce accuracy and increase computation by design (as they must consider worst-case perturbations). Xiang et al.’s PatchCleanser and PatchCure systems~\citep{xiang2022patchcleanser, xiang2024patchcure}, which remove adversarial patches from images, provide provable protection but introduce extra processing steps and can slightly affect clean performance. In other domains, Ahmed et al.~\citep{ahmed2022keyword} noted that adding adversarial defenses to voice interfaces (like liveness checks to stop replay attacks) sometimes hurt the user experience or system responsiveness. Privacy-preserving training techniques (differential privacy, etc.) similarly tend to degrade model accuracy~\citep{liu2022mldoctor, tang2022membership}.
 
-\paragraph{Evaluation methodology.} There is increasing recognition that standard distance metrics and evaluation practices may not reflect human perception or operational realities. Lp norms measure pixel differences but do not reliably predict whether humans detect adversarial examples \citep{carlini2022membership}, a conclusion reinforced by eye-tracking studies in virtual reality that show mathematically imperceptible perturbations can be obvious to drivers \citep{ma2024avara}. Privacy research warns that defences evaluated using average-case metrics may still leak data about specific individuals \citep{carlini2022membership}. As a result, researchers advocate human-in-the-loop evaluation, domain-appropriate perturbation constraints, realistic query budgets and explicit reporting of computational cost.
+Encouragingly, some recent work aims to minimize these trade-offs. PatchCleanser~\citep{xiang2022patchcleanser} was shown to neutralize adversarial patches without significantly impacting a classifier’s normal accuracy. Li et al. introduced \textbf{MIST}~\citep{li2024mist}, a training approach that reduces overfitting on the most vulnerable training examples, improving robustness while preserving accuracy on the rest. In reinforcement learning, Wang et al.’s \textbf{CAMP} method~\citep{wang2025camp} demonstrated that policies can be trained to be adversarially robust without sacrificing much reward in the absence of an attack.
 
-\paragraph{Physical deployment and system integration.} A significant theme is the gap between digital adversarial examples and the complexities of physical environments. Physical attacks must contend with distance, viewpoint, illumination and sensor noise. Jia et al. tested physical adversarial signs against production autonomous vehicles \citep{jia2022physical}, while subsequent studies attacked X-ray detectors \citep{liu2023xadv}, LiDAR systems \citep{cao2023lidar}, voice recognition using tubes \citep{ahmed2023tubes}, road-surface LiDAR spoofing \citep{kobayashi2025shadow} and perceptual hashing algorithms \citep{zhang2025atkscopes}. Researchers also show that system components such as data filters, file-type detectors and compiler pipelines can introduce new vulnerabilities: privacy side channels can emerge from data filtering \citep{debenedetti2024privacy}, malware detection can be bypassed via file-type manipulation \citep{nasr2025magika}, and defences can disappear during compilation \citep{chen2023obsan}. These findings stress that robustness must be integrated end-to-end.
+\paragraph{Evaluation methodology and realism.} There is increasing recognition that standard evaluation metrics and practices may not align with what really matters. For example, many defenses report robustness in terms of $L_p$ norms, but Carlini et al.~\citep{carlini2022membership} argue that focusing on average-case performance or high distortion bounds can be misleading. They emphasize the importance of worst-case and low false-positive evaluations in a security context. Similarly, Ma et al.~\citep{ma2024avara} used a virtual reality driving simulator with human participants to show that even “imperceptible” perturbations (per $L_p$ metrics) can sometimes be obvious to a human driver. This suggests that purely norm-based definitions of imperceptibility are flawed and that human studies might be needed for certain claims. In privacy, a defense that looks strong on aggregate metrics might still leak specific sensitive details, which is why reporting worst-case leakage is advocated~\citep{carlini2022membership}.
 
-\paragraph{Real-world adversarial incidents.} Documented attacks underscore the importance of system interfaces and economic incentives. The EchoLeak attack used a single phishing email, a reference link and automatic image preview to extract data from Microsoft 365 Copilot \citep{EchoLeak2025}. A prompt-injection exploit on Google Bard hid instructions in a shared document and encoded private data via an image URL \citep{HackerOneBard}, while the AgentFlayer demonstration extracted API keys from a poisoned document in Google Drive \citep{AgentFlayer2025}. These cases show that large language model deployments can be compromised via email, document summarisation and browsing contexts, and attackers often chain simple techniques. Beyond prompt injection, the divergence attack reveals training data from ChatGPT at rates far exceeding previous methods \citep{Nasr2023}, and high-fidelity model extraction against commercial APIs is feasible \citep{Liu2024}. Supply chain poisoning tools like Nightshade allow artists to corrupt generative model training data \citep{Nightshade2023}, and deepfake scams show how attackers manipulate human users \citep{EftsureDeepfake2024}. Together, these incidents illustrate that adversarial threats span the entire ML pipeline, from data collection to deployment and human interaction.
+In response, some papers are advocating more comprehensive evaluations: including human perception tests, testing against adaptive attacks not seen during defense development, and being transparent about computational costs and other constraints.
 
-\paragraph{Attack and defence evolution.} Over time, attacks have become more practical and stealthy. Early work focused on physically realisable perturbations like the frustum attack, which exploits automotive sensor fusion \citep{hallyburton2022frustum}. The popularity of large language models brought natural-language jailbreaking; black-box methods such as PAIR and TAP elicit harmful outputs within a small number of queries \citep{chao2023jailbreaking,mehrotra2024tree}. Multimodal models reveal cross-modal vulnerabilities as vision encoders receive less hardening than text components \citep{qi2024visual}. Recent attacks prioritise persistence: MergeBackdoor remains dormant until merged with other models \citep{wang2025mergebackdoor}, and persistent backdoors survive continual learning \citep{guo2025persistent}. Defences have evolved from generic heuristics to specialised, interpretable and context-aware mechanisms. Blacklight identifies black-box query attacks by detecting near-duplicate queries \citep{li2022blacklight}. JBShield manipulates hidden states to remove toxic or jailbreak concepts \citep{zhang2025jbshield}, SafeSpeech reduces the utility of synthesised voice data to deter cloning \citep{zhang2025safespeech}, and DeBackdoor detects backdoors under black-box and data-scarce conditions \citep{popovic2025debackdoor}. The distribution of attack types over time is shown in Figure \ref{fig:attack_types}.
+\paragraph{Physical deployment and system integration.} A major gap identified is between digital adversarial examples and their behavior in complex physical or system contexts. Attacks that work on static images may fail on videos or in changing environments. Researchers like Jia et al.~\citep{jia2022physical} tackled this by constructing adversarial signs tested on a real car in various conditions (distance, angle). Others extended adversarial testing to sensor-rich settings: Liu et al.~\citep{liu2023xadv} attacked medical X-ray systems, Cao et al.~\citep{cao2023lidar} targeted LiDAR in autonomous vehicles, Ahmed et al.~\citep{ahmed2023tubes} exploited the acoustic channel using pipes to physically induce targeted sounds for voice assistants, and Kobayashi et al.~\citep{kobayashi2025shadow} manipulated LiDAR by projecting shadows on roads. Zhang et al.~\citep{zhang2025atkscopes} demonstrated attacks on perceptual hashing algorithms (used in content moderation) by printing carefully altered images.
 
-\paragraph{Economic and organisational factors.} Finally, we note that economic and organisational dynamics receive relatively little attention. Researchers highlight that the cost of extracting proprietary models can be much lower than the cost of training and protecting them: pre-trained encoders can be extracted cheaply \citep{cong2022sslguard}, and watermark removal requires only a small fraction of training data \citep{lu2024neural}. Organisational studies suggest that ML practitioners often lack motivation or resources to implement adversarial defences, viewing security and machine learning as separate domains \citep{mink2023barriers}. As a result, adversarial evaluations are rarely prioritised, and attacks may go undetected in production. Addressing adversarial threats therefore requires not only technical advances but also shifts in organisational culture and closer collaboration between ML and security teams.
+These studies underscore that when deploying defenses, one must consider the entire system. Sometimes adding a defense or filter can introduce new vulnerabilities. For example, Debenedetti et al.~\citep{debenedetti2024privacy} showed that a “defense” which filters sensitive information from data could inadvertently create a side channel for privacy leakage (e.g., an attacker can tell if data was filtered). Nasr et al.~\citep{nasr2025magika} found that ML-based malware detectors could be evaded by manipulating file types—taking advantage of how the system processes inputs rather than the classifier itself. Chen et al.~\citep{chen2023obsan} reported that certain defensive transformations might not carry through once models are compiled or optimized, nullifying the defense on the deployed model. All this points to a need for end-to-end robustness evaluations, including pre-processing, post-processing, and even hardware effects.
+
+\paragraph{Real-world adversarial incidents.} Documented cases of adversarial attacks “in the wild” provide valuable insight. We highlight a few:
+
+- In the \textbf{EchoLeak} incident (2025), a malicious image embedded in a phishing email caused Microsoft’s GitHub Copilot (an AI coding assistant) to leak proprietary code~\citep{EchoLeak2025}. The image exploited Copilot’s tendency to follow links and parse content, tricking it into exposing internal data in its suggestions. This was essentially a supply chain attack on the model’s input (email with an image link), not a gradient-based perturbation of code.
+
+- A vulnerability in Google’s Bard, reported via bug bounty, showed that hidden prompts in a shared Google Doc could be executed by Bard’s document summary feature, resulting in leakage of private information through a cleverly encoded URL~\citep{HackerOneBard}. The adversary hid instructions in text that Bard’s extension would read, bypassing the normal input channel.
+
+- The \textbf{AgentFlayer} demonstration~\citep{AgentFlayer2025} crafted a single poisoned document that, when processed by an LLM-based agent (with browsing and code execution abilities), caused it to reveal API keys. This attack chained multiple steps: the agent retrieved the document, executed hidden code from it, and thereby exfiltrated secrets. It exploited the trust the agent placed in retrieved content.
+
+Common threads in these incidents include: exploiting system integration points (like how the model interfaces with email, documents, or tools), and using “unintended” input channels (images, metadata, chained context) rather than straightforward model queries. Attackers combined simple methods like hiding content and relying on the system’s automated behavior, which is far from the theoretically optimal $L_p$-bounded perturbations often studied, yet very effective.
+
+Beyond LLMs, Nasr et al.~\citep{Nasr2023} demonstrated a membership inference-style attack (“divergence attack”) on ChatGPT that could extract training data at a much higher success rate than previously seen, raising red flags for foundation model privacy. Liu et al.~\citep{Liu2024} achieved high-fidelity model extraction on a private model through its API, illustrating that even large models can be cloned if query costs are low enough. Meanwhile, the advent of generative AI led to countermeasures by affected parties, such as the \textbf{Nightshade} tool~\citep{Nightshade2023} which artists use to poison art datasets to prevent AI models from learning their styles. And outside of the model domain entirely, criminals have leveraged \textbf{deepfakes} to impersonate voices or images of trusted figures to commit fraud~\citep{EftsureDeepfake2024}.
+
+These real incidents show that adversarial threats extend from the technical realm (model internals) to the socio-technical realm (user behavior, trust, and system design). They reaffirm that robust ML deployment must consider things like prompt filtering, content sanitization, rate limiting, and user education.
+
+\paragraph{Attack and defense evolution.} Over time, attacks have grown in sophistication, but also in practicality. Early adversarial work often produced attacks that were optimal in theory but hard to execute outside controlled settings (e.g., requiring precise pixel-level control). More recent attacks focus on persistent and stealthy effects. For example, Hallyburton et al.~\citep{hallyburton2022frustum} exploited how self-driving cars fuse sensor data, introducing an adversarial object in one sensor’s view that the other sensor couldn’t see, causing dangerous blind spots. The explosion of interest in LLMs brought about natural-language “jailbreaking” attacks; Chao et al.~\citep{chao2023jailbreaking} and Mehrotra et al.~\citep{mehrotra2024tree} even automated the generation of such prompts, showing high success rates against GPT-4 with minimal queries. Qi et al.~\citep{qi2024visual} found that a single adversarial image could universally attack vision-language models by making them follow harmful instructions they’d normally refuse, taking advantage of less-guarded visual inputs.
+
+Recent attacks also aim to be persistent: Wang et al.~\citep{wang2025mergebackdoor} proposed a “MergeBackdoor” that stays latent until a model is merged (a common practice in fine-tuning), effectively infecting downstream models; Guo et al.~\citep{guo2025persistent} designed backdoors that survive through continuous learning, so even if a model is updated, the backdoor remains.
+
+Defenses have also evolved. Early defenses were often heuristic and easily broken. Now, more defenses are specialized and context-aware. Li et al.~\citep{li2022blacklight} created \textbf{Blacklight}, which detects black-box attacks by monitoring for clusters of similar queries (something a normal user wouldn’t produce, but a gradient estimation might). \textbf{JBShield} by Zhang et al.~\citep{zhang2025jbshield} targets LLMs: it intervenes in the model’s hidden states to “erase” concepts related to jailbreak attempts or toxicity without degrading helpful responses. \textbf{SafeSpeech}~\citep{zhang2025safespeech} focuses on the audio domain, making it hard for attackers to clone a person’s voice by slightly altering released audio (deteriorating a would-be attacker’s training data, but not perceptibly changing the audio to normal listeners). \textbf{DeBackdoor}~\citep{popovic2025debackdoor} tries to detect backdoors in models even when the defender has very limited data and only black-box access, which is closer to a real scenario if one must evaluate a model of unknown provenance.
+
+These advancements indicate a maturing of the field: both attacks and defenses are paying more attention to constraints and persistence (how an attack might realistically be carried out without being immediately obvious, and how a defense can hold up over time and adaptation).
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{fig07_attack_types.png}
-    \caption{Distribution of attack types across the 2022–2025 period. Evasion attacks dominate, but the composition shifts as new modalities and tactics emerge.}
+    \caption{Prevalence of attack types over 2022–2025. Evasion attacks remain the most common, but poisoning/backdoor and privacy attacks have gained ground, especially in recent years as new modalities and threat vectors (like LLM prompt attacks) emerge.}
     \label{fig:attack_types}
 \end{figure}
+
+\paragraph{Economic and organizational factors.} A lesser-discussed area, but one that emerged in some papers, is the economics and human side of adversarial ML. Several researchers pointed out that, from an attacker’s perspective, some attacks are much cheaper than defending against them. Cong et al.~\citep{cong2022sslguard} noted that it can be relatively inexpensive to steal a self-supervised model, undercutting the huge cost that the victim invested in training it. Lu et al.~\citep{lu2024neural} showed that removing watermarks (a proposed IP protection for models) can be done with just a small subset of data and modest compute, again suggesting defenses need to consider raising attacker costs.
+
+On the defender side, Mink et al.’s interviews~\citep{mink2023barriers} revealed that in many organizations, there’s no clear “owner” of adversarial ML risk. Data scientists often consider security out-of-scope, and security teams may not be versed in ML. The result is that robust ML often isn’t prioritized until something goes wrong. Adversarial evaluation is rarely integrated into the ML development cycle due to time and resource constraints.
+
+This points to solutions beyond algorithms: better tools for risk assessment, clearer guidelines on whose responsibility it is to test ML models for adversarial robustness, and perhaps incentives (from regulators or customers) to invest in these defenses. Otherwise, even the best research ideas might not find their way into practice if organizations are not prepared to adopt them.
 
 %==============================================================================
 % 6. FOUNDATION MODELS AND LARGE LANGUAGE MODELS
 %==============================================================================
 \section{Foundation Models and Large Language Models: An Emerging Parallel Frontier}
 
-The rapid growth of large language models represents a significant shift in adversarial machine learning, developing alongside traditional research focused on computer vision. While image classifiers operate in continuous pixel space with bounded $L_p$-norm perturbations, LLMs function in discrete token spaces with open-ended context windows and fundamentally different attack surfaces. These systems now power applications affecting millions, including customer service chatbots, code generation tools, and medical assistants. However, adversarial research in this domain reveals the same theory-practice gaps observed in traditional ML fields.
+The rapid rise of large language models (LLMs) and other foundation models in the 2022–2025 period presents a new frontier for adversarial ML. These systems differ from traditional classifiers: they operate on discrete tokens (words or bytes), have extremely high dimensionality and capacity, and often serve as general-purpose platforms integrated with various tools.
 
-\subsection{From Manual Jailbreaks to Automated Optimization}
+While our review focused on security venues, which only started to include LLM-related adversarial work around 2024, it’s worth discussing how the theory–practice gap manifests in this domain, as it parallels issues we saw in vision and other areas.
 
-Initial LLM adversarial research relied on manual prompt engineering, where simple role-playing scenarios or encoded instructions (ROT13, Base64) bypassed safety measures. This changed with Zou et al.'s~\citep{zou2023universal} Greedy Coordinate Gradient (GCG) attack, which automates discrete optimization over token sequences to generate universal adversarial suffixes. GCG achieved 100\% success on Vicuna-7B and 88\% on Llama-2-7B-Chat, with transfer rates of 87.9\% for GPT-3.5, 53.6\% for GPT-4, and 66\% for PaLM-2. Notably, Claude-2 showed significantly higher resistance at only 2.1\% success.
+\subsection{From Manual Jailbreaks to Automated Attacks}
 
-Yet GCG exemplifies the theory-practice gap. The attack requires white-box gradient access through the model's embedding layer and hundreds of thousands of forward and backward passes during optimization. For production APIs that expose only final text outputs, obtaining gradients is impossible. Carlini et al.~\citep{carlini2023jailbroken} note that conducting such attacks would cost approximately \$18 on GPT-3.5-Turbo, making them impractical when loss and gradients cannot be easily accessed.
+Early adversarial behavior in LLMs was often discovered through trial and error by users (“jailbreaking” the model by asking it to ignore instructions or role-play without constraints). These were essentially social engineering attacks on the AI’s prompt interface. Over time, researchers sought systematic ways to generate such exploits.
 
-Recent research has shifted toward black-box methods reflecting real-world constraints. Chao et al.~\citep{chao2023jailbreaking} introduced PAIR (Prompt Automatic Iterative Refinement), using an attacker LLM to refine jailbreak prompts based on target model feedback, succeeding in fewer than 20 queries. Mehrotra et al.~\citep{mehrotra2024tree} developed Tree of Attacks with Pruning (TAP), achieving over 80\% success against GPT-4-Turbo and GPT-4o while bypassing LlamaGuard. These represent serious attack vectors requiring only API access and operating within reasonable query limits.
+Zou et al.~\citep{zou2023universal} introduced a gradient-based method (GCG) that found universal adversarial prompts (suffixes) for LLMs by optimizing in the token space. Impressively, they achieved nearly 100\% success in causing open-source models like Vicuna-7B to produce disallowed outputs, and these prompts even transferred to some degree to closed models like GPT-3.5 and GPT-4. However, GCG assumed white-box access to the model’s gradients (feasible for open models but not for closed APIs) and required on the order of hundreds of thousands of model queries or gradient computations—a scale far beyond what a realistic attacker could afford on a paid API.
 
-Multi-turn attacks reveal particularly concerning vulnerabilities. Russinovich et al.~\citep{russinovich2024crescendo} demonstrated the Crescendo attack, gradually escalating through seemingly harmless conversations to achieve up to 100\% success in under 10 turns. Each message passes safety checks individually; only the accumulated context produces policy violations. Production chat interfaces designed to maintain conversation history inadvertently enable attacks that unfold over minutes rather than seconds.
+Recognizing this, other work turned to black-box strategies that are more practical. Chao et al.~\citep{chao2023jailbreaking} devised \textbf{PAIR}, which uses an LLM to recursively refine another LLM’s prompts. Essentially, one uses ChatGPT (or another model) to generate and test potential jailbreak prompts in a few-shot loop, drastically cutting down on the human creativity needed. Mehrotra et al.~\citep{mehrotra2024tree} presented a \textbf{tree-of-thoughts} approach to prompt generation (TAP), which prunes and expands candidate prompts in a search tree, achieving over 80\% success on GPT-4 with on the order of tens of queries, not millions.
 
-\subsection{Multimodal Models: Exploiting Cross-Modal Alignment Gaps}
+Multi-turn attacks like Crescendo~\citep{russinovich2024crescendo} highlight another dimension: instead of trying one prompt, an attacker can string a conversation along multiple turns to gradually erode the model’s defenses. For example, by first establishing a narrative or context where forbidden content becomes “necessary” or “requested,” the attacker can lead the model into compliance. These multi-turn exploits are hard to catch with automated filters, because no single prompt is obviously malicious.
 
-Vision-language models present attack surfaces absent in text-only systems. Qi et al.~\citep{qi2024visual} showed that a single adversarial image can universally jailbreak vision-language models, forcing compliance with harmful instructions the models would reject in text-only contexts. This vulnerability arises from an alignment gap: while LLM components undergo extensive safety training on text data, vision encoders receive substantially less adversarial hardening.
+In summary, for LLMs, the initial gradient-heavy attacks demonstrated what was possible in theory, but the field quickly moved toward simpler, more accessible methods (just as we saw simpler practical attacks often matter more than complex ones in other domains).
 
-Typography-based attacks achieve concerning results without gradient access. Gong et al.~\citep{gong2024figstep} introduced FigStep, converting harmful text into images that models read via OCR, yielding 82.5\% average attack success across six open-source vision-language models compared to 44.8\% for identical text-only queries. Against commercial systems, Niu et al.~\citep{niu2024jailbreak} demonstrated multi-modal linkage attacks combining encryption-decryption processes across modalities, achieving 97.8\% success on GPT-4o's SafeBench, 98.8\% on MM-SafetyBench, and 99.1\% on HADES-Dataset.
+\subsection{Multimodal Models and Cross-Modal Exploits}
 
-Audio modalities show similar vulnerabilities. Zhang et al.~\citep{zhang2024advwave} developed AdvWave, demonstrating that adversarial acoustic noise can jailbreak speech-enabled models with 40\% higher success rates than baselines. It successfully jailbroke GPT-4o's speech-to-speech API in just 30 queries with nearly perfect results. The perturbations mimic common urban sounds (dog barks, car horns), making detection difficult without compromising legitimate functionality.
+LLMs are now often part of \textbf{multimodal models} (e.g., vision-and-language models like GPT-4V or image captioners that also have language understanding). This opens cross-modal attack surfaces.
 
-\subsection{The Theory-Practice Gap Manifests Differently for LLMs}
+Qi et al.~\citep{qi2024visual} discovered that adding a certain adversarial image to the prompt of a vision-language model could jailbreak it into following instructions it should not. The crux was that the image encoder had not been aligned for safety as rigorously as the text model, creating a path to bypass restrictions. Similarly, Gong et al.~\citep{gong2024figstep} showed that one can present toxic or disallowed text to a model as an image (which the model then OCRs and processes) to evade text-based filters—a strategy they call \textbf{FigShell/FigStep}. Such cross-modal tricks had high success rates (e.g., roughly doubling the success of attacks compared to text-only on some open-source models).
 
-Examining LLM adversarial research through our analytical framework reveals familiar issues with domain-specific characteristics:
+Niu et al.~\citep{niu2024jailbreak} went a step further by distributing the attack across modalities—a part of the exploit in text, part in an image, part in an audio—so that each piece looked innocuous on its own but together they formed a malicious instruction sequence. They achieved near-100\% success on certain multi-modal safety benchmarks of GPT-4.
 
-\textbf{Model Access Assumptions.} The most powerful attacks require white-box gradient access available only for open-source models. Production APIs like GPT-4 and Claude expose at most top-5 token probabilities, making direct loss calculations impossible. Huang et al.~\citep{huang2023catastrophic} found their ``Catastrophic Jailbreak'' achieved 95\% misalignment on 11 open-source models but only 7\% on ChatGPT, an 88-point gap demonstrating substantially more thorough safety training for proprietary models.
+Audio models are also vulnerable. Zhang et al.~\citep{zhang2024advwave} created \textbf{AdvWave}, perturbations to audio input that cause speech recognition models to output a hidden prompt (which then an LLM follows), all while sounding like ordinary background noise to humans. They managed to consistently bypass a voice-based GPT-4 interface within a few dozen queries.
 
-\textbf{Query Budget Realism.} OpenAI's free tier permits approximately 3 requests per minute, while paid tiers allow up to 3,500 requests per minute~\citep{openai2024ratelimits}. Gradient-based attacks requiring 50,000 to 256,000 queries face economic barriers (costs exceeding \$18 per attempt) and rate limiting that academic papers often overlook. Black-box methods like PAIR operate within more realistic budgets (approximately 20 queries), though even these face practical limitations at scale.
+These findings show that just as defenses patch one channel (say text), attackers will look for another (images, audio). It mirrors how, in computer security, if one entry point is locked, attackers try another.
 
-\textbf{Evaluation Instability.} Unlike static computer vision models, LLM providers continuously update systems and silently patch vulnerabilities. A paper claiming 80\% success against ``GPT-4 as of March 2024'' cannot be verified by June 2024 when the model has changed. Rando and Tram\`er~\citep{rando2024adversarial} note that this evolving defense landscape means ``we cannot measure progress against continuously updated closed-source systems,'' creating benchmarking challenges absent in traditional adversarial ML.
+Defending multimodal systems thus requires a holistic approach—ensuring each input modality is sanitized and that combined inputs are checked for encoded malicious signals.
 
-\textbf{Threat Model Formalization.} LLM attacks lack the formal structure bounding CV adversarial examples (like $L_p$-norm budgets or imperceptibility constraints). Defining ``harmful'' output requires subjective human judgment. Perez et al.~\citep{perez2022red} showed that manual red teaming still outperforms automated methods in finding worst-case model failures, suggesting the full attack landscape remains only partially understood by algorithmic approaches.
+\subsection{The Theory–Practice Gap for LLMs}
 
-Prompt-injection incidents further illustrate how the theory--practice gap for LLMs is rooted in interface design.  EchoLeak bypassed Copilot's prompt classifier, link filter and content-security policy by chaining hidden instructions, reference-style links and auto-fetched images \citep{EchoLeak2025}.  Bard's Extensions were hijacked by a hidden prompt in a shared document, causing the model to encode sensitive data into a URL \citep{HackerOneBard}.  \emph{AgentFlayer} showed that a single malicious document could extract API keys via OpenAI's Connectors \citep{AgentFlayer2025}.  Tenable's HackedGPT study identified seven vulnerabilities in ChatGPT's browsing and memory tools, demonstrating how comments or trusted websites can inject instructions into the model's browsing context.  These cases reveal that LLM robustness must address prompt filtering, memory management and connector policies alongside traditional model training.
+The gap between research assumptions and practice takes new forms with LLMs:
 
-\subsection{Defense Mechanisms: Progress and Persistent Limitations}
+- \textbf{Model Access:} The most potent attacks often assume white-box access (e.g., gradient-based optimization of prompts), but commercial LLMs don’t offer that. Huang et al.~\citep{huang2023catastrophic} found that an attack that got 95\% success on open models only managed 7\% on ChatGPT, showing the difference that safety training and closed access can make. So evaluating on open models might severely overestimate risk to closed ones (or conversely, improvements that work on open models may not transfer to closed ones).
 
-Production systems have adopted guardrail architectures assessing prompts and responses before and after LLM processing. Meta's Llama Guard~\citep{inan2023llamaguard} fine-tunes a Llama model to detect policy violations in six harm categories, now at its fourth version with multimodal support. NVIDIA's NeMo Guardrails~\citep{rebedea2023nemo} provides programmable input/output guidelines using Colang, achieving 1.4$\times$ improvement in safety compliance with approximately 0.5 seconds added latency.
+- \textbf{Query Limits:} Many research attacks ignore API rate limits or costs. But OpenAI’s API, for instance, imposes pricing per token and possible throttling. A 50,000-query attack might cost more than many adversaries would spend and could be detected by monitoring. Thus, focusing on low-query attacks (like PAIR or TAP that use $<20$ queries) is much more practical.
 
-Recent studies reveal significant weaknesses. Hackett and Gretton~\citep{hackett2024bypassing} tested six guardrail systems, including Azure Prompt Shield and Meta Prompt Guard, against character injection attacks (homoglyphs, zero-width characters, Unicode tags) and emoji smuggling, finding up to 100\% evasion success with no guardrail performing consistently across attack types. Perplexity-based detection works well against GCG-style attacks producing scrambled suffixes but fails against semantic jailbreaks generating fluent text.
+- \textbf{Evolving Targets:} Unlike static models in a lab, deployed LLMs are updated regularly. An exploit found today might quietly be fixed tomorrow. Rando and Tramèr~\citep{rando2024adversarial} noted this makes it hard to even benchmark progress—there’s no fixed reference when the target is a moving one.
 
-Automated red teaming has advanced substantially. Bertrand et al.~\citep{bertrand2024rainbow} introduced Rainbow Teaming, employing quality-diversity optimization through MAP-Elites to create diverse attack databases, achieving greater than 90\% success across Llama 2/3 models while providing attacks valuable for diagnosis and safety fine-tuning. Hong et al.~\citep{hong2024curiosity} applied curiosity-driven reinforcement learning to red teaming, successfully provoking harmful responses from RLHF-tuned models.
+- \textbf{Defining “Adversarial”:} In image classification, it’s clear what an attack is (misclassification). In LLMs, what constitutes a successful attack? If the policy says “don’t output hate speech” and a prompt gets the model to do it, that’s an attack. But measuring “harm” or “misbehavior” is tricky and sometimes subjective. So evaluation often involves human judgment (red teaming), which is hard to formalize. Perez et al.~\citep{perez2022red} found that human red-teamers still outperform automated methods in finding clever exploits, indicating that purely algorithmic evaluation might miss things.
 
-Bai et al.~\citep{bai2022constitutional} introduced Constitutional AI, using RLAIF (RL from AI Feedback) with explicit constitutional principles for self-assessment and revision, producing responses that explain objections rather than refusing outright. However, conflicting goals between helpfulness and harmlessness create vulnerabilities that adversaries can exploit.
+The known incidents (like EchoLeak, Bard’s doc exploit, AgentFlayer) highlight that some of the biggest vulnerabilities come not from clever prompt engineering alone, but from how these models interact with other systems and content. For example, the fact that Copilot fetched an image automatically or that Bard’s extension read a doc and returned a summary—these conveniences created openings that an attacker exploited.
 
-Standardized benchmarks aim to systematize jailbreak assessments. Chao et al.~\citep{chao2024jailbreakbench} released JailbreakBench, featuring 100 misuse behaviors across 10 OpenAI policy categories with public leaderboards tracking attack methods and defenses. While enabling reproducible comparison, it faces typical safety evaluation issues: subjective harm definitions, model updates invalidating findings, and challenges capturing worst-case behaviors through automated metrics.
+Thus, closing the gap here means not just making better attacks or defenses, but also designing system features with security in mind (e.g., not auto-fetching content from untrusted sources, isolating the model’s browsing, etc.).
 
-Agent-specific vulnerabilities represent an emerging concern. Zhan et al.~\citep{zhan2024injecagent} developed InjecAgent, testing 1,054 cases for indirect prompt injection in tool-integrated agents, finding ReAct-prompted GPT-4 vulnerable 24\% of the time, with enhanced attacks nearly doubling success rates. When LLMs control tools, access databases, and execute code, successful jailbreaks shift from producing problematic text to taking consequential real-world actions.
+\subsection{Defense Strategies for LLMs}
 
-\subsection{Foundation Model Properties Amplify Systemic Risk}
+Deployers of LLMs use multiple \textbf{guardrails} to enforce policy: prompt filtering (scanning user inputs for problematic content), output filtering (scanning model responses), and auxiliary models to judge compliance. Meta’s \textbf{LlamaGuard}~\citep{inan2023llamaguard}, for instance, is a secondary model trained to flag policy violations in Llama’s output across several categories. NVIDIA’s \textbf{NeMo Guardrails}~\citep{rebedea2023nemo} system uses rule-based scripts to intercept or modify a model’s inputs/outputs that might be unsafe.
 
-Bommasani et al.~\citep{bommasani2021opportunities} identified two features distinguishing foundation models from traditional ML: emergence (unpredictable capabilities from scale) and homogenization (single models serving numerous downstream applications). Adversarial weaknesses in GPT-4 impact not only ChatGPT but every application built on its API, affecting tools from legal document analyzers to educational tutors and medical triage systems. Unlike standalone image classifiers where a compromise affects specific implementations, vulnerabilities in foundation models have systemic effects across the ecosystem.
+However, Hackett and Gretton~\citep{hackett2024bypassing} found that these guardrails can be brittle. They bypassed character-level filters by using homoglyphs (similar-looking characters from other alphabets) or non-printing characters to smuggle bad instructions. If a guardrail looked for the word “attack,” an attacker might use look-alike characters to slip past.
+
+Another approach to defense is automated red teaming: using AI to find AI’s flaws. \textbf{Rainbow} by Bertrand et al.~\citep{bertrand2024rainbow} uses an evolutionary algorithm to generate diverse sets of adversarial prompts, which can be used to train or test models. Hong et al.~\citep{hong2024curiosity} applied reinforcement learning to have one model learn to push another into unsafe territory. These techniques can populate a library of known fails for developers to fix.
+
+A novel alignment strategy, \textbf{Constitutional AI} by Bai et al.~\citep{bai2022constitutional}, has models critique their own outputs against a set of rules and refine them. This yields explanations when they refuse (e.g., “I’m sorry, I cannot provide that because…”). It aims to be more transparent and less adversarial to the user. But even that can be manipulated; if a user finds a loophole in the “constitution,” the model might still produce something harmful while thinking it’s following a higher principle.
+
+Standard benchmarks for LLM safety, like JailbreakBench~\citep{chao2024jailbreakbench}, provide a set of test prompts and track whether models comply or break. These help quantify progress, but as noted, they risk turning into a cat-and-mouse: once a prompt is known, models can be patched to resist it. And real adversaries will always try to find novel prompts not in the benchmark.
+
+One especially challenging scenario is when LLMs act as \textbf{agents}—beyond just chatting, they can browse the web, execute code, or call APIs (think of tools like AutoGPT or the ChatGPT plugins). Zhan et al.~\citep{zhan2024injecagent} found that these agents can be tricked via “indirect prompt injection”—malicious instructions on a web page the agent visits, or in the code it retrieves. They reported a significant fraction of tested agent scenarios were exploitable. This raises the stakes: a compromised agent might not just say something bad, it could perform harmful actions (like sending an email, or posting data).
+
+Foundation models also concentrate risk. As Bommasani et al.~\citep{bommasani2021opportunities} pointed out, these models have \textbf{emergent capabilities} (they can do things not anticipated by the training task) and are \textbf{homogenizing} (the same model or architecture is used in many places). So an unknown flaw in one foundation model could propagate to dozens of applications using it, a systemic risk that’s different from having many independent smaller models.
+
+In summary, the adversarial challenges with LLMs are a microcosm of the broader theory-practice gap: the attacks and defenses have to consider factors (cost, continuous updates, human factors) beyond what typical static analysis of models encompassed. The field is adjusting, but much like in adversarial vision, there’s a lot of catching up to do to align research practices with the dynamism of real-world AI deployments.
 
 %==============================================================================
 % 7. TEMPORAL TRENDS
 %==============================================================================
 \section{Temporal Trends}
 
-A central question of this review is whether the research community has responded to calls for greater practical relevance. Figure~\ref{fig:trends} summarises temporal trends from 2022 to 2025. Our analysis reveals several persistent patterns. Real system testing remains rare—about five per cent of papers across all years—despite widespread encouragement to evaluate on deployed systems. Dependence on gradient information has held steady at roughly sixty-seven per cent, with few works adopting gradient-free methods. White box assumptions have not declined appreciably (about sixty-three per cent in 2025 compared to sixty-four per cent in 2022), and the distribution of application domains continues to be dominated by image data (around sixty-five per cent). Very few papers incorporate economic analysis, and this proportion stays below eleven per cent in every year.
-
-There is evidence of modest progress. High query budgets have become slightly less common, declining from about eighty per cent to roughly seventy-six per cent by 2025, and some researchers have proposed more query-efficient attacks. Awareness that attackers often lack complete system knowledge has increased, but this has yet to result in major changes to threat modelling practices.
-
-A further shift is evident in the emergence of large language and multimodal models as a focus of adversarial ML. Work in 2024–2025 points to fundamentally different attack surfaces for such systems: they operate on discrete tokens rather than continuous pixel values and are subject to instability as providers continually update their models. Despite these differences, similar theory-to-practice gaps persist. White box gradient-based attacks such as GCG achieve high success on open-source language models \citep{zou2023universal}, yet they are impractical against commercial APIs that reveal only output tokens. Recent black box methods like PAIR \citep{chao2023jailbreaking} and TAP \citep{mehrotra2024tree} succeed within tens of queries under more realistic conditions. Multimodal models expose cross-modal vulnerabilities—vision encoders often receive less hardening than text components \citep{qi2024visual}—and foundation models centralise risk because one model supports many downstream applications. Taken together, the temporal trends indicate that while some improvements have been made, the research community has not yet fully embraced the operational realities of adversarial machine learning.
+A key question for this review is whether the field has shifted to address the theory–practice gap after it was pointed out by works like Apruzzese et al.~\citep{apruzzese2022real}. Figure~\ref{fig:trends} summarizes some trends over 2022–2025 in our dataset.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{fig11_yearly_trends.png}
-    \caption{Temporal trends showing the gap between research and practice from 2022 to 2025.  Real-world testing remains rare and other key metrics show only incremental change.}
+    \caption{Trends from 2022 to 2025 on several gap indicators. Real-world testing remains exceedingly rare throughout, while there are slight improvements in areas like query budget assumptions. The composition of attack types also evolved, with more poisoning and privacy papers by 2024–2025.}
     \label{fig:trends}
 \end{figure}
+
+Overall, progress in closing the gap has been limited:
+
+- The rate of \textbf{real-world testing} hovered around 5\% each year. There was no clear upward trend. This suggests that, as of 2025, evaluating on deployed systems is still more the exception than the norm.
+
+- Dependence on \textbf{gradients} remained high (around two-thirds of papers each year). Perhaps a slight decrease by 2025 (still above 65%). Despite increased attention to black-box methods, gradient-based analysis continues to dominate, likely because it’s easier to study and yields strong attack benchmarks.
+
+- The prevalence of \textbf{white-box} threat models stayed roughly constant, around 60–64\%. We did notice that some papers now explicitly justify their threat model or consider multiple scenarios, which is a positive sign, even if the default hasn’t changed much.
+
+- Assumptions of \textbf{high query budgets} dipped a bit—approximately 80\% of papers in 2022–2023 assumed essentially unlimited queries, down to perhaps 75–78\% by 2025. This reflects a few more works on query-efficient attacks, but still, most research did not focus on stringent query limits.
+
+- The \textbf{domain focus} only recently started broadening. In 2022–2023, image classification was overwhelmingly dominant. By 2024, with the surge of interest in LLMs, we saw more text and multi-modal security papers. This diversifies the field somewhat, though images remain the largest slice.
+
+- Discussion of \textbf{economic or organizational factors} in papers remains very low (under ~10–12\% each year had any mention). This did not change meaningfully. It may change in the future as the field intersects more with policy and real-world deployments.
+
+On a positive note, the field is not static. The mix of attack types changed: early on, evasion attacks on vision models were most common, but by 2024, there were more poisoning/backdoor and privacy papers. This suggests a response to broaden the scope of adversarial ML.
+
+Another notable shift is the inclusion of LLM-related topics around 2024. Though our dataset is security venues, some began featuring papers on prompt injection, LLM jailbreaks, and backdoors in generative models. These areas inherently force consideration of realistic constraints (since they involve expensive models and interactive use), which might in turn push the field toward more practical evaluations.
+
+In summary, while awareness of the theory–practice gap has increased (it’s frequently cited in introductions by 2024), the concrete changes in research practices were incremental by 2025. It often takes time for community incentives (like reviewer expectations, competition benchmarks) to realign. We expect that as more cases of real-world adversarial incidents come to light, and perhaps as funding agencies emphasize deployable security, the trend might accelerate.
 
 %==============================================================================
 % 8. CROSS-VENUE ANALYSIS
 %==============================================================================
 \section{Cross-Venue Analysis}
 
+Although all four venues we surveyed exhibited similar overall patterns, each had its own emphasis and strengths in the context of adversarial ML.
+
+Figure~\ref{fig:heatmap} provides a comparative overview of some metrics by venue.
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{fig10_conference_comparison.png}
-    \caption{Conference comparison heatmap showing similar patterns across all venues.}
+    \caption{Comparison of adversarial ML research characteristics by conference. The differences are relatively small, but each venue has a slightly different focus.}
     \label{fig:heatmap}
 \end{figure}
 
-While all venues share similar theory-practice gap patterns, each has developed distinctive emphases that collectively illuminate different facets of the research landscape. ACM CCS research uniquely emphasises business logic, usability constraints, and intellectual property protection. Contributions include demonstrating how economic incentives shape the threat landscape \citep{cong2022sslguard, lu2024neural}, documenting relationships between mathematical metrics and human perception \citep{ma2024avara}, analysing system-level integration considerations \citep{nasr2025magika}, and examining architectural constraints in emerging deployment patterns.
+**ACM CCS** papers often situated adversarial ML in the broader context of system security or used insights from machine learning to address classical security issues. We observed CCS papers emphasizing things like business logic and attack economics. For instance, Cong et al.~\citep{cong2022sslguard} and Lu et al.~\citep{lu2024neural} addressed intellectual property concerns (model stealing and watermarking). Ma et al.~\citep{ma2024avara} connected adversarial robustness to human factors by measuring drivers’ reactions. Nasr et al.~\citep{nasr2025magika} linked adversarial ML with malware evasion (file type manipulation). These reflect CCS’s interdisciplinary nature, blending ML vulnerabilities with system attacks and real-world impact. CCS papers had a relatively high fraction that considered factors like cost or practicality (still a minority, but notable ones like those above).
 
-IEEE S\&P research emphasises computational efficiency, privacy-utility trade-offs, and certified scalability. The venue has advanced understanding of threat modelling considerations and resource assumptions \citep{carlini2022membership}, documented accuracy-privacy trade-offs \citep{rezaei2023accuracy}, and examined scalability considerations for certified robustness deployment \citep{li2023sok}.
+**IEEE S\&P (Oakland)** papers tended to be more formal or measurement-driven. We saw a number of S\&P papers that systematically evaluated a problem (e.g., Carlini et al.’s membership privacy evaluation~\citep{carlini2022membership}, Rezaei et al.’s quantification of the accuracy–privacy trade-off~\citep{rezaei2023accuracy}). S\&P also had some “SoK” (Systematization of Knowledge) papers, like Li et al.’s on certified robustness~\citep{li2023sok}, indicating an interest in taking stock of where the field stands. The threat modeling in S\&P papers was often explicit; even if many still assumed white-box, they would discuss why and consider partial knowledge in some cases.
 
-NDSS research emphasises system-level constraints, distributed training considerations, and physical deployment realities. Contributions include documenting gaps between digital perturbations and physical deployment \citep{jia2022physical}, developing metrics for non-image domains \citep{kireev2023cost}, analysing distributed training heterogeneity \citep{rieger2022deepsight}, and studying adversarial dynamics where defences create exploitable side channels.
+**NDSS** had fewer adversarial ML papers (49 in our set), but those often looked at specific system applications or emerging areas. For example, Jia et al.~\citep{jia2022physical} in NDSS 2022 did the physical adversarial stop sign work. Kireev et al.~\citep{kireev2023cost} in NDSS 2023 brought a new perspective with attack cost metrics in fraud detection. Rieger et al.~\citep{rieger2022deepsight} explored adversarial attacks in federated learning (distributed scenario). NDSS papers frequently involved scenario-based evaluations (like attacking a particular platform or setup) which inherently brings in some practical constraints. Many NDSS papers still assumed strong attackers, but the contexts (cars, medical imaging, federated setting) were closer to real deployments.
 
-USENIX Security research emphasises testing on deployed systems and domain-specific constraints. The venue has documented tensions between theoretical rigour and deployment constraints \citep{xiang2022patchcleanser, xiang2024patchcure}, analysed trade-offs involving computational cost, regulatory compliance, and usability \citep{ahmed2022keyword}, studied adversarial dynamics when defences encounter adaptive attackers in production, and examined domain-specific requirements \citep{eykholt2023uret}.
+**USENIX Security** had the largest share of papers and a broad mix. Several USENIX papers explicitly evaluated their methods on production systems or through industry partnerships. For example, Duan et al.~\citep{duan2022perception} (YouTube copyright evasion) and Nayan et al.~\citep{nayan2024sok} (model extraction in the wild) were USENIX papers. USENIX also had many defense papers focusing on practicality: Xiang et al.’s patch defenses~\citep{xiang2022patchcleanser, xiang2024patchcure}, Ahmed et al.’s work on voice command security~\citep{ahmed2022keyword}, Eykholt et al.’s URET toolkit~\citep{eykholt2023uret}, etc. The average Gap Score for USENIX was slightly higher (3.25), possibly because it had a lot of papers and some categories like privacy attacks (which often assume a lot of background knowledge). But qualitatively, USENIX papers often come with artifacts or try out their ideas on real software.
 
-Our analysis reveals that defence papers demonstrate somewhat higher alignment with practical considerations than attack papers on average. Defence papers show 6 per cent real-system testing versus 5 per cent for attacks, 41 per cent gradient-free approaches versus 27 per cent, and 38 per cent black-box focus versus 31 per cent. However, both categories remain distant from deployment-ready research.
+Looking at attack vs. defense papers (Figure~\ref{fig:atk_def}), we noticed a small gap: defense papers tended, on average, to make more practical considerations. For instance, 6\% of defense papers vs. 5\% of attack papers had real-system testing (still low, but a difference), and 41\% of defenses vs. 27\% of attacks did not require gradients (meaning defenses more often evaluated black-box settings or gradient-free approaches). Also, 38\% of defenses vs. 31\% of attacks assumed a black-box adversary. This might be because defense authors know that a good defense must handle the black-box case (since an attacker might not conveniently be white-box), whereas attack authors often show a new vulnerability under a strong assumption to make a point. 
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{fig09_attack_vs_defense.png}
-    \caption{Comparison of practicality metrics between attack-focused and defense-focused papers.}
+    \caption{Comparison of attack-focused vs. defense-focused papers on practicality metrics. Defense papers had a slight edge in being evaluated under realistic conditions (e.g., more often gradient-free or black-box), but in general both categories show theoretical leanings.}
     \label{fig:atk_def}
 \end{figure}
+
+No category is immune from the gap: even some defense papers proposed methods impractical to deploy (like requiring retraining a model in a costly way, or assuming control of data that’s unrealistic). But on the whole, defense research is slowly incorporating more real-world constraints, likely because the ultimate goal of a defense is deployment.
+
+In summary, across venues we see a common core of highly theoretical work, but with pockets of practicality. CCS and NDSS provided more system-integrated perspectives, S\&P provided rigor and formal analysis, and USENIX served as a big tent capturing a variety of approaches (with some emphasis on empirical evaluation and artifacts). A healthy field needs all these, and bridging theory and practice might benefit from cross-pollination: e.g., formal analysis (common at S\&P) applied to practical scenarios (emphasized at CCS/NDSS), or the large-scale empirical approach of USENIX combined with the threat modeling depth from S\&P.
 
 %==============================================================================
 % 9. RECOMMENDATIONS
 %==============================================================================
 \section{Recommendations}
 
-Bridging the gap between academic adversarial machine learning and practical deployment requires coordinated action across researchers, conference organisers, industry and funding bodies. We summarise key recommendations for each group without sub‑levels of subsections.
+To close the gap between academic research and practical needs in adversarial ML, we propose the following recommendations tailored to different stakeholders in the community:
 
-\paragraph{Researchers.}
-Researchers should prioritise validation on operational systems and seek partnerships with industry to test defences in deployment settings, even if only limited real‑environment evaluation is feasible. Adopt realistic threat models by default: assume black‑box access unless a white‑box scenario is justified and clearly state the implications of such assumptions. Expand the scope of research beyond image classification to include tabular, graph, time series, multimodal and language models, reflecting real deployment contexts. Incorporate economic analysis by considering attack costs, defender budgets and return‑on‑investment trade‑offs, and recognise that human factors (e.g. perceptibility) are essential, so evaluation should include human testing rather than relying solely on mathematical metrics. When reporting results, use domain‑appropriate perturbation constraints and disclose query budgets and computational cost in practical units.
+\paragraph{For researchers: Embrace realistic assumptions and evaluations.} Whenever possible, validate your methods under conditions that mirror deployment. This might involve testing an attack on a running system or using a defense on a production-like workload. If direct real-world testing is not feasible, try to include at least one experiment simulating a practical scenario (e.g., limited queries, partial model knowledge, or human evaluation of “imperceptibility”). Clearly state your threat model and justify why it makes sense. If you assume something like white-box access or thousands of queries, discuss how an attacker might actually obtain that. Conversely, consider including a black-box or low-query evaluation of your attack (if you’re proposing one) to show its potential impact. For defenses, always test against adaptive attacks and consider the cost—both computational and potential impact on accuracy or user experience. Incorporating discussions of attack/defense cost, feasibility, and even organizational considerations (will people use this defense?) can make your work more impactful.
 
-\paragraph{Venues and programme committees.}
-Conference organisers and reviewers can foster practical research by encouraging or requiring real‑world validation; if such testing is infeasible, authors should explain why. Recognise and reward deployability, for example by providing artefact badges for work tested on production systems. Develop clear guidelines that ask authors to address the realism of their threat models, query budgets, gradient assumptions, choice of metrics, economic implications and the ability of attackers to adapt. Value negative results: papers demonstrating that attacks fail under realistic conditions provide important insights and should not be overlooked in favour of only positive findings.
+\paragraph{For conference organizers and reviewers: Incentivize practical relevance.} Program committees should encourage authors to include practical evaluations. While not every paper can test on a live system, authors should at least be pressed to acknowledge the gap. Review criteria could explicitly mention consideration of threat model realism and deployment constraints. We also suggest that conferences introduce awards or recognition for artifacts and real-world evaluations (some venues already do artifact badges; extending that to “deployed evaluation” could be useful). Workshops or special sessions on adversarial ML in practice (bringing in industry speakers) could highlight issues that need research attention. When reviewers see a paper with exclusively CIFAR-10 gradient-based experiments, it’s fair to ask for some justification of relevance beyond that setting.
 
-\paragraph{Industry practitioners.}
-Practitioners should interpret academic results in light of operational realities, adjusting risk assessments accordingly rather than accepting laboratory success rates at face value. Budget time and resources for re‑engineering research prototypes before they are production‑ready, and prioritise defences against plausible adversaries—black‑box attacks, low query budgets, economically motivated attackers and domain‑specific constraints. Organisations can improve the relevance of research by contributing anonymised data on actual adversarial attempts and deployment constraints.
+\paragraph{For industry practitioners: Communicate challenges and share data.} Companies deploying ML systems should systematically log and share (to the extent possible) attempts of adversarial behavior or unusual inputs they encounter. Even anonymized reports of “we observed X attack in the wild” can steer academic focus. Practitioners could partner with researchers to allow limited testing of attacks/defenses on their platforms (e.g., via bug bounty programs or red teaming exercises). When evaluating academic proposals, practitioners should consider not just the reported robustness but the assumptions behind it. Pressure-test defenses under your specific threat model and constraints; some might not hold up. It may also be worthwhile for companies to invest in internal adversarial ML teams (similar to how big tech companies have red teams for security) – these teams can try known academic attacks on production models, and feed back results to both management (for risk assessment) and the research community (for knowledge).
 
-To secure large language model and foundation model deployments, industry should: (i) maintain least‑privilege architectures by treating connectors (email, drives, calendars, repositories) as untrusted input and isolating system prompts from user prompts; (ii) implement robust prompt filtering and memory controls that parse Markdown, HTML and other formats, and treat comments or metadata as untrusted while limiting the exposure of conversational history; (iii) reduce model memorisation by limiting training on sensitive data, applying de‑identification or differential privacy, and monitoring for repeated or unnatural queries; (iv) raise the cost of model extraction through strict query limits, output randomisation and watermarking; and (v) protect the training pipeline and human layer by verifying data provenance, detecting poisoned samples, honouring opt‑out requests, and educating staff about deepfake and phishing threats.
+For those implementing large language models and foundation models, in particular, we recommend: (i) sandboxing and monitoring any tool-use or code-execution capabilities of AI agents; (ii) filtering inputs from external sources (like documents or URLs) to remove hidden instructions or code; (iii) rate-limiting and detecting bursts of similar queries that could indicate automated attacks; (iv) educating users about adversarial content (e.g., warning that images or links sent to an AI assistant could be malicious); and (v) having a response plan (similar to cybersecurity incident response) for when adversarial incidents occur, which might include updating model filters, retracting certain features, or issuing patch prompts to the model.
 
-\paragraph{Funding agencies.}
-Funding bodies should support industry–academic collaborations that include real‑world validation and fund deployment studies rather than focusing solely on novel algorithms. Replication studies that test academic claims against operational systems are essential for progress and should be incentivised. Red‑team/blue‑team exercises with realistic constraints can yield valuable insights and merit funding.
+\paragraph{For funding agencies and broader community efforts: Bridge the gap with collaborative projects.} Funding agencies can encourage projects that involve academia–industry collaboration, where researchers get access to real systems and data. For example, a grant call could specifically seek proposals that test adversarial ML defenses on critical infrastructure (with appropriate partnerships). Challenge competitions could be organized around more realistic tasks (e.g., “bypass this model with fewer than N queries” or “defend a model that is accessible only via an API”). The creation of shared benchmarks that mimic production environments (for instance, a simulated social media platform for adversarial content generation, or an API environment with costs) could provide stepping stones for researchers to try more practical approaches without needing to negotiate access to a private system.
+
+We also encourage interdisciplinary collaboration: adversarial ML researchers working with HCI experts to measure human perception of adversarial examples, or with legal experts to understand the ramifications of model IP theft. This can broaden the impact and ensure that when solutions are proposed, they consider human and organizational factors.
+
+In essence, aligning the incentives is key. Academic career incentives often reward novelty and theoretical depth; these need not conflict with practicality, but making practical impact more rewarding (through awards, funding, recognition) will help. By implementing these recommendations, we believe the adversarial ML community can more effectively produce insights and tools that improve the security of machine learning in practice.
 
 %==============================================================================
 % 10. LIMITATIONS
 %==============================================================================
 \section{Limitations and Threats to Validity}
 
-This review has several limitations that warrant consideration. First, our analysis focuses exclusively on four security venues (ACM CCS, IEEE S\&P, NDSS, and USENIX Security) and may not reflect patterns at machine learning conferences such as NeurIPS, ICML, or ICLR, where different methodological norms and evaluation standards may apply. Second, publication bias may suppress negative results, meaning that attacks which fail under realistic constraints or defenses which prove impractical in deployment are less likely to be published, potentially skewing our view of the field's progress. Third, our temporal window from 2022 to 2025 may not capture longer-term trends or reflect the full impact of recent methodological shifts. 
+This study has several limitations that should be acknowledged:
 
-Our quantitative framework, while systematic, introduces its own limitations. The Gap Score reduces complex trade-offs to binary indicators, potentially oversimplifying nuanced situations where papers exhibit partial alignment with practical considerations. Manual coding introduces subjectivity, particularly for papers that span multiple categories or employ hybrid approaches. Additionally, the definition of ``real system testing'' may vary across papers, with some testing on emulated production environments that share some but not all deployment constraints.
+First, our analysis is limited to four security conferences. Adversarial ML research also appears in ML-focused venues (NeurIPS, ICML, ICLR) and others (CVPR, ICCV for vision attacks, etc.). Those venues might have different focuses or norms (for example, ML conferences might emphasize novel algorithmic contributions even if not practical, or have more simulation-based work). Our conclusions are most applicable to the security community’s take on adversarial ML. A complementary study on ML conferences could provide a fuller picture.
 
-Finally, security venues may be more practice-focused than typical computer science venues given their traditional emphasis on real-world threats. If this is the case, our findings may underestimate the theory-practice gap in the broader machine learning research community, suggesting that the disconnect we document could be even more pronounced when considering adversarial ML research published outside security conferences.
+Second, within our dataset, we treated all papers equally, but there could be nuance (a short workshop paper vs. a long conference paper, or a paper that is largely theoretical but with a small practical component). We tried to capture some nuance with our qualitative analysis, but our coding (especially the Gap Score) reduces things to binary flags. This oversimplifies reality—some papers made partial progress on one factor (e.g., maybe they assume white-box but at least discuss how to relax it, which our binary flag wouldn’t credit).
+
+Third, our coding was manual and based on our interpretation of papers. This introduces potential bias or error. We might have missed that a paper actually did have a certain constraint if it wasn’t clearly stated. We might also have subjective judgments (e.g., what counts as “real system testing” can vary—some papers used a local instance of a production system; we generally counted that as yes if it faithfully represented deployment).
+
+Fourth, the field is moving fast. The 2025 data we have is partial and, as noted, LLM-related research only recently gained traction. If one reads this paper even a year later, the landscape might have shifted (for example, if by 2026 more papers evaluate on LLM APIs or more defenses consider cost explicitly, etc.). We provide a snapshot, and one should be cautious about extrapolating trends too far out.
+
+Fifth, the presence of a gap doesn’t mean a piece of research is not valuable. We don’t intend to dismiss the importance of theoretical explorations (which often later lead to practical techniques). Our gap indicators should not be seen as absolute “good/bad” judgments. They simply highlight the aspects where practical considerations were or were not included. A paper could score high on our gap scale yet still contribute fundamentally important knowledge (for instance, Carlini and Wagner’s attacks were white-box and expensive, but they changed our understanding of model vulnerability). Similarly, some papers we coded as more practical might have limited novelty. So, there’s a balance.
+
+Lastly, we should note a limitation in our understanding of “practical.” What is impractical today (like requiring a million queries) might become practical tomorrow as technology or attacker capabilities improve. Also, “practical” is context-dependent: an assumption might be practical for some threat actors (nation-states) but not for others (individual hackers). We tried to use a baseline of a reasonably resourceful attacker but not nation-state level (except where noted in specific papers). A different perspective on attacker capabilities could alter some interpretations.
+
+Despite these limitations, we hope our findings shed light on general trends and provoke discussion. We attempted to triangulate quantitative coding with qualitative examples to ensure our conclusions are well-founded. Future work could refine this analysis (e.g., weighting factors by importance, or surveying practitioners to directly rate what research assumptions are most unrealistic) for an even more informed perspective.
 
 %==============================================================================
 % 11. CONCLUSION
 %==============================================================================
 \section{Conclusion}
 
-The analysis of 454 research papers from 2022 to 2025, presented at the four largest security conferences (ACM CCS, IEEE S\&P, NDSS, and USENIX Security), shows that while the adversarial ML community has developed a strong foundation of theories, many researchers overlook real-world issues. The results reveal that most research papers do not pass validity checks for real-world systems (94.7\%), often require gradient access, which is rarely feasible in practice (67.8\%), suggest query budgets that exceed real-world limits (80.4\%), and use white-box threat models (63.2\%). Other problems highlighted by a thematic analysis include Lp norms that do not align with human understanding, robustness failing to carry over from simulations to real applications, neglecting economic impact and compatibility, and benchmarks that emphasize worst-case scenarios. Large language models and other foundational models introduce new vulnerabilities through discrete token spaces and cross-modal inputs. However, the gap between scientific research and real-world use remains. Many applications depend on a single model, making it crucial for researchers and other professionals to address these gaps. Case studies examining prompt injection attacks on Copilot and Bard, divergence attacks related to training data leaks, and model extraction provide further evidence of these issues.
+Our analysis of 454 adversarial ML papers (2022–2025) indicates that while the field has advanced in technical depth, many research practices still diverge from the needs of real-world deployment. Only a small fraction of studies evaluated their methods on operational systems (5.3\%), and the majority assumed attacker capabilities or experimental conditions that are difficult to attain outside the lab. For example, 63.2\% of papers assumed a white-box threat model, 67.8\% relied on having gradient access to the model, and 80.4\% allowed attack queries at scales far above typical operational limits. These assumptions simplify research but mean that the resulting attacks and defenses may require significant adaptation for use in practice.
+
+Additionally, our thematic review suggests gaps in how research measures success versus what matters in reality. Many studies focus on $L_p$ perturbation norms or worst-case theoretical analysis, whereas in practice factors like human perception, system-level integration, and economic cost are critical. We highlighted emerging challenges with foundation models, where prompt-based attacks and cross-modal exploits demonstrate that the adversarial landscape continues to evolve, often faster than defenses are deployed.
+
+Despite some progress—such as increased code release, a modest rise in work on query-efficient attacks, and greater acknowledgment of the gap in recent papers—the core issues identified in earlier critiques persist. We observe that five key dimensions remain under-addressed: realistic threat modeling, limited attacker access (no gradients), evaluation on real systems, diversification beyond the usual vision benchmarks, and consideration of economic and human factors. Addressing these will be vital as machine learning systems become ever more embedded in high-stakes applications.
+
+We offer recommendations for researchers to incorporate practical constraints into their work, for conferences and reviewers to encourage and reward realism, for industry practitioners to share data and collaborate on evaluating methods, and for funding bodies to support projects that bridge academia and real-world deployment. By aligning research incentives with deployment challenges, the adversarial ML community can narrow the theory–practice gap.
+
+As AI systems continue to proliferate, ensuring their robustness against adversarial misuse is increasingly a matter of public safety and trust. Bridging this gap is thus not only an academic exercise but a societal imperative. We are optimistic that with the growing awareness of these issues and the collective efforts of the community, future adversarial ML research will more seamlessly translate into secure machine learning in practice.
 
 %==============================================================================
 % REFERENCES
@@ -586,67 +667,53 @@ The analysis of 454 research papers from 2022 to 2025, presented at the four lar
 \appendix
 \section{Complete Paper Analysis Dataset}
 
-The complete analysis of all 454 papers is available in the supplementary CSV file: 
-\texttt{all\_conferences\_analysis\_results\_2022\_2025.csv}
+For transparency and to facilitate future meta-analyses, we provide our full dataset of coded results for all 454 papers in the supplementary material (\texttt{all\_conferences\_analysis\_results\_2022\_2025.csv}). Table~\ref{tab:full_dataset_summary} shows a condensed excerpt of key fields.
 
-The dataset includes the following columns for each paper:
+The dataset columns include:
 \begin{itemize}[noitemsep]
-    \item Year, Conference, Filename, Title, Authors
-    \item G1 (Focus), G2 (Attack Type), G3 (ML Type), G4 (Data Domain)
-    \item G5 (Economics), G6 (Code Release), G7 (Real System Testing)
-    \item T1 (Threat Model), T2 (Training Data Access)
-    \item Q1 (Gradient Requirements), Q2 (Query Budget), Q3 (Computation)
-    \item Gap indicator flags and Traditional Score
+    \item Year, Conference, Title (first author and shorthand)
+    \item G1 (Focus: attack or defense), G2 (Attack Type: Evasion, Poison, Privacy, Multiple)
+    \item G3 (ML paradigm: DL=deep learning, Trad=traditional ML, Both)
+    \item G4 (Data Domain: Images, Text, Audio, Malware, Other)
+    \item G5 (Economics discussed: YES/NO)
+    \item G6 (Code released: YES/NO)
+    \item G7 (Real system testing: YES/NO)
+    \item T1 (Threat model: White-box, Gray-box, Black-box)
+    \item T2 (Training data access assumed: Full, Partial, None)
+    \item Q1 (Requires gradients: YES/NO)
+    \item Q2 (Query budget: High, Low, None)
+    \item Q3 (Computation needed: High = GPU or extensive, Low = CPU or minimal)
+    \item Gap Score (0–6) as defined in the paper.
 \end{itemize}
 
-\noindent Benchmark meanings (aligned with the CSV fields used in the table):
-\begin{itemize}[noitemsep]
-    \item G1 Focus: atk (attack), def (defense), both.
-    \item G2 Attack Type: Evasion, Poisoning, Privacy, Multiple.
-    \item G3 ML Type: DL, Traditional, Both.
-    \item G4 Data Domain: Images, Text, Audio, Malware, Other.
-    \item G5 Economics mentioned: YES/NO.
-    \item G6 Code released: YES/NO.
-    \item G7 Real system testing: YES/NO.
-    \item T1 Threat model: White-box, Gray-box, Black-box.
-    \item T2 Training data access: Full, Partial, None.
-    \item Q1 Requires gradients: YES/NO.
-    \item Q2 Query budget: High ($>$1000), Low ($<$1000), None.
-    \item Q3 Computation: High (GPU), Low (CPU).
-    \item Traditional\_Score (Gap Score 0--6): sum of six impractical-assumption flags (higher = less practical).
-\end{itemize}
-
-For full per-paper details (all 24 columns), please see the CSV file. Below is a compact, bordered summary table focused on the most critical taxonomy fields. Binary fields are rendered as checkmarks (yes) or blanks (no); threat/access levels are abbreviated (W/B/G/P, F/P, H/L).
+In the table, binary fields are indicated with checkmarks (Yes) or \(\times\) (No), and abbreviated labels are used for threat model (W = white, B = black, G = gray) and other categorical fields for compactness.
 
 \begin{landscape}
 \begin{tiny}
 \setlength{\tabcolsep}{0.65pt}
 \renewcommand{\arraystretch}{0.7}
 \begin{longtable}{|p{0.7cm}|p{0.9cm}|p{1.4cm}|p{0.7cm}|p{1.0cm}|p{0.7cm}|p{0.7cm}|p{0.7cm}|p{0.7cm}|p{0.7cm}|p{0.7cm}|p{0.7cm}|p{0.7cm}|p{0.7cm}|p{0.7cm}|p{0.7cm}|p{0.7cm}|}
-\caption{Compact summary of papers (key taxonomy fields).}\label{tab:full_dataset_summary}\\
+\caption{Summary of all reviewed papers with key taxonomy fields. (G1: Focus; G2: Attack Type; G3: ML Type; G4: Domain; G5: Economics; G6: Code; G7: Real-world eval; T1: Threat Model; T2: Train Data Access; Q1: Gradient; Q2: Query Budget; Q3: Computation; WB: White-box flag; Gap Score.)}\label{tab:full_dataset_summary}\\
 \hline
-Year & Venue & Paper (1st author) & G1 & G2 & G3 & G4 & G5 & G6 & G7 & T1 & T2 & Grad & Qry & Comp & WB & Trad. \\
+Year & Venue & First Author & G1 & G2 & G3 & G4 & G5 & G6 & G7 & T1 & T2 & Grad & Qry & Comp & WB & Gap \\
 \hline
 \endfirsthead
 \hline
-Year & Venue & Paper (1st author) & G1 & G2 & G3 & G4 & G5 & G6 & G7 & T1 & T2 & Grad & Qry & Comp & WB & Trad. \\
+Year & Venue & First Author & G1 & G2 & G3 & G4 & G5 & G6 & G7 & T1 & T2 & Grad & Qry & Comp & WB & Gap \\
 \hline
 \endhead
 \hline
-\multicolumn{17}{r}{\small Continued on next page}\\
+\multicolumn{17}{r}{\small (Continued on next page)}\\
 \hline
 \endfoot
 \hline
 \endlastfoot
 \csvreader[
     separator=semicolon,
-    column count=24,
     late after line=\\\hline
 ]{all_conferences_analysis_results_clean.csv}{
 Year=\Year,
 Conference=\Conference,
-Filename=\Filename,
-Title=\Title,
 Authors=\Authors,
 G1=\GOne,
 G2=\GTwo,
@@ -660,15 +727,10 @@ T2=\Ttwo,
 Q1=\Qone,
 Q2=\Qtwo,
 Q3=\Qthree,
-Flag_Grad=\FGrad,
-Flag_HighQ=\FHighQ,
 Flag_WB=\FWB,
-Flag_NoEcon=\FNoEcon,
-Flag_NoCode=\FNoCode,
-Flag_NoReal=\FNoReal,
 Traditional_Score=\TScore
 }{
-\Year & \Conference & \StrBefore{\Authors}{ } & \GOne & \GTwo & \GThree & \GFour & \yn{\GFive} & \yn{\GSix} & \yn{\GSeven} & \threat{\Tone} & \access{\Ttwo} & \yn{\Qone} & \level{\Qtwo} & \level{\Qthree} & \yn{\FWB} & \TScore
+\Year & \Conference & \StrBefore{\Authors}{ } & \GOne & \IfStrEq{\GTwo}{Evasion}{Ev}{\IfStrEq{\GTwo}{Poisoning}{Po}{\IfStrEq{\GTwo}{Privacy}{Pr}{\IfStrEq{\GTwo}{Multiple}{M}{\GTwo}}}} & \GThree & \IfStrEq{\GFour}{Images}{Img}{\IfStrEq{\GFour}{Text}{Txt}{\IfStrEq{\GFour}{Audio}{Aud}{\IfStrEq{\GFour}{Malware}{Mal}{Oth}}}} & \yn{\GFive} & \yn{\GSix} & \yn{\GSeven} & \threat{\Tone} & \access{\Ttwo} & \yn{\Qone} & \level{\Qtwo} & \level{\Qthree} & \yn{\FWB} & \TScore
 }
 \end{longtable}
 \end{tiny}
