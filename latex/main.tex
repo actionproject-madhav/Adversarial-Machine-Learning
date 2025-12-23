@@ -564,38 +564,18 @@ Bommasani et al.~\citep{bommasani2021opportunities} identified two features dist
 %==============================================================================
 \section{Temporal Trends}
 
-A central question motivates this review: has the research community responded to calls for greater practical relevance? Our temporal analysis provides insight into this question.
+A central question of this review is whether the research community has responded to calls for greater practical relevance. Figure~\ref{fig:trends} summarises temporal trends from 2022 to 2025. Our analysis reveals several persistent patterns. Real system testing remains rare—about five per cent of papers across all years—despite widespread encouragement to evaluate on deployed systems. Dependence on gradient information has held steady at roughly sixty-seven per cent, with few works adopting gradient-free methods. White box assumptions have not declined appreciably (about sixty-three per cent in 2025 compared to sixty-four per cent in 2022), and the distribution of application domains continues to be dominated by image data (around sixty-five per cent). Very few papers incorporate economic analysis, and this proportion stays below eleven per cent in every year.
+
+There is evidence of modest progress. High query budgets have become slightly less common, declining from about eighty per cent to roughly seventy-six per cent by 2025, and some researchers have proposed more query-efficient attacks. Awareness that attackers often lack complete system knowledge has increased, but this has yet to result in major changes to threat modelling practices.
+
+A further shift is evident in the emergence of large language and multimodal models as a focus of adversarial ML. Work in 2024–2025 points to fundamentally different attack surfaces for such systems: they operate on discrete tokens rather than continuous pixel values and are subject to instability as providers continually update their models. Despite these differences, similar theory-to-practice gaps persist. White box gradient-based attacks such as GCG achieve high success on open-source language models \citep{zou2023universal}, yet they are impractical against commercial APIs that reveal only output tokens. Recent black box methods like PAIR \citep{chao2023jailbreaking} and TAP \citep{mehrotra2024tree} succeed within tens of queries under more realistic conditions. Multimodal models expose cross-modal vulnerabilities—vision encoders often receive less hardening than text components \citep{qi2024visual}—and foundation models centralise risk because one model supports many downstream applications. Taken together, the temporal trends indicate that while some improvements have been made, the research community has not yet fully embraced the operational realities of adversarial machine learning.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{fig11_yearly_trends.png}
-    \caption{Temporal trends showing the theory-practice gap from 2022 to 2025, with limited change in key metrics.}
+    \caption{Temporal trends showing the gap between research and practice from 2022 to 2025.  Real-world testing remains rare and other key metrics show only incremental change.}
     \label{fig:trends}
 \end{figure}
-
-\subsection{Stable Patterns}
-
-\textbf{Real-world testing} remains at approximately 5\% across all years. Despite calls for deployment validation, the research community has not substantially shifted toward testing on production systems.
-
-\textbf{Gradient dependency} has remained relatively stable at 67--69\%. There has been limited movement toward gradient-free approaches at the aggregate level.
-
-\textbf{White-box assumptions} show no substantial reduction (63\% in 2025 vs. 64\% in 2022). Threat model distributions have remained consistent.
-
-\textbf{Domain distribution} persists with image data representing 65\% of papers throughout the study period.
-
-\textbf{Economic analysis} remains below 11\% in all years.
-
-\subsection{Areas of Modest Progress}
-
-Query efficiency shows some progress, with high-budget assumptions declining from 80.4\% to approximately 76\% by 2025. Some researchers have developed query-efficient attacks, though these represent a minority of approaches.
-
-Awareness of attacker knowledge limitations has increased, with growing acknowledgment that adversaries often lack full system knowledge. However, this awareness has not yet translated into substantial shifts in threat modeling practices.
-
-\subsection{Emerging Research Areas}
-
-The 2024--2025 period has seen substantial growth in LLM security research, representing a significant shift in the adversarial ML landscape. While traditional research focused predominantly on computer vision (65\% of papers in our dataset), large language models and multimodal foundation models introduce fundamentally different attack surfaces. These systems operate in discrete token spaces rather than continuous pixel spaces, face evaluation instability as providers continuously update models, and lack the formal perturbation constraints (like $L_p$-norm budgets) that bound traditional adversarial examples.
-
-Yet the theory-practice gap manifests similarly. White-box gradient-based attacks like GCG~\citep{zou2023universal} achieve high success rates on open-source models but prove impractical against production APIs that expose only final outputs. Black-box methods like PAIR~\citep{chao2023jailbreaking} and TAP~\citep{mehrotra2024tree} operate within more realistic constraints, succeeding in under 20 queries against commercial systems. Multimodal models reveal cross-modal alignment gaps, where vision encoders receive less adversarial hardening than text components~\citep{qi2024visual}. As discussed in Section~6, these systems amplify systemic risk through homogenization: vulnerabilities in foundation models like GPT-4 affect every downstream application built on their APIs, from legal document analyzers to medical triage systems.
 
 %==============================================================================
 % 8. CROSS-VENUE ANALYSIS
@@ -715,25 +695,7 @@ Finally, security venues may be more practice-focused than typical computer scie
 %==============================================================================
 \section{Conclusion}
 
-This systematic review involving 454 research papers published from 2022--2025 at four prestigious security conferences bears evidence of some beneficial contributions by the research community of adversarial machine learning studies in spite of the theory-practice gap noticed by Apruzzese et al.
-
-The quantitative trends are striking:
-\begin{itemize}[noitemsep]
-    \item 94.7\% of the papers don't test on real systems
-    \item 67.8\% need gradients which might not be accessible in real life
-    \item 80.4\% assume query budgets that could exceed deployment limits
-    \item 63.2\% assume white-box access that could not be provided in deployment situations
-\end{itemize}
-
-Thematic analysis shows other considerations emerging. $L_p$ norms may not model human perception well. Robustness may not generalize to production-quality settings. Defense systems do not necessarily take into consideration economic losses and use ease-of-use constraints. Assessment metrics are often averages for the worst-case scenario characteristics.
-
-The emergence of large language models and foundation models represents a parallel frontier where these same theory-practice gaps manifest through different attack surfaces. While these systems introduce new challenges (discrete token spaces, evaluation instability, cross-modal vulnerabilities), they exhibit familiar patterns: impractical gradient-based attacks, unrealistic query budgets, and insufficient real-world validation. The systemic nature of foundation model deployment, where single models serve numerous downstream applications, amplifies the practical importance of addressing these gaps.
-
-Among the many contributions of the research community is the theoretical foundation and pioneering research in adversarial phenomena. However, to move forward, accomplishing the goal of closing the theory-practice gap will necessitate structural changes in conferences that reward verification of effectiveness in the real world, assumptions of reasonable threats in research, industry inputs of deployment results, and distribution of funding that emphasizes effectiveness along with innovation.
-
-However, the efficacy of ever more widespread ML-dependent systems is contingent on the ongoing involvements of the community of ML researchers with both the theory and the practicalities. Our observations indicate that those practicalities can, through shifts within publishing, evaluation, and collaboration, help ensure that community-driven ML adversarial research and development work increasingly serves a practical, security context.
-
-Our case-study analysis of prompt-injection exploits against Copilot and Bard, training-data leakage via divergence attacks, model extraction from commercial APIs and deepfake-based scams underscores that adversarial ML in practice hinges on pipelines, interfaces and human factors \citep{EchoLeak2025,EftsureDeepfake2024}.  Addressing these challenges requires defences that secure connectors, limit memorisation and align incentives across the ML supply chain, beyond traditional gradient-based robustness.
+The analysis of 454 research papers from 2022 to 2025, presented at the four largest security conferences (ACM CCS, IEEE S\&P, NDSS, and USENIX Security), shows that while the adversarial ML community has developed a strong foundation of theories, many researchers overlook real-world issues. The results reveal that most research papers do not pass validity checks for real-world systems (94.7\%), often require gradient access, which is rarely feasible in practice (67.8\%), suggest query budgets that exceed real-world limits (80.4\%), and use white-box threat models (63.2\%). Other problems highlighted by a thematic analysis include Lp norms that do not align with human understanding, robustness failing to carry over from simulations to real applications, neglecting economic impact and compatibility, and benchmarks that emphasize worst-case scenarios. Large language models and other foundational models introduce new vulnerabilities through discrete token spaces and cross-modal inputs. However, the gap between scientific research and real-world use remains. Many applications depend on a single model, making it crucial for researchers and other professionals to address these gaps. Case studies examining prompt injection attacks on Copilot and Bard, divergence attacks related to training data leaks, and model extraction provide further evidence of these issues.
 
 %==============================================================================
 % REFERENCES
