@@ -408,99 +408,26 @@ Conference-level analysis reveals similar patterns across venues: ACM CCS averag
 %==============================================================================
 \section{Thematic Findings}
 
-Beyond quantitative metrics, thematic analysis across venues reveals structural patterns in how adversarial ML research is conducted and evaluated.
+Beyond the quantitative metrics, our thematic analysis across venues reveals several recurring patterns and emerging directions in adversarial machine learning research.
 
-\subsection{The Utility-Robustness Trade-off}
+\paragraph{Utility and robustness trade-off.} Practical deployment often requires balancing security guarantees against system performance. Studies from USENIX Security highlight that defenses offering certifiable robustness can reduce clean accuracy and increase inference cost by an order of magnitude \citep{xiang2022patchcleanser, xiang2024patchcure}. This tension extends beyond vision: defenses against malicious activations in voice assistants degrade natural accuracy \citep{ahmed2022keyword}, and differential privacy techniques reduce model utility \citep{liu2022mldoctor,tang2022membership}. Recent work shows progress: PatchCleanser masks images without harming state-of-the-art accuracy \citep{xiang2022patchcleanser}; MIST limits overfitting on the most vulnerable training instances \citep{li2024mist}; and CAMP demonstrates that adversarially robust reinforcement learning can preserve expected returns \citep{wang2025camp}.
 
-A significant consideration for deployment is the relationship between security guarantees and system performance. Research from USENIX Security (2022--2025) particularly illuminates this tension.
+\paragraph{Evaluation methodology.} There is increasing recognition that standard distance metrics and evaluation practices may not reflect human perception or operational realities. Lp norms measure pixel differences but do not reliably predict whether humans detect adversarial examples \citep{carlini2022membership}, a conclusion reinforced by eye-tracking studies in virtual reality that show mathematically imperceptible perturbations can be obvious to drivers \citep{ma2024avara}. Privacy research warns that defences evaluated using average-case metrics may still leak data about specific individuals \citep{carlini2022membership}. As a result, researchers advocate human-in-the-loop evaluation, domain-appropriate perturbation constraints, realistic query budgets and explicit reporting of computational cost.
 
-Xiang et al.~\citep{xiang2022patchcleanser} found that defensive proposals achieving certifiable robustness against adversarial patches frequently yielded reduced clean classification accuracy, which may discourage real-world deployment. By 2024, Xiang et al.~\citep{xiang2024patchcure} documented that certifiably robust defenses in computer vision require 10 to 100 times more inference-time computation than undefended models, presenting computational challenges for practical deployment.
+\paragraph{Physical deployment and system integration.} A significant theme is the gap between digital adversarial examples and the complexities of physical environments. Physical attacks must contend with distance, viewpoint, illumination and sensor noise. Jia et al. tested physical adversarial signs against production autonomous vehicles \citep{jia2022physical}, while subsequent studies attacked X-ray detectors \citep{liu2023xadv}, LiDAR systems \citep{cao2023lidar}, voice recognition using tubes \citep{ahmed2023tubes}, road-surface LiDAR spoofing \citep{kobayashi2025shadow} and perceptual hashing algorithms \citep{zhang2025atkscopes}. Researchers also show that system components such as data filters, file-type detectors and compiler pipelines can introduce new vulnerabilities: privacy side channels can emerge from data filtering \citep{debenedetti2024privacy}, malware detection can be bypassed via file-type manipulation \citep{nasr2025magika}, and defences can disappear during compilation \citep{chen2023obsan}. These findings stress that robustness must be integrated end-to-end.
 
-This pattern extends beyond vision systems. Ahmed et al.~\citep{ahmed2022keyword} found that defenses against malicious activations in voice assistants typically affect natural accuracy. Similarly, widely used privacy-preserving techniques like DP-SGD may compromise model utility to achieve privacy guarantees~\citep{liu2022mldoctor, tang2022membership}.
+\paragraph{Real-world adversarial incidents.} Documented attacks underscore the importance of system interfaces and economic incentives. The EchoLeak attack used a single phishing email, a reference link and automatic image preview to extract data from Microsoft 365 Copilot \citep{EchoLeak2025}. A prompt-injection exploit on Google Bard hid instructions in a shared document and encoded private data via an image URL \citep{HackerOneBard}, while the AgentFlayer demonstration extracted API keys from a poisoned document in Google Drive \citep{AgentFlayer2025}. These cases show that large language model deployments can be compromised via email, document summarisation and browsing contexts, and attackers often chain simple techniques. Beyond prompt injection, the divergence attack reveals training data from ChatGPT at rates far exceeding previous methods \citep{Nasr2023}, and high-fidelity model extraction against commercial APIs is feasible \citep{Liu2024}. Supply chain poisoning tools like Nightshade allow artists to corrupt generative model training data \citep{Nightshade2023}, and deepfake scams show how attackers manipulate human users \citep{EftsureDeepfake2024}. Together, these incidents illustrate that adversarial threats span the entire ML pipeline, from data collection to deployment and human interaction.
 
-Some recent work demonstrates progress in addressing this trade-off. PatchCleanser introduced a double-masking approach compatible with any image classifier, achieving high certified robustness while preserving state-of-the-art clean accuracy~\citep{xiang2022patchcleanser}. MIST offers a pathway toward robust security by strategically limiting overfitting only to the most membership-vulnerable training instances~\citep{li2024mist}. CAMP training demonstrated that provable adversarial robustness in deep reinforcement learning need not sacrifice certified expected return, which may be valuable for safety-critical robotics applications~\citep{wang2025camp}.
+\paragraph{Attack and defence evolution.} Over time, attacks have become more practical and stealthy. Early work focused on physically realisable perturbations like the frustum attack, which exploits automotive sensor fusion \citep{hallyburton2022frustum}. The popularity of large language models brought natural-language jailbreaking; black-box methods such as PAIR and TAP elicit harmful outputs within a small number of queries \citep{chao2023jailbreaking,mehrotra2024tree}. Multimodal models reveal cross-modal vulnerabilities as vision encoders receive less hardening than text components \citep{qi2024visual}. Recent attacks prioritise persistence: MergeBackdoor remains dormant until merged with other models \citep{wang2025mergebackdoor}, and persistent backdoors survive continual learning \citep{guo2025persistent}. Defences have evolved from generic heuristics to specialised, interpretable and context-aware mechanisms. Blacklight identifies black-box query attacks by detecting near-duplicate queries \citep{li2022blacklight}. JBShield manipulates hidden states to remove toxic or jailbreak concepts \citep{zhang2025jbshield}, SafeSpeech reduces the utility of synthesised voice data to deter cloning \citep{zhang2025safespeech}, and DeBackdoor detects backdoors under black-box and data-scarce conditions \citep{popovic2025debackdoor}. The distribution of attack types over time is shown in Figure \ref{fig:attack_types}.
 
-\subsection{Evaluation Methodology}
-
-Research across venues reveals considerations regarding how attacks and defenses are evaluated.
-
-\subsubsection{Distance Metrics}
-
-Standard evaluation measures adversarial perturbation size using $L_p$ norms, which are mathematical measures of distance between original and perturbed inputs. However, as Carlini et al.~\citep{carlini2022membership} document, conventional distance metrics like $L_p$ norms, which measure pixel-level differences, do not reliably predict whether humans perceive adversarial perturbations.
-
-This consideration was empirically examined by the Avara framework~\citep{ma2024avara}, which used VR environments and eye-tracking to study whether drivers notice adversarial traffic signs. They found that $L_p$ norms do not reliably predict whether human drivers notice adversarial perturbations: attacks deemed ``imperceptible'' by mathematical standards may be immediately obvious to a driver, while attacks violating $L_p$ constraints might go unnoticed in realistic driving conditions.
-
-\subsubsection{Privacy Evaluation}
-
-Privacy attacks present particular evaluation challenges. Carlini et al.~\citep{carlini2022membership} observe that privacy is fundamentally a worst-case concern: a defense succeeds only if it protects all individuals, not just the majority. Yet membership inference attacks are typically evaluated using average-case metrics (overall accuracy, AUC) that may mask severe privacy leakage for specific individuals.
-
-\subsection{Physical Deployment Considerations}
-
-A consideration for conventional AML research concerns the gap between digital adversarial examples and the complex physical conditions governing real-world perception systems.
-
-\subsubsection{Physical Attack Challenges}
-
-Digital perturbations optimized in simulation may perform differently when deployed physically due to environmental factors: distance and viewing angle variations, illumination changes, sensor noise, and compression artifacts. NDSS research has particularly emphasized this consideration.
-
-Jia et al.~\citep{jia2022physical} developed robust physical adversarial example pipelines tested against production autonomous vehicles running YOLO v5 traffic sign recognition. Their work required accounting for real-road conditions that simulation may not capture.
-
-Physical attack research at USENIX has expanded beyond vision systems. Liu et al.~\citep{liu2023xadv} designed physically realizable 3D adversarial objects capable of deceiving X-ray prohibited item detection, requiring optimization for shape rather than color or texture and accounting for complex object overlap in luggage. Cao et al.~\citep{cao2023lidar} demonstrated Physical Removal Attacks using focused laser spoofing to selectively remove LiDAR point cloud data on autonomous vehicles. The ``Tubes Among Us'' research~\citep{ahmed2023tubes} demonstrated analog adversarial attacks where adversaries manipulate voice signals using simple tubes to bypass speaker recognition, effectively bypassing established digital artifact detection methods.
-
-By 2025, physical attack research has embraced increasingly practical scenarios. ``Shadow Hack''~\citep{kobayashi2025shadow} exploits LiDAR weaknesses using ordinary non-reflective materials placed on roads, requiring no specialized equipment. ATKSCOPES~\citep{zhang2025atkscopes} demonstrates rapid evasion against real-world perceptual hashing algorithms by dynamically adapting to victim systems.
-
-\subsubsection{System Integration}
-
-Research increasingly recognizes that integrating ML models into complex systems introduces considerations that isolated model analysis may miss. Debenedetti et al.~\citep{debenedetti2024privacy} reveal that system-level components such as training data filters or output monitoring may introduce privacy side channels exploitable by adaptive adversaries, potentially affecting provable differential privacy guarantees.
-
-Nasr et al.~\citep{nasr2025magika} demonstrated this by examining how exploiting Google's Magika file-type classifier affects Gmail's malware detection pipeline, showing that a single non-robust component can compromise an entire security pipeline.
-
-Chen et al.~\citep{chen2023obsan} document that security mechanisms integrated solely at the framework level may not persist once models are compiled into optimized executables for deployment. Defenses may need to be embedded within the DL compiler pipeline to persist through deployment, a requirement often absent from academic work.
-
-\subsubsection{Real-World Adversarial ML Scenarios}
-Recent incidents reveal how adversaries exploit the interfaces and economics of deployed ML systems rather than computing gradients.  The 2025 \emph{EchoLeak} attack showed how a single phishing email with hidden instructions could trigger a chain reaction: the attacker embedded subtle prompts instructing Microsoft~365~Copilot not to mention the email's content, inserted a reference-style Markdown link that bypassed link filtering, and relied on the Teams client's automatic image preview to fetch data via an allowed proxy, resulting in zero-click exfiltration \citep{EchoLeak2025}.  A similar prompt-injection exploit on Google Bard Extensions placed malicious instructions in a shared document; when the model summarised the file, it encoded private data into an image URL and used Google Apps Script to evade content-security policies \citep{HackerOneBard}.  Researchers further demonstrated with \emph{AgentFlayer} that a single poisoned document uploaded to a Google~Drive could extract API keys when ChatGPT's Connector summarised it \citep{AgentFlayer2025}, and Tenable's ``HackedGPT'' study exposed how ChatGPT's browsing and memory features can be hijacked through comments on trusted websites or cleverly crafted URLs.  Collectively, these cases underscore that LLM deployments are vulnerable to prompt injection through email clients, document summarisation and web-browsing contexts, and that attackers chain low-cost techniques across multiple system components.
-
-Beyond prompt injection, adversaries have shown that they can extract models and data through repetitive queries.  The ``divergence attack'' on ChatGPT causes the aligned \texttt{gpt-3.5-turbo} model to behave like its unaligned base: by prompting the system to repeat a word indefinitely, researchers coaxed it into revealing training data (including real email addresses and phone numbers) at a rate 150~times higher than previous attacks \citep{Nasr2023}, recovering thousands of training examples for about \$200 in query costs.  Other studies of model extraction against ML-as-a-service APIs report fidelities between 63~\% and 84~\% when cloning commercial emotion-recognition models \citep{Liu2024}, indicating that modest query budgets suffice to approximate proprietary systems.  These findings reveal that alignment and rate-limiting measures alone do not prevent data leakage or model theft.
-
-Finally, adversaries are attacking the ML supply chain and human layer.  The \emph{Nightshade} tool allows artists to embed imperceptible pixel perturbations into their artwork; if these images are scraped and used to train generative models, the model learns incorrect associations (e.g., dogs become cats), with fewer than 100 poison samples per prompt needed to corrupt a stable diffusion model \citep{Nightshade2023}.  At the human level, scammers increasingly use deepfake voice and video to impersonate executives—one 2024 case involved a convincing video call that tricked an employee into wiring \$25~million \citep{EftsureDeepfake2024}.  Such socio-technical attacks show that adversarial ML in practice is intertwined with economic incentives, content-moderation policies and user behaviour.  Addressing these threats requires system-level defences and organisational awareness, not just robust classifiers.
-
-\subsection{Attack Evolution}
-
-Despite methodological considerations about assumptions, research has progressively explored more practical attack vectors.
+\paragraph{Economic and organisational factors.} Finally, we note that economic and organisational dynamics receive relatively little attention. Researchers highlight that the cost of extracting proprietary models can be much lower than the cost of training and protecting them: pre-trained encoders can be extracted cheaply \citep{cong2022sslguard}, and watermark removal requires only a small fraction of training data \citep{lu2024neural}. Organisational studies suggest that ML practitioners often lack motivation or resources to implement adversarial defences, viewing security and machine learning as separate domains \citep{mink2023barriers}. As a result, adversarial evaluations are rarely prioritised, and attacks may go undetected in production. Addressing adversarial threats therefore requires not only technical advances but also shifts in organisational culture and closer collaboration between ML and security teams.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{fig07_attack_types.png}
-    \caption{Attack type distribution showing evasion attacks (48\%) predominate, with trends over time.}
+    \caption{Distribution of attack types across the 2022–2025 period. Evasion attacks dominate, but the composition shifts as new modalities and tactics emerge.}
     \label{fig:attack_types}
 \end{figure}
-
-Early practical attacks (2022) demonstrated physically realizable approaches like the ``frustum attack,'' which leverages environmental context to compromise automotive sensor fusion in black-box settings~\citep{hallyburton2022frustum}.
-
-By 2023--2024, attacks increasingly emphasized simplicity and accessibility. The effectiveness of jailbreaking LLMs through natural language prompts, even by users without ML expertise, illustrated the potential of accessible black-box attacks compared to complex gradient optimization.
-
-The 2025 landscape shows attacks prioritizing stealth and persistence. MergeBackdoor~\citep{wang2025mergebackdoor} reveals supply chain considerations where seemingly benign upstream models pass security checks but activate malicious backdoors upon merging with other components. Guo et al.~\citep{guo2025persistent} describe persistent backdoor strategies targeting stable neuronal components, ensuring exploits survive continuous parameter updates in continual learning systems.
-
-\subsection{Defense Evolution}
-
-Defensive research has evolved from generic solutions toward specialized, interpretable, and context-aware mechanisms.
-
-Blacklight~\citep{li2022blacklight} detected and mitigated black-box query-based attacks against MLaaS by leveraging the observation that iterative optimization produces highly similar queries, providing defense against persistent attackers that bypass account-based security measures.
-
-Recent defenses demonstrate increased sophistication. JBShield~\citep{zhang2025jbshield} moves beyond heuristics for LLM protection by using the Linear Representation Hypothesis to identify and manipulate ``toxic'' and ``jailbreak'' concepts within hidden states. SafeSpeech~\citep{zhang2025safespeech} proactively affects voice data during training to make synthesized audio less usable, achieving robustness against voice cloning. DeBackdoor~\citep{popovic2025debackdoor} addresses deployment constraints by providing backdoor detection effective under black-box access, data scarcity, and pre-deployment inspection limitations.
-
-\subsection{Economic and Organizational Factors}
-
-Academic research has given limited attention to the economic and organizational dimensions of adversarial ML.
-
-\subsubsection{Economic Considerations}
-
-ACM CCS research has highlighted how commercial ML services create incentives for IP theft that may affect protective mechanisms. Cong et al.~\citep{cong2022sslguard} document that extracting pre-trained encoders may cost substantially less than training from scratch. Lu et al.~\citep{lu2024neural} show that Neural Dehydration can remove watermarks using less than 2\% of training data. The economic asymmetry, where model extraction attacks may cost orders of magnitude less than defenses or the assets they protect, remains an area requiring additional attention.
-
-\subsubsection{Organizational Considerations}
-
-Beyond technical considerations, qualitative research reveals organizational factors affecting industry adoption. Mink et al.~\citep{mink2023barriers} found that ML practitioners often lack institutional motivation and resources to understand and mitigate adversarial threats, frequently viewing security and machine learning as disconnected fields.
-
-This organizational separation results in lower prioritization of adversarial evaluations before deployment and limited visibility into monitoring for active attacks. Defenses may remain unimplemented due to isolation between ML and security teams or because competing business priorities outweigh the cost and time needed for robust implementation.
 
 %==============================================================================
 % 6. FOUNDATION MODELS AND LARGE LANGUAGE MODELS
