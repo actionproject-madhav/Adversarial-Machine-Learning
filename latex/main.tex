@@ -124,6 +124,8 @@ Machine learning systems are being used more often in security-critical applicat
 
 Our analysis shows that 94.7\% of the papers do not test on deployed systems, 67.8\% depend on gradient access that is rarely available in real situations, 80.4\% assume query budgets that go beyond typical operational limits, and 63.2\% use white-box threat models. We identify five areas that need more attention in relation to real-world deployment: specifying threat models, accessing gradients, validating on real systems, ensuring diversity beyond image classification, and considering economic and human factors. Our temporal analysis from 2022 to 2025 shows that progress in these areas is gradual rather than swift.
 
+In addition to our quantitative analysis, we examine real-world adversarial incidents—including
+
 We also examine how these gaps manifest in the emerging domain of large language models and multimodal foundation models. Despite operating in discrete token spaces with fundamentally different attack surfaces, these systems exhibit the same theory-practice disconnect: impractical gradient-based attacks, unrealistic query budgets, evaluation instability, and insufficient real-world validation. The systemic deployment of foundation models, where single systems serve numerous downstream applications, amplifies the practical importance of closing these gaps. We end with suggestions for researchers, venues, practitioners, and funding agencies to promote more effective adversarial machine learning research.
 
 \textbf{Keywords:} adversarial machine learning, theory-practice gap, security research, systematic review, threat modeling
@@ -686,6 +688,18 @@ Evaluate privacy using true-positive rate at low false-positive rates, not only 
 \textbf{Prioritize defenses against realistic threats:} black-box attacks, low query budget scenarios, economically motivated adversaries, and domain-specific constraints.
 
 \textbf{Consider contributing data.} Anonymized information about real attack attempts could help ground academic research in deployment reality.
+
+\subsubsection{LLM Deployment Security Practices}
+
+Recent incidents highlight specific vulnerabilities in production LLM deployments that require systematic defenses:
+
+\begin{itemize}
+  \item \textbf{Secure integration and least-privilege access:} treat connectors (e.g., email, drives, calendars, code repositories) as untrusted input channels.  Isolate system instructions from user prompts, disable automatic retrieval of external content unless explicitly allowed, and restrict link formats.  Multi-step prompt-injection chains like EchoLeak and AgentFlayer highlight that vulnerabilities often arise at the intersection of components \citep{EchoLeak2025}.
+  \item \textbf{Robust prompt filtering and memory management:} build filters that understand Markdown, HTML and file formats, and treat comments in documents or websites as untrusted.  Limit how much previous conversation history and user memory is exposed to tools.  Bard's document-level injection and Tenable's browsing-context attacks show how easily hidden instructions can hijack LLMs \citep{HackerOneBard}.
+  \item \textbf{Limit model memorisation and monitor query patterns:} reduce training on sensitive data, employ de-identification and differential privacy, and detect repetitive or nonsensical prompts.  The divergence attack on ChatGPT demonstrates that aligned models can still leak training data \citep{Nasr2023}; monitoring for suspicious query patterns is critical.
+  \item \textbf{Raise the cost of model extraction:} enforce strict query budgets, rate limiting, output rounding and randomised responses; watermark outputs to make extracted models traceable.  Studies achieving 63--84~\% fidelity against commercial ML-as-a-service APIs \citep{Liu2024} show that moderate query budgets suffice to clone models, so providers must increase the economic barrier.
+  \item \textbf{Protect the training pipeline and human layer:} verify licensing and provenance of training data, detect poisoned samples and allow content creators to opt out.  Tools like Nightshade show that artists can poison training data \citep{Nightshade2023}.  Organisations should also train employees to recognise deepfake phishing calls and implement multi-channel verification procedures \citep{EftsureDeepfake2024}.
+\end{itemize}
 
 \subsection{For Funding Agencies}
 
