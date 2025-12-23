@@ -518,23 +518,15 @@ A further shift is evident in the emergence of large language and multimodal mod
 
 While all venues share similar theory-practice gap patterns, each has developed distinctive emphases that collectively illuminate different facets of the research landscape.
 
-\subsection{ACM CCS: Economics and System Integration}
+\paragraph{ACM CCS: Economics and system integration.} ACM CCS research uniquely emphasises business logic, usability constraints, and intellectual property protection. Contributions include demonstrating how economic incentives shape the threat landscape \citep{cong2022sslguard, lu2024neural}, documenting relationships between mathematical metrics and human perception \citep{ma2024avara}, analysing system-level integration considerations \citep{nasr2025magika}, and examining architectural constraints in emerging deployment patterns.
 
-ACM CCS research uniquely emphasizes business logic, usability constraints, and intellectual property protection. Contributions include demonstrating how economic incentives shape the threat landscape~\citep{cong2022sslguard, lu2024neural}, documenting relationships between mathematical metrics and human perception~\citep{ma2024avara}, analyzing system-level integration considerations~\citep{nasr2025magika}, and examining architectural constraints in emerging deployment patterns.
+\paragraph{IEEE S\&P: Efficiency and formal guarantees.} IEEE S\&P research emphasises computational efficiency, privacy-utility trade-offs, and certified scalability. The venue has advanced understanding of threat modelling considerations and resource assumptions \citep{carlini2022membership}, documented accuracy-privacy trade-offs \citep{rezaei2023accuracy}, and examined scalability considerations for certified robustness deployment \citep{li2023sok}.
 
-\subsection{IEEE S\&P: Efficiency and Formal Guarantees}
+\paragraph{NDSS: Physical constraints and operational realities.} NDSS research emphasises system-level constraints, distributed training considerations, and physical deployment realities. Contributions include documenting gaps between digital perturbations and physical deployment \citep{jia2022physical}, developing metrics for non-image domains \citep{kireev2023cost}, analysing distributed training heterogeneity \citep{rieger2022deepsight}, and studying adversarial dynamics where defences create exploitable side channels.
 
-IEEE S\&P research emphasizes computational efficiency, privacy-utility trade-offs, and certified scalability. The venue has advanced understanding of threat modeling considerations and resource assumptions~\citep{carlini2022membership}, documented accuracy-privacy trade-offs~\citep{rezaei2023accuracy}, and examined scalability considerations for certified robustness deployment~\citep{li2023sok}.
+\paragraph{USENIX Security: Real-world validation and domain diversity.} USENIX Security research emphasises testing on deployed systems and domain-specific constraints. The venue has documented tensions between theoretical rigour and deployment constraints \citep{xiang2022patchcleanser, xiang2024patchcure}, analysed trade-offs involving computational cost, regulatory compliance, and usability \citep{ahmed2022keyword}, studied adversarial dynamics when defences encounter adaptive attackers in production, and examined domain-specific requirements \citep{eykholt2023uret}.
 
-\subsection{NDSS: Physical Constraints and Operational Realities}
-
-NDSS research emphasizes system-level constraints, distributed training considerations, and physical deployment realities. Contributions include documenting gaps between digital perturbations and physical deployment~\citep{jia2022physical}, developing metrics for non-image domains~\citep{kireev2023cost}, analyzing distributed training heterogeneity~\citep{rieger2022deepsight}, and studying adversarial dynamics where defenses create exploitable side channels.
-
-\subsection{USENIX Security: Real-World Validation and Domain Diversity}
-
-USENIX Security research emphasizes testing on deployed systems and domain-specific constraints. The venue has documented tensions between theoretical rigor and deployment constraints~\citep{xiang2022patchcleanser, xiang2024patchcure}, analyzed trade-offs involving computational cost, regulatory compliance, and usability~\citep{ahmed2022keyword}, studied adversarial dynamics when defenses encounter adaptive attackers in production, and examined domain-specific requirements~\citep{eykholt2023uret}.
-
-\subsection{Attack versus Defense Papers}
+\paragraph{Attack versus defence papers.} Our analysis reveals that defence papers demonstrate somewhat higher alignment with practical considerations than attack papers on average. Defence papers show 6 per cent real-system testing versus 5 per cent for attacks, 41 per cent gradient-free approaches versus 27 per cent, and 38 per cent black-box focus versus 31 per cent. However, both categories remain distant from deployment-ready research.
 
 \begin{figure}[H]
     \centering
@@ -542,8 +534,6 @@ USENIX Security research emphasizes testing on deployed systems and domain-speci
     \caption{Comparison of practicality metrics between attack-focused and defense-focused papers.}
     \label{fig:atk_def}
 \end{figure}
-
-Our analysis reveals that defense papers demonstrate somewhat higher alignment with practical considerations than attack papers on average. Defense papers show 6\% real-system testing versus 5\% for attacks, 41\% gradient-free approaches versus 27\%, and 38\% black-box focus versus 31\%. However, both categories remain distant from deployment-ready research.
 
 %==============================================================================
 % 9. RECOMMENDATIONS
