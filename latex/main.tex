@@ -122,7 +122,7 @@
 \begin{abstract}
 Machine learning systems are being used more often in security-critical applications, but there is still a significant gap between academic research in adversarial machine learning and the needs for real-world deployment. This systematic review looks at 454 papers published in four major security venues (ACM CCS, IEEE S\&P, NDSS, and USENIX Security) covering the years from 2022 to 2025. Using the analytical framework introduced by Apruzzese et al. in ``Real Attackers Don't Compute Gradients,'' we evaluate how current research addresses the divide between theory and practice.
 
-Our analysis shows that 94.7\% of the papers do not test on deployed systems, 67.8\% depend on gradient access that is rarely available in real situations, 80.4\% assume query budgets that go beyond typical operational limits, and 63.2\% use white-box threat models. We identify five areas that need more attention in relation to real-world deployment: specifying threat models, accessing gradients, validating on real systems, ensuring diversity beyond image classification, and considering economic and human factors. Our temporal analysis from 2022 to 2025 shows that progress in these areas is gradual rather than swift. We end with suggestions for researchers, venues, practitioners, and funding agencies to promote more effective adversarial machine learning research.
+Our analysis shows that 94.7\% of the papers do not test on deployed systems, 67.8\% depend on gradient access that is rarely available in real situations, 80.4\% assume query budgets that go beyond typical operational limits, and 63.2\% use white-box threat models. We identify five areas that need more attention in relation to real-world deployment: specifying threat models, accessing gradients, validating on real systems, ensuring diversity beyond image classification, and considering economic and human factors. Our temporal analysis from 2022 to 2025 shows that progress in these areas is gradual rather than swift. Additionally, we examine the emerging parallel frontier of large language models and foundation models, finding that these systems exhibit the same theory-practice gaps observed in traditional adversarial ML research, though manifested through different attack surfaces and evaluation challenges. We end with suggestions for researchers, venues, practitioners, and funding agencies to promote more effective adversarial machine learning research.
 
 \textbf{Keywords:} adversarial machine learning, theory-practice gap, security research, systematic review, threat modeling
 \end{abstract}
@@ -136,7 +136,7 @@ Our analysis shows that 94.7\% of the papers do not test on deployed systems, 67
 %==============================================================================
 \section{Introduction}
 
-Machine learning has become an essential part of software systems in many areas. It is used in facial recognition at border crossings, fraud detection in financial services, navigation for autonomous vehicles, and content moderation on social platforms. ML models now influence decisions that impact millions of people every day. This widespread use has led to greater scrutiny of vulnerabilities in these models. Researchers design specific inputs to trigger failures that system creators did not foresee.
+Machine learning has become an essential part of software systems in many areas. It is used in facial recognition at border crossings, fraud detection in financial services, navigation for autonomous vehicles, and content moderation on social platforms. Large language models now power customer service chatbots, code generation tools, and medical assistants. ML models now influence decisions that impact millions of people every day. This widespread use has led to greater scrutiny of vulnerabilities in these models. Researchers design specific inputs to trigger failures that system creators did not foresee.
 
 The field of adversarial machine learning (AML) has emerged to explore these weaknesses and develop defenses. Over the last ten years, researchers have shown how sophisticated attacks can work: small changes that lead to image misclassification, poisoned training data that creates hidden backdoors, and privacy attacks that reveal sensitive information through targeted queries. In response, the community has proposed many defenses to improve model strength.
 
@@ -586,7 +586,9 @@ Awareness of attacker knowledge limitations has increased, with growing acknowle
 
 \subsection{Emerging Research Areas}
 
-The 2024--2025 period has seen growth in LLM security research, introducing new considerations. Jailbreak attacks evolve rapidly relative to RLHF defenses~\citep{shen2024llm}. Prompt injection against commercial LLM services poses practical concerns. Adversarial training, the standard defense approach, remains computationally intensive for broad deployment.
+The 2024--2025 period has seen substantial growth in LLM security research, representing a significant shift in the adversarial ML landscape. While traditional research focused predominantly on computer vision (65\% of papers in our dataset), large language models and multimodal foundation models introduce fundamentally different attack surfaces. These systems operate in discrete token spaces rather than continuous pixel spaces, face evaluation instability as providers continuously update models, and lack the formal perturbation constraints (like $L_p$-norm budgets) that bound traditional adversarial examples.
+
+Yet the theory-practice gap manifests similarly. White-box gradient-based attacks like GCG~\citep{zou2023universal} achieve high success rates on open-source models but prove impractical against production APIs that expose only final outputs. Black-box methods like PAIR~\citep{chao2023jailbreaking} and TAP~\citep{mehrotra2024tree} operate within more realistic constraints, succeeding in under 20 queries against commercial systems. Multimodal models reveal cross-modal alignment gaps, where vision encoders receive less adversarial hardening than text components~\citep{qi2024visual}. As discussed in Section~6, these systems amplify systemic risk through homogenization: vulnerabilities in foundation models like GPT-4 affect every downstream application built on their APIs, from legal document analyzers to medical triage systems.
 
 %==============================================================================
 % 8. CROSS-VENUE ANALYSIS
@@ -644,7 +646,7 @@ Bridging the theory-practice gap requires coordinated effort across the research
 
 \textbf{Employ realistic threat models.} Consider black-box access as a default assumption. When white-box assumptions are necessary, justify them explicitly and acknowledge their implications.
 
-\textbf{Expand domain coverage.} Extend research beyond image classification to tabular data, graphs, time-series, and multimodal systems where practical deployment is occurring.
+\textbf{Expand domain coverage.} Extend research beyond image classification to tabular data, graphs, time-series, multimodal systems, and large language models where practical deployment is occurring.
 
 \textbf{Consider economic factors.} Analyze attack costs, defender resources, and return-on-investment trade-offs. Security decisions involve economic considerations.
 
@@ -711,6 +713,8 @@ The quantitative trends are striking:
 \end{itemize}
 
 Thematic analysis shows other considerations emerging. $L_p$ norms may not model human perception well. Robustness may not generalize to production-quality settings. Defense systems do not necessarily take into consideration economic losses and use ease-of-use constraints. Assessment metrics are often averages for the worst-case scenario characteristics.
+
+The emergence of large language models and foundation models represents a parallel frontier where these same theory-practice gaps manifest through different attack surfaces. While these systems introduce new challenges (discrete token spaces, evaluation instability, cross-modal vulnerabilities), they exhibit familiar patterns: impractical gradient-based attacks, unrealistic query budgets, and insufficient real-world validation. The systemic nature of foundation model deployment, where single models serve numerous downstream applications, amplifies the practical importance of addressing these gaps.
 
 Among the many contributions of the research community is the theoretical foundation and pioneering research in adversarial phenomena. However, to move forward, accomplishing the goal of closing the theory-practice gap will necessitate structural changes in conferences that reward verification of effectiveness in the real world, assumptions of reasonable threats in research, industry inputs of deployment results, and distribution of funding that emphasizes effectiveness along with innovation.
 
