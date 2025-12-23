@@ -498,7 +498,62 @@ Beyond technical considerations, qualitative research reveals organizational fac
 This organizational separation results in lower prioritization of adversarial evaluations before deployment and limited visibility into monitoring for active attacks. Defenses may remain unimplemented due to isolation between ML and security teams or because competing business priorities outweigh the cost and time needed for robust implementation.
 
 %==============================================================================
-% 6. TEMPORAL TRENDS
+% 6. FOUNDATION MODELS AND LARGE LANGUAGE MODELS
+%==============================================================================
+\section{Foundation Models and Large Language Models: An Emerging Parallel Frontier}
+
+The rapid growth of large language models represents a significant shift in adversarial machine learning, developing alongside traditional research focused on computer vision. While image classifiers operate in continuous pixel space with bounded $L_p$-norm perturbations, LLMs function in discrete token spaces with open-ended context windows and fundamentally different attack surfaces. These systems now power applications affecting millions, including customer service chatbots, code generation tools, and medical assistants. However, adversarial research in this domain reveals the same theory-practice gaps observed in traditional ML fields.
+
+\subsection{From Manual Jailbreaks to Automated Optimization}
+
+Initial LLM adversarial research relied on manual prompt engineering, where simple role-playing scenarios or encoded instructions (ROT13, Base64) bypassed safety measures. This changed with Zou et al.'s~\citep{zou2023universal} Greedy Coordinate Gradient (GCG) attack, which automates discrete optimization over token sequences to generate universal adversarial suffixes. GCG achieved 100\% success on Vicuna-7B and 88\% on Llama-2-7B-Chat, with transfer rates of 87.9\% for GPT-3.5, 53.6\% for GPT-4, and 66\% for PaLM-2. Notably, Claude-2 showed significantly higher resistance at only 2.1\% success.
+
+Yet GCG exemplifies the theory-practice gap. The attack requires white-box gradient access through the model's embedding layer and hundreds of thousands of forward and backward passes during optimization. For production APIs that expose only final text outputs, obtaining gradients is impossible. Carlini et al.~\citep{carlini2023jailbroken} note that conducting such attacks would cost approximately \$18 on GPT-3.5-Turbo, making them impractical when loss and gradients cannot be easily accessed.
+
+Recent research has shifted toward black-box methods reflecting real-world constraints. Chao et al.~\citep{chao2023jailbreaking} introduced PAIR (Prompt Automatic Iterative Refinement), using an attacker LLM to refine jailbreak prompts based on target model feedback, succeeding in fewer than 20 queries. Mehrotra et al.~\citep{mehrotra2024tree} developed Tree of Attacks with Pruning (TAP), achieving over 80\% success against GPT-4-Turbo and GPT-4o while bypassing LlamaGuard. These represent serious attack vectors requiring only API access and operating within reasonable query limits.
+
+Multi-turn attacks reveal particularly concerning vulnerabilities. Russinovich et al.~\citep{russinovich2024crescendo} demonstrated the Crescendo attack, gradually escalating through seemingly harmless conversations to achieve up to 100\% success in under 10 turns. Each message passes safety checks individually; only the accumulated context produces policy violations. Production chat interfaces designed to maintain conversation history inadvertently enable attacks that unfold over minutes rather than seconds.
+
+\subsection{Multimodal Models: Exploiting Cross-Modal Alignment Gaps}
+
+Vision-language models present attack surfaces absent in text-only systems. Qi et al.~\citep{qi2024visual} showed that a single adversarial image can universally jailbreak vision-language models, forcing compliance with harmful instructions the models would reject in text-only contexts. This vulnerability arises from an alignment gap: while LLM components undergo extensive safety training on text data, vision encoders receive substantially less adversarial hardening.
+
+Typography-based attacks achieve concerning results without gradient access. Gong et al.~\citep{gong2024figstep} introduced FigStep, converting harmful text into images that models read via OCR, yielding 82.5\% average attack success across six open-source vision-language models compared to 44.8\% for identical text-only queries. Against commercial systems, Niu et al.~\citep{niu2024jailbreak} demonstrated multi-modal linkage attacks combining encryption-decryption processes across modalities, achieving 97.8\% success on GPT-4o's SafeBench, 98.8\% on MM-SafetyBench, and 99.1\% on HADES-Dataset.
+
+Audio modalities show similar vulnerabilities. Zhang et al.~\citep{zhang2024advwave} developed AdvWave, demonstrating that adversarial acoustic noise can jailbreak speech-enabled models with 40\% higher success rates than baselines. It successfully jailbroke GPT-4o's speech-to-speech API in just 30 queries with nearly perfect results. The perturbations mimic common urban sounds (dog barks, car horns), making detection difficult without compromising legitimate functionality.
+
+\subsection{The Theory-Practice Gap Manifests Differently for LLMs}
+
+Examining LLM adversarial research through our analytical framework reveals familiar issues with domain-specific characteristics:
+
+\textbf{Model Access Assumptions.} The most powerful attacks require white-box gradient access available only for open-source models. Production APIs like GPT-4 and Claude expose at most top-5 token probabilities, making direct loss calculations impossible. Huang et al.~\citep{huang2023catastrophic} found their ``Catastrophic Jailbreak'' achieved 95\% misalignment on 11 open-source models but only 7\% on ChatGPT, an 88-point gap demonstrating substantially more thorough safety training for proprietary models.
+
+\textbf{Query Budget Realism.} OpenAI's free tier permits approximately 3 requests per minute, while paid tiers allow up to 3,500 requests per minute~\citep{openai2024ratelimits}. Gradient-based attacks requiring 50,000 to 256,000 queries face economic barriers (costs exceeding \$18 per attempt) and rate limiting that academic papers often overlook. Black-box methods like PAIR operate within more realistic budgets (approximately 20 queries), though even these face practical limitations at scale.
+
+\textbf{Evaluation Instability.} Unlike static computer vision models, LLM providers continuously update systems and silently patch vulnerabilities. A paper claiming 80\% success against ``GPT-4 as of March 2024'' cannot be verified by June 2024 when the model has changed. Rando and Tram\`er~\citep{rando2024adversarial} note that this evolving defense landscape means ``we cannot measure progress against continuously updated closed-source systems,'' creating benchmarking challenges absent in traditional adversarial ML.
+
+\textbf{Threat Model Formalization.} LLM attacks lack the formal structure bounding CV adversarial examples (like $L_p$-norm budgets or imperceptibility constraints). Defining ``harmful'' output requires subjective human judgment. Perez et al.~\citep{perez2022red} showed that manual red teaming still outperforms automated methods in finding worst-case model failures, suggesting the full attack landscape remains only partially understood by algorithmic approaches.
+
+\subsection{Defense Mechanisms: Progress and Persistent Limitations}
+
+Production systems have adopted guardrail architectures assessing prompts and responses before and after LLM processing. Meta's Llama Guard~\citep{inan2023llamaguard} fine-tunes a Llama model to detect policy violations in six harm categories, now at its fourth version with multimodal support. NVIDIA's NeMo Guardrails~\citep{rebedea2023nemo} provides programmable input/output guidelines using Colang, achieving 1.4$\times$ improvement in safety compliance with approximately 0.5 seconds added latency.
+
+Recent studies reveal significant weaknesses. Hackett and Gretton~\citep{hackett2024bypassing} tested six guardrail systems, including Azure Prompt Shield and Meta Prompt Guard, against character injection attacks (homoglyphs, zero-width characters, Unicode tags) and emoji smuggling, finding up to 100\% evasion success with no guardrail performing consistently across attack types. Perplexity-based detection works well against GCG-style attacks producing scrambled suffixes but fails against semantic jailbreaks generating fluent text.
+
+Automated red teaming has advanced substantially. Bertrand et al.~\citep{bertrand2024rainbow} introduced Rainbow Teaming, employing quality-diversity optimization through MAP-Elites to create diverse attack databases, achieving greater than 90\% success across Llama 2/3 models while providing attacks valuable for diagnosis and safety fine-tuning. Hong et al.~\citep{hong2024curiosity} applied curiosity-driven reinforcement learning to red teaming, successfully provoking harmful responses from RLHF-tuned models.
+
+Bai et al.~\citep{bai2022constitutional} introduced Constitutional AI, using RLAIF (RL from AI Feedback) with explicit constitutional principles for self-assessment and revision, producing responses that explain objections rather than refusing outright. However, conflicting goals between helpfulness and harmlessness create vulnerabilities that adversaries can exploit.
+
+Standardized benchmarks aim to systematize jailbreak assessments. Chao et al.~\citep{chao2024jailbreakbench} released JailbreakBench, featuring 100 misuse behaviors across 10 OpenAI policy categories with public leaderboards tracking attack methods and defenses. While enabling reproducible comparison, it faces typical safety evaluation issues: subjective harm definitions, model updates invalidating findings, and challenges capturing worst-case behaviors through automated metrics.
+
+Agent-specific vulnerabilities represent an emerging concern. Zhan et al.~\citep{zhan2024injecagent} developed InjecAgent, testing 1,054 cases for indirect prompt injection in tool-integrated agents, finding ReAct-prompted GPT-4 vulnerable 24\% of the time, with enhanced attacks nearly doubling success rates. When LLMs control tools, access databases, and execute code, successful jailbreaks shift from producing problematic text to taking consequential real-world actions.
+
+\subsection{Foundation Model Properties Amplify Systemic Risk}
+
+Bommasani et al.~\citep{bommasani2021opportunities} identified two features distinguishing foundation models from traditional ML: emergence (unpredictable capabilities from scale) and homogenization (single models serving numerous downstream applications). Adversarial weaknesses in GPT-4 impact not only ChatGPT but every application built on its API, affecting tools from legal document analyzers to educational tutors and medical triage systems. Unlike standalone image classifiers where a compromise affects specific implementations, vulnerabilities in foundation models have systemic effects across the ecosystem.
+
+%==============================================================================
+% 7. TEMPORAL TRENDS
 %==============================================================================
 \section{Temporal Trends}
 
@@ -534,7 +589,7 @@ Awareness of attacker knowledge limitations has increased, with growing acknowle
 The 2024--2025 period has seen growth in LLM security research, introducing new considerations. Jailbreak attacks evolve rapidly relative to RLHF defenses~\citep{shen2024llm}. Prompt injection against commercial LLM services poses practical concerns. Adversarial training, the standard defense approach, remains computationally intensive for broad deployment.
 
 %==============================================================================
-% 7. CROSS-VENUE ANALYSIS
+% 8. CROSS-VENUE ANALYSIS
 %==============================================================================
 \section{Cross-Venue Analysis}
 
@@ -575,7 +630,7 @@ USENIX Security research emphasizes testing on deployed systems and domain-speci
 Our analysis reveals that defense papers demonstrate somewhat higher alignment with practical considerations than attack papers on average. Defense papers show 6\% real-system testing versus 5\% for attacks, 41\% gradient-free approaches versus 27\%, and 38\% black-box focus versus 31\%. However, both categories remain distant from deployment-ready research.
 
 %==============================================================================
-% 8. RECOMMENDATIONS
+% 9. RECOMMENDATIONS
 %==============================================================================
 \section{Recommendations}
 
@@ -624,7 +679,7 @@ Evaluate privacy using true-positive rate at low false-positive rates, not only 
 Support industry-academic partnerships with real-world validation components. Fund deployment studies rather than only paper publication. Incentivize replication studies that validate academic claims against production systems. Consider red team / blue team programs with realistic constraints.
 
 %==============================================================================
-% 9. LIMITATIONS
+% 10. LIMITATIONS
 %==============================================================================
 \section{Limitations and Threats to Validity}
 
@@ -641,7 +696,7 @@ The Gap Score reduces complex trade-offs to binary decisions, potentially oversi
 Security venues may actually be more practice-focused than typical computer science venues given their traditional emphasis on real-world threats. Our findings may therefore underestimate the theory-practice gap in the broader ML research community.
 
 %==============================================================================
-% 10. CONCLUSION
+% 11. CONCLUSION
 %==============================================================================
 \section{Conclusion}
 
