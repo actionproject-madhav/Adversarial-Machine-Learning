@@ -623,61 +623,21 @@ Our analysis reveals that defense papers demonstrate somewhat higher alignment w
 %==============================================================================
 \section{Recommendations}
 
-Bridging the theory-practice gap requires coordinated effort across the research ecosystem. We offer recommendations for multiple stakeholder groups.
+Bridging the gap between academic adversarial machine learning and practical deployment requires coordinated action across researchers, conference organisers, industry and funding bodies. We summarise key recommendations for each group without sub‑levels of subsections.
 
-\subsection{For Researchers}
+\paragraph{Researchers.}
+Researchers should prioritise validation on operational systems and seek partnerships with industry to test defences in deployment settings, even if only limited real‑environment evaluation is feasible. Adopt realistic threat models by default: assume black‑box access unless a white‑box scenario is justified and clearly state the implications of such assumptions. Expand the scope of research beyond image classification to include tabular, graph, time series, multimodal and language models, reflecting real deployment contexts. Incorporate economic analysis by considering attack costs, defender budgets and return‑on‑investment trade‑offs, and recognise that human factors (e.g. perceptibility) are essential, so evaluation should include human testing rather than relying solely on mathematical metrics. When reporting results, use domain‑appropriate perturbation constraints and disclose query budgets and computational cost in practical units.
 
-\subsubsection{Methodological Considerations}
+\paragraph{Venues and programme committees.}
+Conference organisers and reviewers can foster practical research by encouraging or requiring real‑world validation; if such testing is infeasible, authors should explain why. Recognise and reward deployability, for example by providing artefact badges for work tested on production systems. Develop clear guidelines that ask authors to address the realism of their threat models, query budgets, gradient assumptions, choice of metrics, economic implications and the ability of attackers to adapt. Value negative results: papers demonstrating that attacks fail under realistic conditions provide important insights and should not be overlooked in favour of only positive findings.
 
-\textbf{Validate on real systems when feasible.} Partner with industry to evaluate against production deployments. Even limited real-world testing can reveal constraints not apparent in laboratory settings.
+\paragraph{Industry practitioners.}
+Practitioners should interpret academic results in light of operational realities, adjusting risk assessments accordingly rather than accepting laboratory success rates at face value. Budget time and resources for re‑engineering research prototypes before they are production‑ready, and prioritise defences against plausible adversaries—black‑box attacks, low query budgets, economically motivated attackers and domain‑specific constraints. Organisations can improve the relevance of research by contributing anonymised data on actual adversarial attempts and deployment constraints.
 
-\textbf{Employ realistic threat models.} Consider black-box access as a default assumption. When white-box assumptions are necessary, justify them explicitly and acknowledge their implications.
+To secure large language model and foundation model deployments, industry should: (i) maintain least‑privilege architectures by treating connectors (email, drives, calendars, repositories) as untrusted input and isolating system prompts from user prompts; (ii) implement robust prompt filtering and memory controls that parse Markdown, HTML and other formats, and treat comments or metadata as untrusted while limiting the exposure of conversational history; (iii) reduce model memorisation by limiting training on sensitive data, applying de‑identification or differential privacy, and monitoring for repeated or unnatural queries; (iv) raise the cost of model extraction through strict query limits, output randomisation and watermarking; and (v) protect the training pipeline and human layer by verifying data provenance, detecting poisoned samples, honouring opt‑out requests, and educating staff about deepfake and phishing threats.
 
-\textbf{Expand domain coverage.} Extend research beyond image classification to tabular data, graphs, time-series, multimodal systems, and large language models where practical deployment is occurring.
-
-\textbf{Consider economic factors.} Analyze attack costs, defender resources, and return-on-investment trade-offs. Security decisions involve economic considerations.
-
-\textbf{Include human evaluation.} Test perceptibility against actual humans rather than relying solely on mathematical metrics.
-
-\subsubsection{Evaluation Practices}
-
-Evaluate privacy using true-positive rate at low false-positive rates, not only average accuracy or AUC. For non-image domains, define domain-appropriate perturbation constraints. Report query budgets realistically based on what commercial APIs actually permit. Measure computational requirements in practical units such as wall-clock time and computational cost.
-
-\subsection{For Venues and Program Committees}
-
-\textbf{Encourage real-world validation.} At minimum, request authors to justify why real-system testing is infeasible if omitted.
-
-\textbf{Consider artifact badges for deployability.} Recognize work tested on production systems with explicit acknowledgment.
-
-\textbf{Develop evaluation guidelines.} Request papers to explicitly address threat model realism, query budget constraints, gradient requirements, domain-appropriate metrics, economic considerations, and adaptive adversary testing.
-
-\textbf{Value negative results.} Papers demonstrating that attacks fail under realistic constraints provide valuable information that positive-result publication preferences may suppress.
-
-\subsection{For Industry Practitioners}
-
-\textbf{Interpret academic results in deployment context.} Adjust risk assessments for deployment realities rather than accepting laboratory success rates directly.
-
-\textbf{Anticipate adaptation requirements.} Budget for re-engineering before research prototypes become production-ready.
-
-\textbf{Prioritize defenses against realistic threats:} black-box attacks, low query budget scenarios, economically motivated adversaries, and domain-specific constraints.
-
-\textbf{Consider contributing data.} Anonymized information about real attack attempts could help ground academic research in deployment reality.
-
-\subsubsection{LLM Deployment Security Practices}
-
-Recent incidents highlight specific vulnerabilities in production LLM deployments that require systematic defenses:
-
-\begin{itemize}
-  \item \textbf{Secure integration and least-privilege access:} treat connectors (e.g., email, drives, calendars, code repositories) as untrusted input channels.  Isolate system instructions from user prompts, disable automatic retrieval of external content unless explicitly allowed, and restrict link formats.  Multi-step prompt-injection chains like EchoLeak and AgentFlayer highlight that vulnerabilities often arise at the intersection of components \citep{EchoLeak2025}.
-  \item \textbf{Robust prompt filtering and memory management:} build filters that understand Markdown, HTML and file formats, and treat comments in documents or websites as untrusted.  Limit how much previous conversation history and user memory is exposed to tools.  Bard's document-level injection and Tenable's browsing-context attacks show how easily hidden instructions can hijack LLMs \citep{HackerOneBard}.
-  \item \textbf{Limit model memorisation and monitor query patterns:} reduce training on sensitive data, employ de-identification and differential privacy, and detect repetitive or nonsensical prompts.  The divergence attack on ChatGPT demonstrates that aligned models can still leak training data \citep{Nasr2023}; monitoring for suspicious query patterns is critical.
-  \item \textbf{Raise the cost of model extraction:} enforce strict query budgets, rate limiting, output rounding and randomised responses; watermark outputs to make extracted models traceable.  Studies achieving 63--84~\% fidelity against commercial ML-as-a-service APIs \citep{Liu2024} show that moderate query budgets suffice to clone models, so providers must increase the economic barrier.
-  \item \textbf{Protect the training pipeline and human layer:} verify licensing and provenance of training data, detect poisoned samples and allow content creators to opt out.  Tools like Nightshade show that artists can poison training data \citep{Nightshade2023}.  Organisations should also train employees to recognise deepfake phishing calls and implement multi-channel verification procedures \citep{EftsureDeepfake2024}.
-\end{itemize}
-
-\subsection{For Funding Agencies}
-
-Support industry-academic partnerships with real-world validation components. Fund deployment studies rather than only paper publication. Incentivize replication studies that validate academic claims against production systems. Consider red team / blue team programs with realistic constraints.
+\paragraph{Funding agencies.}
+Funding bodies should support industry–academic collaborations that include real‑world validation and fund deployment studies rather than focusing solely on novel algorithms. Replication studies that test academic claims against operational systems are essential for progress and should be incentivised. Red‑team/blue‑team exercises with realistic constraints can yield valuable insights and merit funding.
 
 %==============================================================================
 % 10. LIMITATIONS
