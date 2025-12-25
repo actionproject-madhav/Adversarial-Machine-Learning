@@ -291,6 +291,23 @@ Each paper received a score from 0 (none of these factors present) to 6 (all fac
 This Gap Score is a simple heuristic and not all factors are equally critical, but it provides a rough measure of a paper’s practical orientation. We will examine both individual factors and this aggregate score in our analysis.
 
 %==============================================================================
+% 4. REAL-WORLD ADVERSARIAL INCIDENTS
+%==============================================================================
+\section{Real-World Adversarial Incidents}
+
+Before turning to quantitative results and thematic analysis, it is instructive to consider real examples of adversarial attacks “in the wild.”  These incidents illustrate the complexity and socio‑technical nature of adversarial misuse and motivate the need to bridge theory and practice.  In each case, adversaries exploited system integrations, human behavior, or unanticipated input channels rather than computing optimal perturbations.
+
+\begin{itemize}[noitemsep]
+    \item \textbf{EchoLeak (2025).}  A malicious image embedded in a phishing email caused Microsoft’s GitHub Copilot, an AI coding assistant, to leak proprietary code~\citep{EchoLeak2025}.  The image tricked Copilot into following a link and parsing remote content, leading it to expose internal data in its suggestions.  This was a supply‑chain attack via the model’s input channel rather than a gradient‑based perturbation.
+    \item \textbf{Bard document exploit.}  A vulnerability in Google’s Bard, disclosed through a bug bounty, showed that hidden prompts in a shared Google Doc could be executed by Bard’s document summary feature~\citep{HackerOneBard}.  Encoded instructions in the document’s text bypassed the normal input channel and induced Bard to leak private information via a crafted URL.
+    \item \textbf{AgentFlayer (2025).}  The AgentFlayer demonstration~\citep{AgentFlayer2025} crafted a single poisoned document that, when processed by an LLM‑based agent with browsing and code‑execution abilities, caused it to reveal API keys.  The attack chained multiple steps—retrieving the document, executing hidden code, and exfiltrating secrets—by exploiting the agent’s trust in retrieved content.
+    \item \textbf{Additional threats.}  Nasr et al.~\citep{Nasr2023} presented a “divergence attack” on ChatGPT that extracted training data with higher success than previous membership inference attacks, raising concerns about privacy in foundation models.  Liu et al.~\citep{Liu2024} showed that high‑fidelity model extraction is possible through black‑box APIs if query costs are low.  Generative‑AI countermeasures such as Nightshade~\citep{Nightshade2023} poison art datasets to prevent style mimicry, while outside the ML domain deepfakes have been used to impersonate trusted individuals for fraud~\citep{EftsureDeepfake2024}.
+\end{itemize}
+
+These cases highlight themes that recur throughout this review: adversarial threats span technical and human factors, and real attackers often find simple exploits that circumvent defenses envisaged in academic settings.  They underscore the importance of considering system integrations, content sanitization, rate limiting and user education alongside model‑centric robustness.
+
+
+%==============================================================================
 % 4. QUANTITATIVE FINDINGS
 %==============================================================================
 \section{Quantitative Findings}
@@ -428,19 +445,6 @@ In response, some papers are advocating more comprehensive evaluations: includin
 
 These studies underscore that when deploying defenses, one must consider the entire system. Sometimes adding a defense or filter can introduce new vulnerabilities. For example, Debenedetti et al.~\citep{debenedetti2024privacy} showed that a “defense” which filters sensitive information from data could inadvertently create a side channel for privacy leakage (e.g., an attacker can tell if data was filtered). Nasr et al.~\citep{nasr2025magika} found that ML-based malware detectors could be evaded by manipulating file types—taking advantage of how the system processes inputs rather than the classifier itself. Chen et al.~\citep{chen2023obsan} reported that certain defensive transformations might not carry through once models are compiled or optimized, nullifying the defense on the deployed model. All this points to a need for end-to-end robustness evaluations, including pre-processing, post-processing, and even hardware effects.
 
-\paragraph{Real-world adversarial incidents.} Documented cases of adversarial attacks “in the wild” provide valuable insight. We highlight a few:
-
-- In the \textbf{EchoLeak} incident (2025), a malicious image embedded in a phishing email caused Microsoft’s GitHub Copilot (an AI coding assistant) to leak proprietary code~\citep{EchoLeak2025}. The image exploited Copilot’s tendency to follow links and parse content, tricking it into exposing internal data in its suggestions. This was essentially a supply chain attack on the model’s input (email with an image link), not a gradient-based perturbation of code.
-
-- A vulnerability in Google’s Bard, reported via bug bounty, showed that hidden prompts in a shared Google Doc could be executed by Bard’s document summary feature, resulting in leakage of private information through a cleverly encoded URL~\citep{HackerOneBard}. The adversary hid instructions in text that Bard’s extension would read, bypassing the normal input channel.
-
-- The \textbf{AgentFlayer} demonstration~\citep{AgentFlayer2025} crafted a single poisoned document that, when processed by an LLM-based agent (with browsing and code execution abilities), caused it to reveal API keys. This attack chained multiple steps: the agent retrieved the document, executed hidden code from it, and thereby exfiltrated secrets. It exploited the trust the agent placed in retrieved content.
-
-Common threads in these incidents include: exploiting system integration points (like how the model interfaces with email, documents, or tools), and using “unintended” input channels (images, metadata, chained context) rather than straightforward model queries. Attackers combined simple methods like hiding content and relying on the system’s automated behavior, which is far from the theoretically optimal $L_p$-bounded perturbations often studied, yet very effective.
-
-Beyond LLMs, Nasr et al.~\citep{Nasr2023} demonstrated a membership inference-style attack (“divergence attack”) on ChatGPT that could extract training data at a much higher success rate than previously seen, raising red flags for foundation model privacy. Liu et al.~\citep{Liu2024} achieved high-fidelity model extraction on a private model through its API, illustrating that even large models can be cloned if query costs are low enough. Meanwhile, the advent of generative AI led to countermeasures by affected parties, such as the \textbf{Nightshade} tool~\citep{Nightshade2023} which artists use to poison art datasets to prevent AI models from learning their styles. And outside of the model domain entirely, criminals have leveraged \textbf{deepfakes} to impersonate voices or images of trusted figures to commit fraud~\citep{EftsureDeepfake2024}.
-
-These real incidents show that adversarial threats extend from the technical realm (model internals) to the socio-technical realm (user behavior, trust, and system design). They reaffirm that robust ML deployment must consider things like prompt filtering, content sanitization, rate limiting, and user education.
 
 \paragraph{Attack and defense evolution.} Over time, attacks have grown in sophistication, but also in practicality. Early adversarial work often produced attacks that were optimal in theory but hard to execute outside controlled settings (e.g., requiring precise pixel-level control). More recent attacks focus on persistent and stealthy effects. For example, Hallyburton et al.~\citep{hallyburton2022frustum} exploited how self-driving cars fuse sensor data, introducing an adversarial object in one sensor’s view that the other sensor couldn’t see, causing dangerous blind spots. The explosion of interest in LLMs brought about natural-language “jailbreaking” attacks; Chao et al.~\citep{chao2023jailbreaking} and Mehrotra et al.~\citep{mehrotra2024tree} even automated the generation of such prompts, showing high success rates against GPT-4 with minimal queries. Qi et al.~\citep{qi2024visual} found that a single adversarial image could universally attack vision-language models by making them follow harmful instructions they’d normally refuse, taking advantage of less-guarded visual inputs.
 
@@ -459,6 +463,7 @@ This points to solutions beyond algorithms: better tools for risk assessment, cl
 %==============================================================================
 % 6. FOUNDATION MODELS AND LARGE LANGUAGE MODELS
 %==============================================================================
+\iffalse
 \section{Foundation Models and Large Language Models: An Emerging Parallel Frontier}
 
 The rapid rise of large language models (LLMs) and other foundation models in the 2022–2025 period presents a new frontier for adversarial ML. These systems differ from traditional classifiers: they operate on discrete tokens (words or bytes), have extremely high dimensionality and capacity, and often serve as general-purpose platforms integrated with various tools.
@@ -524,6 +529,7 @@ One especially challenging scenario is when LLMs act as \textbf{agents}—beyond
 Foundation models also concentrate risk. As Bommasani et al.~\citep{bommasani2021opportunities} pointed out, these models have \textbf{emergent capabilities} (they can do things not anticipated by the training task) and are \textbf{homogenizing} (the same model or architecture is used in many places). So an unknown flaw in one foundation model could propagate to dozens of applications using it, a systemic risk that’s different from having many independent smaller models.
 
 In summary, the adversarial challenges with LLMs are a microcosm of the broader theory-practice gap: the attacks and defenses have to consider factors (cost, continuous updates, human factors) beyond what typical static analysis of models encompassed. The field is adjusting, but much like in adversarial vision, there’s a lot of catching up to do to align research practices with the dynamism of real-world AI deployments.
+\fi
 
 %==============================================================================
 % 7. TEMPORAL TRENDS
@@ -604,6 +610,20 @@ In essence, aligning the incentives is key. Academic career incentives often rew
 \section{Limitations and Threats to Validity}
 
 This study has several limitations.  It focuses on four security conferences, so our observations may not reflect adversarial ML research in ML-focused venues or other domains where different norms prevail.  Our coding and gap score simplify reality—binary flags cannot capture partial progress or nuanced threat models—and the classifications were done manually, which can introduce bias or overlook subtle details.  The field is also evolving rapidly; our dataset ends in early 2025, and the balance of work may shift as research on large language models and other modalities expands.  Finally, what counts as “practical” is context-dependent and may change over time: assumptions impractical today might become realistic tomorrow as technology and attacker capabilities evolve.  Despite these caveats, we hope that our synthesis of quantitative trends and qualitative themes offers useful insights and prompts more systematic evaluations in future studies.
+
+%-------------------------------------------------------------------------------
+% 10. FOUNDATION MODELS AND LARGE LANGUAGE MODELS
+%-------------------------------------------------------------------------------
+\section{Foundation Models and Large Language Models: New Frontiers}
+
+The surge of large language models (LLMs) and other foundation models during 2022–2025 introduces adversarial issues that parallel but also diverge from those studied in vision and traditional ML. These systems operate on discrete tokens, can accept multimodal inputs, and are often deployed via expensive, rate‑limited APIs. Early adversarial behaviours emerged as \emph{jailbreaks}—users discovered that by phrasing prompts cleverly or by role‑playing they could elicit disallowed content. Research soon proposed automated prompt-generation methods, ranging from gradient-based universal suffixes on open-source models to black-box search strategies that use a few queries of the target model.
+
+Threats to multimodal models involve cross‑modal exploits: adversarial images can trigger harmful instructions in vision–language models, while toxic text encoded as an image can bypass text filters. Audio perturbations (AdvWave) have tricked speech interfaces into emitting hidden prompts. LLM-specific factors complicate the theory–practice gap. The most powerful prompt‑injection attacks often require white-box gradients or thousands of queries, but commercial APIs expose only black-box interfaces and enforce rate limits. Deployed models are updated frequently, so successful jailbreaks may not persist. Defining what constitutes an adversarial failure is also more subjective than in classification; red teaming remains partly an art.
+
+Defense strategies for LLMs include prompt and output filtering, secondary models like LlamaGuard or NeMo Guardrails, automated red teaming frameworks, and alignment techniques (e.g., Constitutional AI). However, these guardrails can be brittle; homoglyphs and indirect prompt injection can circumvent simple filters, and adaptive attackers continuously evolve. Foundation models also pose systemic risks because a single flaw can propagate across many downstream applications.
+
+Overall, adversarial ML research for LLMs is still in its infancy. The challenges it surfaces—discrete tokens, multimodal inputs, rate‑limited interfaces, shifting policies, and agentic behaviour—broaden the theory–practice gap. Addressing them will require a holistic view of system design and collaboration between ML, security and human‑computer interaction communities. We treat this emerging area as a direction for future research rather than as part of our systematic evaluation.
+
 
 %==============================================================================
 % 10. CONCLUSION
