@@ -582,13 +582,9 @@
 }
 
 % =============================================================================
-% ADDITIONAL REFERENCES FROM BACKGROUND PAPER
-% Add these entries to your existing ref.bib file
+% FOUNDATIONAL ADVERSARIAL ML PAPERS
 % =============================================================================
 
-% -----------------------------------------------------------------------------
-% FOUNDATIONAL ADVERSARIAL ML PAPERS
-% -----------------------------------------------------------------------------
 @inproceedings{szegedy2013intriguing,
   title={Intriguing Properties of Neural Networks},
   author={Szegedy, Christian and Zaremba, Wojciech and Sutskever, Ilya and Bruna, Joan and Erhan, Dumitru and Goodfellow, Ian and Fergus, Rob},
@@ -627,10 +623,10 @@
   year={2017}
 }
 
-@inproceedings{carlini2019evaluating,
+@article{carlini2019evaluating,
   title={On Evaluating Adversarial Robustness},
   author={Carlini, Nicholas and Athalye, Anish and Papernot, Nicolas and Brendel, Wieland and Rauber, Jonas and Tsipras, Dimitris and Goodfellow, Ian and Madry, Aleksander and Kurakin, Alexey},
-  booktitle={arXiv preprint arXiv:1902.06705},
+  journal={arXiv preprint arXiv:1902.06705},
   year={2019}
 }
 
@@ -730,6 +726,33 @@
 }
 
 % -----------------------------------------------------------------------------
+% EVALUATION AND BENCHMARKING (ADDED)
+% -----------------------------------------------------------------------------
+@inproceedings{croce2020reliable,
+  title={Reliable Evaluation of Adversarial Robustness with an Ensemble of Diverse Parameter-free Attacks},
+  author={Croce, Francesco and Hein, Matthias},
+  booktitle={International Conference on Machine Learning},
+  pages={2206--2216},
+  year={2020}
+}
+
+@inproceedings{croce2021robustbench,
+  title={{RobustBench}: A Standardized Adversarial Robustness Benchmark},
+  author={Croce, Francesco and Andriushchenko, Maksym and Sehwag, Vikash and Debenedetti, Edoardo and Flammarion, Nicolas and Chiang, Mung and Mittal, Prateek and Hein, Matthias},
+  booktitle={Advances in Neural Information Processing Systems},
+  year={2021}
+}
+
+@inproceedings{tramer2020adaptive,
+  title={On Adaptive Attacks to Adversarial Example Defenses},
+  author={Tramer, Florian and Carlini, Nicholas and Brendel, Wieland and Madry, Aleksander and Kurakin, Alexey and Papernot, Nicolas and Goodfellow, Ian},
+  booktitle={Advances in Neural Information Processing Systems},
+  volume={33},
+  pages={1633--1645},
+  year={2020}
+}
+
+% -----------------------------------------------------------------------------
 % PRIVACY ATTACKS
 % -----------------------------------------------------------------------------
 @inproceedings{shokri2017membership,
@@ -764,6 +787,14 @@
   year={2021}
 }
 
+@inproceedings{jagielski2020high,
+  title={High Accuracy and High Fidelity Extraction of Neural Networks},
+  author={Jagielski, Matthew and Carlini, Nicholas and Berthelot, David and Kurakin, Alex and Papernot, Nicolas},
+  booktitle={USENIX Security Symposium},
+  pages={1345--1362},
+  year={2020}
+}
+
 % -----------------------------------------------------------------------------
 % TRAINING TIME ATTACKS
 % -----------------------------------------------------------------------------
@@ -775,10 +806,10 @@
   year={2012}
 }
 
-@inproceedings{gu2017badnets,
+@article{gu2017badnets,
   title={{BadNets}: Identifying Vulnerabilities in the Machine Learning Model Supply Chain},
   author={Gu, Tianyu and Dolan-Gavitt, Brendan and Garg, Siddharth},
-  booktitle={arXiv preprint arXiv:1708.06733},
+  journal={arXiv preprint arXiv:1708.06733},
   year={2017}
 }
 
@@ -833,7 +864,7 @@
 }
 
 % -----------------------------------------------------------------------------
-% LLM AND FOUNDATION MODEL PAPERS (NEW SECTION 6)
+% LLM AND FOUNDATION MODEL PAPERS
 % -----------------------------------------------------------------------------
 @inproceedings{zou2023universal,
   title={Universal and Transferable Adversarial Attacks on Aligned Language Models},
@@ -841,6 +872,13 @@
   booktitle={Advances in Neural Information Processing Systems},
   volume={36},
   year={2023}
+}
+
+@inproceedings{liu2024autodan,
+  title={{AutoDAN}: Generating Stealthy Jailbreak Prompts on Aligned Large Language Models},
+  author={Liu, Xiaogeng and Xu, Nan and Chen, Muhao and Xiao, Chaowei},
+  booktitle={International Conference on Learning Representations},
+  year={2024}
 }
 
 @article{carlini2023jailbroken,
@@ -863,6 +901,27 @@
   author={Mehrotra, Anay and Zampetakis, Manolis and Kassianik, Paul and Nelson, Blaine and Anderson, Hyrum and Singer, Yaron and Globerson, Amir},
   booktitle={Advances in Neural Information Processing Systems},
   year={2024}
+}
+
+@inproceedings{mazeika2024harmbench,
+  title={{HarmBench}: A Standardized Evaluation Framework for Automated Red Teaming and Robust Refusal},
+  author={Mazeika, Mantas and Phan, Long and Yin, Xuwang and Zou, Andy and Wang, Zifan and Mu, Norman and Sakhaee, Elham and Li, Nathaniel and Basart, Steven and Li, Bo and others},
+  booktitle={International Conference on Machine Learning},
+  year={2024}
+}
+
+@inproceedings{liu2024prompt,
+  title={Formalizing and Benchmarking Prompt Injection Attacks and Defenses},
+  author={Liu, Yupei and Jia, Yuqi and Geng, Runpeng and Jia, Jinyuan and Gong, Neil Zhenqiang},
+  booktitle={USENIX Security Symposium},
+  year={2024}
+}
+
+@article{greshake2023youve,
+  title={Not What You've Signed Up For: Compromising Real-World {LLM}-Integrated Applications with Indirect Prompt Injection},
+  author={Greshake, Kai and Abdelnabi, Sahar and Mishra, Shailesh and Endres, Christoph and Holz, Thorsten and Fritz, Mario},
+  journal={arXiv preprint arXiv:2302.12173},
+  year={2023}
 }
 
 @inproceedings{russinovich2024crescendo,
@@ -898,7 +957,7 @@
 }
 
 @article{zhang2024advwave,
-  title = {{AdvWave}: Stealthy Adversarial Jailbreak Attack Against Large Audio-Language Models},
+  title={{AdvWave}: Stealthy Adversarial Jailbreak Attack Against Large Audio-Language Models},
   author={Zhang, Mintong and Li, Jiyi and Li, Tianxin and Liu, Zhaoyuan and Zhang, Dinghao},
   journal={arXiv preprint arXiv:2412.08608},
   year={2024}
@@ -941,7 +1000,7 @@
 }
 
 @inproceedings{rebedea2023nemo,
-  title = {{NeMo} Guardrails: A Toolkit for Controllable and Safe {LLM} Applications with Programmable Rails},
+  title={{NeMo} Guardrails: A Toolkit for Controllable and Safe {LLM} Applications with Programmable Rails},
   author={Rebedea, Traian and Dinu, Razvan and Sreedhar, Makesh Nandan and Parisien, Christopher and Cohen, Jonathan},
   booktitle={Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing: System Demonstrations},
   pages={431--445},
@@ -970,21 +1029,21 @@
 }
 
 @article{bai2022constitutional,
-  title = {Constitutional {AI}: Harmlessness from {AI} Feedback},
+  title={Constitutional {AI}: Harmlessness from {AI} Feedback},
   author={Bai, Yuntao and Kadavath, Saurav and Kundu, Sandipan and Askell, Amanda and Kernion, Jackson and Jones, Andy and Chen, Anna and Goldie, Anna and Mirhoseini, Azalia and McKinnon, Cameron and others},
   journal={arXiv preprint arXiv:2212.08073},
   year={2022}
 }
 
 @inproceedings{chao2024jailbreakbench,
-  title = {{JailbreakBench}: An Open Robustness Benchmark for Jailbreaking Large Language Models},
+  title={{JailbreakBench}: An Open Robustness Benchmark for Jailbreaking Large Language Models},
   author={Chao, Patrick and Debenedetti, Edoardo and Robey, Alexander and Andriushchenko, Maksym and Croce, Francesco and Sehwag, Vikash and Dobriban, Edgar and Flammarion, Nicolas and Kolter, J. Zico and Mittal, Prateek and others},
   booktitle={Advances in Neural Information Processing Systems Datasets and Benchmarks Track},
   year={2024}
 }
 
 @inproceedings{zhan2024injecagent,
-  title = {{InjecAgent}: Benchmarking Indirect Prompt Injections in Tool-Integrated Large Language Model Agents},
+  title={{InjecAgent}: Benchmarking Indirect Prompt Injections in Tool-Integrated Large Language Model Agents},
   author={Zhan, Qiusi and Fang, Zhixiang and Gao, Wei and Gao, Shijia and Yang, Dianbo and Liang, Yiwei and Zhang, Xiaobing and Chen, Gang and Chen, Kai and Ye, Junchi},
   booktitle={Findings of the Association for Computational Linguistics: ACL 2024},
   pages={2566--2587},
@@ -1001,119 +1060,47 @@
 % -----------------------------------------------------------------------------
 % REAL-WORLD INCIDENTS AND CASE STUDIES
 % -----------------------------------------------------------------------------
-@article{EchoLeak2025,
-  author       = {Samuly, Rohan and others},
-  title        = {EchoLeak: The First Real-World Zero-Click Prompt Injection Exploit in a Production LLM System},
-  year         = {2025},
-  journal      = {arXiv preprint arXiv:2509.00000},
-  note         = {Describes a zero-click prompt-injection attack against Microsoft 365 Copilot and mitigation strategies.}
-}
-
-@online{HackerOneBard,
-  author       = {HackerOne Security Researchers},
-  title        = {How a Prompt Injection Vulnerability Led to Data Exfiltration},
-  year         = {2024},
-  url          = {https://www.hackerone.com/blog/prompt-injection-vulnerability-bard},
-  note         = {Blog post describing a prompt-injection exploit against Google Bard Extensions.}
-}
-
-@article{AgentFlayer2025,
-  author       = {Bargury, Michael and Sharbat, Tamir Ishay},
-  title        = {AgentFlayer: Demonstrating Data Exfiltration via ChatGPT Connectors},
-  journal      = {Black Hat USA 2025 Presentation},
-  year         = {2025},
-  note         = {Illustrates how a poisoned document can extract secrets via ChatGPT Connectors.}
-}
-
-@article{Nasr2023,
-  author       = {Nasr, Milad and Carlini, Nicholas and others},
-  title        = {Scalable Extraction of Training Data from (Production) Language Models},
-  journal      = {arXiv preprint arXiv:2311.17035},
-  year         = {2023},
-  note         = {Introduces the divergence attack for extracting ChatGPT training data.}
-}
-
-@article{Nightshade2023,
-  author       = {Wang, Ben and others},
-  title        = {Nightshade: Prompt-Specific Poisoning Attacks on Text-to-Image Generative Models},
-  journal      = {arXiv preprint arXiv:2310.20350},
-  year         = {2023},
-  note         = {Shows how artists can poison training data to mislead generative models.}
-}
-
-@online{WEFNightshade2023,
-  author       = {World Economic Forum},
-  title        = {Why Artists Are Using Nightshade to Poison AI Training Data},
-  year         = {2023},
-  url          = {https://www.weforum.org/agenda/2023/11/nightshade-poison-generative-ai},
-  note         = {Popular summary of Nightshade's motives and implications.}
-}
-
-@article{Liu2024,
-  author       = {Liu, Lingjuan and others},
-  title        = {Model Extraction Attacks Revisited},
-  journal      = {arXiv preprint arXiv:2403.00000},
-  year         = {2024},
-  note         = {Analyzes model extraction against commercial MLaaS APIs.}
-}
-
-@online{EftsureDeepfake2024,
-  author       = {Eftsure Pty Ltd},
-  title        = {7 Deepfake Attacks Examples: Deepfake CEO scams},
-  year         = {2024},
-  url          = {https://eftsure.com/blog/deepfake-attacks-examples/},
-  note         = {Describes real deepfake scams targeting organisations.}
-}
-
-@inproceedings{Apruzzese2022,
-  author       = {Apruzzese, Giovanni and others},
-  title        = {Real Attackers Don't Compute Gradients: Bridging the Gap Between Theory and Practice in Adversarial Machine Learning},
-  booktitle    = {Proceedings of the 31st USENIX Security Symposium},
-  year         = {2022},
-  note         = {Introduces a framework for evaluating theory--practice gaps in adversarial machine learning.}
-}
-
 @article{anthropic2025ai,
-  title     = {Disrupting the First Reported AI-Orchestrated Cyber Espionage Campaign},
-  author    = {{Anthropic}},
-  journal   = {Anthropic Research Blog},
-  year      = {2025},
-  month     = nov,
-  url       = {https://www.anthropic.com/research/disrupting-the-first-reported-ai-orchestrated-cyber-espionage-campaign}
+  title={Disrupting the First Reported {AI}-Orchestrated Cyber Espionage Campaign},
+  author={{Anthropic}},
+  journal={Anthropic Research Blog},
+  year={2025},
+  month={nov},
+  url={https://www.anthropic.com/research/disrupting-the-first-reported-ai-orchestrated-cyber-espionage-campaign}
 }
 
 @article{aim2025echoleak,
-  title     = {EchoLeak: Zero-Click Indirect Prompt Injection in Microsoft 365 Copilot},
-  author    = {{Aim Security}},
-  journal   = {Security Advisory},
-  year      = {2025},
-  url       = {https://www.aim.security/labs/echoleak}
+  title={{EchoLeak}: Zero-Click Indirect Prompt Injection in {Microsoft 365 Copilot}},
+  author={{Aim Security}},
+  journal={Security Advisory},
+  year={2025},
+  url={https://www.aim.security/labs/echoleak}
 }
 
 @article{zenity2025agentflayer,
-  title     = {AgentFlayer: Indirect Prompt Injection in LLM Agent Connectors},
-  author    = {Bargury, Yair and Sharbat, Matan},
-  journal   = {Black Hat USA Briefings},
-  year      = {2025}
+  title={{AgentFlayer}: Indirect Prompt Injection in {LLM} Agent Connectors},
+  author={Bargury, Yair and Sharbat, Matan},
+  journal={Black Hat USA Briefings},
+  year={2025}
 }
 
 @inproceedings{nasr2023scalable,
-  title     = {Scalable Extraction of Training Data from Production Language Models},
-  author    = {Nasr, Milad and others},
-  booktitle = {Proceedings of the IEEE Symposium on Security and Privacy},
-  year      = {2023}
+  title={Scalable Extraction of Training Data from Production Language Models},
+  author={Nasr, Milad and Carlini, Nicholas and Hayase, Jonathan and Jagielski, Matthew and Cooper, A Feder and Ippolito, Daphne and Choquette-Choo, Christopher A and Wallace, Eric and Tram{\`e}r, Florian and Lee, Katherine},
+  booktitle={Proceedings of the IEEE Symposium on Security and Privacy},
+  year={2024}
 }
 
 @inproceedings{carlini2024stealing,
-  title     = {Stealing Part of a Production Language Model},
-  author    = {Carlini, Nicholas and others},
-  booktitle = {Proceedings of the International Conference on Machine Learning (ICML)},
-  year      = {2024}
+  title={Stealing Part of a Production Language Model},
+  author={Carlini, Nicholas and Paleka, Daniel and Dvijotham, Krishnamurthy Dj and Steinke, Thomas and Hayase, Jonathan and Cooper, A Feder and Lee, Katherine and Jagielski, Matthew and Nasr, Milad and Conber, Arthur and others},
+  booktitle={Proceedings of the International Conference on Machine Learning},
+  year={2024}
 }
 
 @article{guardian2024deepfake,
-  title     = {Deepfake Scam Uses AI Voice to Target Corporate Executives},
-  author    = {{The Guardian}},
-  journal   = {The Guardian},
-  year      = {2024}
+  title={Finance Worker Pays Out \$25 Million After Video Call with Deepfake ``Chief Financial Officer''},
+  author={{The Guardian}},
+  journal={The Guardian},
+  year={2024}
 }
