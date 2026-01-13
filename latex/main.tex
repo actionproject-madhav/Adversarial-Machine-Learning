@@ -594,50 +594,89 @@ Our analysis reveals that defense papers demonstrate somewhat higher alignment w
 %==============================================================================
 \section{Recommendations}
 
-Bridging the theory-practice gap requires coordinated effort across the research ecosystem. We offer recommendations for multiple stakeholder groups.
+Our analysis reveals a persistent theory-practice gap: 94.7\% of papers avoid real-system testing, 67.8\% require gradient access, and 63.2\% assume white-box knowledge. Closing this gap requires coordinated intervention across the research ecosystem. We provide evidence-based recommendations for four stakeholder groups, grounded in recent frameworks and successful initiatives from the security and machine learning communities.
 
 \subsection{For Researchers}
 
-\subsubsection{Methodological Considerations}
+\subsubsection{Specify Realistic Threat Models}
 
-\textbf{Validate on real systems when feasible.} Partner with industry to evaluate against production deployments. Even limited real-world testing can reveal constraints not apparent in laboratory settings.
+The prevalence of white-box assumptions (63.2\% of papers) contradicts deployment realities where models are protected behind APIs and security controls. Researchers need structured vocabularies to specify attacker capabilities precisely. The NIST AI Risk Management Framework provides such a taxonomy, classifying attacks by attacker knowledge level, lifecycle stage, and objectives~\citep{nist2023airisk}. Importantly, NIST notes that most documented attacks require minimal system knowledge, contradicting the white-box default in academic work.
 
-\textbf{Employ realistic threat models.} Consider black-box access as a default assumption. When white-box assumptions are necessary, justify them explicitly and acknowledge their implications.
+MITRE ATLAS extends the ATT\&CK framework to AI systems with 66 documented techniques and 33 real-world case studies~\citep{mitre2024atlas}. These case studies reveal that successful attacks, including the 2024 Morris II worm~\citep{nassi2024comworm} and the 2025 state-sponsored AI agent campaign~\citep{anthropic2025espionage}, succeeded without gradient access or white-box knowledge. Researchers should map proposed attacks to ATLAS techniques and justify when assumptions exceed documented attacker capabilities. When white-box access is necessary for theoretical contributions, authors should explicitly discuss the gap between their assumptions and deployment constraints.
 
-\textbf{Expand domain coverage.} Extend research beyond image classification to tabular data, graphs, time-series, and multimodal systems where practical deployment is occurring.
+\subsubsection{Employ Realistic Evaluation Frameworks}
 
-\textbf{Consider economic factors.} Analyze attack costs, defender resources, and return-on-investment trade-offs. Security decisions involve economic considerations.
+Evaluation must enforce constraints that deployed systems actually face. For adversarial robustness in computer vision, AutoAttack has become the standard because it revealed that 13 of 50 evaluated defenses had actual robustness at least 10\% lower than initially reported~\citep{croce2020autoattack}. The ensemble includes gradient-free attacks, providing a model for combining white-box and black-box evaluation. RobustBench maintains standardized leaderboards with over 120 models, requiring non-zero gradients to prevent gradient masking~\citep{croce2021robustbench}.
 
-\textbf{Include human evaluation.} Test perceptibility against actual humans rather than relying solely on mathematical metrics.
+Query budgets present another disconnect. Among papers in our dataset that involve model queries, 80.4\% assume budgets exceeding 1000 queries. Commercial APIs implement rate limiting, costs accumulate with usage, and repeated similar queries trigger anomaly detection. Query-efficient evaluation should become standard practice, with researchers reporting both the number of queries required and whether this budget reflects operational constraints.
 
-\subsubsection{Evaluation Practices}
+For large language model security, standardized benchmarks are emerging. HarmBench provides 400 harmful behaviors across seven categories with explicit evaluation protocols~\citep{mazeika2024harmbench}, while JailbreakBench offers threat model specifications and scoring functions that enable reproducible comparison~\citep{chao2024jailbreakbench}. These benchmarks demonstrate how standardization can improve both rigor and practical relevance.
 
-Evaluate privacy using true-positive rate at low false-positive rates, not only average accuracy or AUC. For non-image domains, define domain-appropriate perturbation constraints. Report query budgets realistically based on what commercial APIs actually permit. Measure computational requirements in practical units such as wall-clock time and computational cost.
+\subsubsection{Report Practical Attack Economics}
 
-\subsection{For Venues and Program Committees}
+Single-attempt success rates misrepresent operational risk. Recent industry evaluations report success rates across multiple attempts (1, 50, 200), revealing dramatic increases with attacker persistence~\citep{anthropic2024modelevals}. The 2024 SaTML Capture-the-Flag competition, involving over 137,000 adversarial interactions against 44 defenses, found that every defense was eventually bypassed through multi-turn attacks~\citep{schulhoff2024satmlctf}. Single-turn evaluation would have missed this critical finding.
 
-\textbf{Encourage real-world validation.} At minimum, request authors to justify why real-system testing is infeasible if omitted.
+Researchers should report: (1) computational costs and query budgets required for attacks, (2) multi-turn success rates where applicable, (3) transferability across model families, and (4) economic costs to mount attacks. For domains beyond images, the constraints differ. Pierazzi et al. demonstrate how to formalize domain-specific constraints for malware, explicitly modeling semantic preservation and side effects~\citep{pierazzi2020intriguing}. Their work provides a template for extending adversarial ML beyond $L_p$ perturbations.
 
-\textbf{Consider artifact badges for deployability.} Recognize work tested on production systems with explicit acknowledgment.
+\subsection{For Conferences and Reviewers}
 
-\textbf{Develop evaluation guidelines.} Request papers to explicitly address threat model realism, query budget constraints, gradient requirements, domain-appropriate metrics, economic considerations, and adaptive adversary testing.
+\subsubsection{Require Artifact Availability}
 
-\textbf{Value negative results.} Papers demonstrating that attacks fail under realistic constraints provide valuable information that positive-result publication preferences may suppress.
+While 89.6\% of papers in our dataset release code, reproducibility requires more than source availability. USENIX Security now mandates that papers share artifacts on permanent repositories (Zenodo, FigShare, Software Heritage) or provide justification for non-release~\citep{usenix2025artifacts}. This policy establishes a baseline without excessive burden. All four surveyed venues offer three-tier badge systems (Available, Functional, Reproduced), but adoption varies. NDSS introduced artifact evaluation only in 2024, while USENIX and IEEE S\&P have established programs.
 
-\subsection{For Industry Practitioners}
+We recommend that security venues require artifact availability as a publication condition, with graduated evaluation for functionality and reproducibility. Permanent archival with DOI assignment ensures long-term accessibility. The REFORMS checklist provides 32 questions covering problem specification, data handling, and limitations that can guide both authors and reviewers~\citep{pineau2021reforms}.
 
-\textbf{Interpret academic results in deployment context.} Adjust risk assessments for deployment realities rather than accepting laboratory success rates directly.
+\subsubsection{Evaluate Threat Model Realism}
 
-\textbf{Anticipate adaptation requirements.} Budget for re-engineering before research prototypes become production-ready.
+Review criteria should explicitly address assumptions underlying adversarial claims. We propose that authors specify: (1) attacker knowledge using NIST taxonomy categories, (2) query budgets and whether they reflect rate limiting and detection, (3) physical realizability for attacks on deployed systems, (4) economic viability including cost-benefit analysis, and (5) adaptive adversary considerations for defense papers.
 
-\textbf{Prioritize defenses against realistic threats:} black-box attacks, low query budget scenarios, economically motivated adversaries, and domain-specific constraints.
+The SaTML conference welcomes position papers addressing methodological concerns~\citep{satml2025cfp}, creating space for research that advances evaluation methodology. Other venues should consider similar tracks. The AISec Workshop, co-located with CCS for 18 consecutive years, demonstrates sustained demand for work bridging ML and security~\citep{aisec2024}. Expanding industry review tracks with practitioner input can help identify when assumptions diverge from operational reality.
 
-\textbf{Consider contributing data.} Anonymized information about real attack attempts could help ground academic research in deployment reality.
+\subsection{For Practitioners}
 
-\subsection{For Funding Agencies}
+\subsubsection{Implement Defense in Depth}
 
-Support industry-academic partnerships with real-world validation components. Fund deployment studies rather than only paper publication. Incentivize replication studies that validate academic claims against production systems. Consider red team / blue team programs with realistic constraints.
+Academic papers typically evaluate single defenses in isolation. Deployed systems require layered protection because no single defense is perfect. Google's Secure AI Framework provides a structured approach with four pillars: secure development, deployment, execution, and monitoring~\citep{google2024saif}. Each pillar includes specific controls and risk assessments.
 
+The OWASP Top 10 for LLM Applications establishes community consensus on priorities~\citep{owasp2025llmtop10}. Prompt injection tops the list because, unlike many academic attacks, it requires no model access or technical sophistication. The 2025 update for agentic systems adds risks specific to multi-agent architectures, including memory poisoning and tool manipulation~\citep{owasp2025agentic}. Practitioners should design systems assuming prompt injection will succeed, implementing architectural isolation that separates control logic from data processing~\citep{harang2024promptinjection}.
+
+\subsubsection{Conduct Continuous Adversarial Testing}
+
+Point-in-time security assessments miss evolving threats. Microsoft's PyRIT automates red teaming with curated attack datasets, enabling continuous evaluation~\citep{microsoft2024pyrit}. Open-source alternatives like Promptfoo and DeepEval provide similar capabilities with OWASP alignment~\citep{promptfoo2024harmbench,deepeval2024}. These tools can integrate into CI/CD pipelines, making adversarial testing part of standard development rather than a separate security audit.
+
+Multi-turn attacks achieve over 90\% success against defenses showing near-zero vulnerability in single-turn evaluation~\citep{anthropic2024adaptive}. This finding underscores why continuous testing matters. Organizations should establish internal red teams that probe systems throughout the development lifecycle, not just before deployment.
+
+\subsubsection{Contribute to Shared Threat Intelligence}
+
+MITRE ATLAS contains 33 real-world case studies because practitioners documented incidents~\citep{mitre2024atlas}. Organizations that experience novel attacks should consider contributing to ATLAS or the AI Incident Database. The Coalition for Secure AI, with members including Google, Microsoft, Amazon, Anthropic, and OpenAI, provides venues for pre-competitive collaboration on supply chain security and risk governance~\citep{cosai2024}. Threat intelligence sharing benefits defenders more than attackers because defenses require comprehensive coverage while attacks need only find one vulnerability.
+
+\subsection{For Funders and Policymakers}
+
+\subsubsection{Require Deployment Validation}
+
+DARPA's GARD program required scenario-based evaluations connecting robustness claims to operational contexts~\citep{darpa2024gard}. The program produced the Adversarial Robustness Toolbox and APRICOT benchmark, both designed for practical application. The successor SABER program explicitly targets the "practical demonstration gap" by funding both research teams and operational assessment teams~\citep{darpa2024saber}.
+
+The NSF National AI Research Institutes program awards 16 to 20 million dollars over four to five years, sufficient for sustained work rather than isolated projects~\citep{nsf2022aiinstitutes}. Theme 6 on AI and cybersecurity requires integration of fundamental advances with practical security problems. This structure provides a model: funding should prioritize proposals that include deployment validation components, partnerships with operational organizations, and plans for transitioning research to practice.
+
+\subsubsection{Support Evaluation Infrastructure}
+
+Individual research groups cannot each build comprehensive evaluation platforms. Shared infrastructure reduces duplication and enables fair comparison. NIST's Dioptra testbed provides open-source infrastructure for evaluating AI security~\citep{nist2024dioptra}. Its modular design allows researchers to swap datasets, models, attacks, and defenses. The UK AI Safety Institute's Systemic Safety Grants Programme funds infrastructure for evaluating deepfakes, misinformation, and system failures~\citep{ukaisafety2024grants}.
+
+The SPHERE Research Infrastructure, used by NDSS for artifact evaluation, demonstrates how standardized testbeds enable reproducibility while reducing reviewer burden~\citep{sphere2024}. Funders should support such shared platforms rather than expecting each institution to develop parallel infrastructure. This investment pays dividends through improved reproducibility and reduced barriers to entry for new researchers.
+
+\subsubsection{Address Critical Gaps}
+
+Our analysis identifies three underfunded areas. First, human factors research represents only 0.09\% of papers despite growing deployment in human-AI systems~\citep{yu2025humanfactors}. Attacks exploiting human cognition, timing, and trust may be more practical than mathematical perturbations. Second, economic analysis remains limited despite Apruzzese et al.'s argument that cost-driven threat modeling is essential~\citep{apruzzese2022real}. Recent work provides foundations~\citep{grosse2024economics}, but domain-specific models for fraud, malware, and other applications require development. Third, multi-turn and agentic evaluation lags behind deployment~\citep{xu2025agentsurvey}. Systems combining multiple models, tools, and external services demand compositional security analysis that current benchmarks do not provide.
+
+\subsubsection{Align Regulation with Research}
+
+The EU AI Act, fully applicable in August 2026, requires high-risk systems to be "accurate, robust, and cybersecurity-resilient" with protection against adversarial attacks~\citep{euaiact2024}. This creates demand for evaluation methodologies that translate academic benchmarks into compliance-ready protocols. The Act's regulatory sandboxes provide testing environments for this translation. Similarly, NIST's AI Risk Management Framework establishes governance structures that organizations use for risk assessment. The forthcoming Control Overlays for Securing AI Systems will adapt security controls specifically for AI vulnerabilities~\citep{nist2024cosais}.
+
+Regulation can drive practical research when compliance requires demonstrated robustness. Funders should support work that bridges academic benchmarks and regulatory requirements, ensuring that compliance obligations incentivize rather than hinder security research.
+
+\subsection{Path Forward}
+
+The theory-practice gap we document is not inevitable. Infrastructure for practical adversarial ML research exists through standardized frameworks (NIST AI RMF, MITRE ATLAS), evaluation tools (AutoAttack, RobustBench, HarmBench), shared testbeds (Dioptra, SPHERE), and industry collaboration venues (CoSAI). The challenge is adoption. Researchers can choose realistic threat models, conferences can require artifact availability and threat model justification, practitioners can implement defense in depth, and funders can prioritize deployment validation. These actions are concrete and achievable. Together, they can ensure that adversarial ML research addresses both theoretical rigor and operational security needs, building on the substantial foundation that existing work has established while directing future effort toward bridging the remaining gaps.
 %==============================================================================
 % 9. LIMITATIONS
 %==============================================================================
