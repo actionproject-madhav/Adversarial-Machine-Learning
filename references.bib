@@ -1,369 +1,562 @@
-@inproceedings{apruzzese2023real,
-  title={"Real Attackers Don't Compute Gradients": Bridging the Gap Between Adversarial ML Research and Practice},
-  author={Apruzzese, G. and Anderson, H. S. and Dambra, S. and Freeman, D. E. and Pierazzi, F. and Roundy, K.},
-  booktitle={2023 IEEE Conference on Secure and Trustworthy Machine Learning (SaTML)},
-  year={2023},
-  doi={10.1109/SATML54575.2023.00031}
-}
+% =============================================================================
+% BIBLIOGRAPHY FOR ADVERSARIAL ML ADOPTION LAG PAPER
+% =============================================================================
 
-@inproceedings{bagdasaryan2022spinning,
-  title={Spinning Language Models: Risks of Propaganda-As-A-Service and Countermeasures},
-  author={Bagdasaryan, E. and Shmatikov, V.},
-  booktitle={IEEE Symposium on Security and Privacy},
-  year={2022},
-  doi={10.1109/SP46214.2022.9833572}
-}
+% -----------------------------------------------------------------------------
+% FOUNDATIONAL ATTACKS (2013-2017)
+% -----------------------------------------------------------------------------
 
-@inproceedings{balle2022reconstructing,
-  title={Reconstructing Training Data with Informed Adversaries},
-  author={Balle, B. and Cherubin, G. and Hayes, J.},
-  booktitle={IEEE Symposium on Security and Privacy},
-  year={2022},
-  doi={10.1109/SP46214.2022.9833677}
-}
-
-@inproceedings{carlini2022membership,
-  title={Membership Inference Attacks From First Principles},
-  author={Carlini, N. and Chien, S. and Nasr, M. and Song, S. and Terzis, A. and Tramèr, F.},
-  booktitle={IEEE Symposium on Security and Privacy},
-  year={2022},
-  doi={10.1109/SP46214.2022.9833649}
-}
-
-@article{carlini2023extracting,
-  title={Extracting Training Data from Diffusion Models},
-  author={Carlini, N. and Hayes, J. and Nasr, M. and Jagielski, M. and Sehwag, V. and Tramèr, F. and Balle, B. and Ippolito, D. and Wallace, E.},
-  journal={ArXiv.Org},
-  year={2023},
-  doi={10.48550/ARXIV.2301.13188}
-}
-
-@inproceedings{carlini2017adversarial,
-  title={Adversarial Examples Are Not Easily Detected: Bypassing Ten Detection Methods},
-  author={Carlini, N. and Wagner, D.},
-  booktitle={ACM Workshop on Artificial Intelligence and Security},
-  year={2017},
-  doi={10.1145/3128572.3140444}
-}
-
-@inproceedings{carlini2017towards,
-  title={Towards Evaluating the Robustness of Neural Networks},
-  author={Carlini, N. and Wagner, D.},
-  booktitle={IEEE Symposium on Security and Privacy},
-  year={2017},
-  doi={10.1109/SP.2017.49}
-}
-
-@article{chahe2023dynamic,
-  title={Dynamic Adversarial Attacks on Autonomous Driving Systems},
-  author={Chahe, A. and Wang, C. and Jeyapratap, A. and Xu, K. and Zhou, L.},
-  journal={ArXiv.Org},
-  year={2023},
-  doi={10.48550/ARXIV.2312.06701}
-}
-
-@inproceedings{chase2021property,
-  title={Property Inference from Poisoning},
-  author={Chase, M. and Ghosh, E. and Mahloujifar, S.},
-  booktitle={IEEE Symposium on Security and Privacy},
-  year={2021},
-  doi={10.1109/SP46214.2022.9833623}
-}
-
-@article{chaudhari2022snap,
-  title={SNAP: Efficient Extraction of Private Properties with Poisoning},
-  author={Chaudhari, H. and Abascal, J. and Oprea, A. and Jagielski, M. and Tramèr, F. and Ullman, J.},
-  journal={ArXiv.Org},
-  year={2022},
-  doi={10.48550/ARXIV.2208.12348}
-}
-
-@inproceedings{goodfellow2014explaining,
-  title={Explaining and Harnessing Adversarial Examples},
-  author={Goodfellow, I. and Shlens, J. and Szegedy, C.},
-  booktitle={International Conference on Learning Representations},
-  year={2014}
+@inproceedings{szegedy2014intriguing,
+  title={Intriguing Properties of Neural Networks},
+  author={Szegedy, Christian and Zaremba, Wojciech and Sutskever, Ilya and Bruna, Joan and Erhan, Dumitru and Goodfellow, Ian and Fergus, Rob},
+  booktitle={International Conference on Learning Representations (ICLR)},
+  year={2014},
+  note={ICLR 2024 Test of Time Award}
 }
 
 @inproceedings{goodfellow2015explaining,
   title={Explaining and Harnessing Adversarial Examples},
-  author={Goodfellow, I. and Shlens, J. and Szegedy, C.},
-  booktitle={International Conference on Learning Representations},
-  year={2015}
-}
-
-@article{grosse2017statistical,
-  title={On the (Statistical) Detection of Adversarial Examples},
-  author={Grosse, K. and Manoharan, P. and Papernot, N. and Backes, M. and McDaniel, P.},
-  journal={ArXiv: Cryptography and Security},
-  year={2017}
-}
-
-@inproceedings{he2023large,
-  title={Large Language Models for Code: Security Hardening and Adversarial Testing},
-  author={He, J. and Vechev, M.},
-  booktitle={Conference on Computer and Communications Security},
-  year={2023},
-  doi={10.1145/3576915.3623175}
-}
-
-@inproceedings{he2015deep,
-  title={Deep Residual Learning for Image Recognition},
-  author={He, K. and Zhang, X. and Ren, S. and Sun, J.},
-  booktitle={Computer Vision and Pattern Recognition},
+  author={Goodfellow, Ian J and Shlens, Jonathon and Szegedy, Christian},
+  booktitle={International Conference on Learning Representations (ICLR)},
   year={2015},
-  doi={10.1109/CVPR.2016.90}
-}
-
-@inproceedings{he2016deep,
-  title={Deep Residual Learning for Image Recognition},
-  author={He, K. and Zhang, X. and Ren, S. and Sun, J.},
-  year={2016},
-  doi={10.1109/CVPR.2016.90}
-}
-
-@inproceedings{huang2011adversarial,
-  title={Adversarial Machine Learning},
-  author={Huang, L. and Joseph, A. D. and Nelson, B. and Rubinstein, B. I. P. and Tygar, J. D.},
-  booktitle={Security and Artificial Intelligence},
-  year={2011},
-  doi={10.1145/2046684.2046692}
-}
-
-@inproceedings{huang2019adversarial,
-  title={Adversarial Machine Learning},
-  author={Huang, L. and Joseph, A. D. and Nelson, B. and Rubinstein, B. I. P. and Tygar, J. D.},
-  booktitle={Security and Artificial Intelligence},
-  year={2019},
-  doi={10.1145/2046684.2046692}
-}
-
-@article{jia2021badencoder,
-  title={BadEncoder: Backdoor Attacks to Pre-trained Encoders in Self-Supervised Learning},
-  author={Jia, J. and Liu, Y. and Gong, N. Z. and Yupei, Gong and Zhenqiang, N.},
-  journal={ArXiv (Cornell University)},
-  year={2021},
-  doi={10.48550/ARXIV.2108.00352}
-}
-
-@inproceedings{jia2022fooling,
-  title={Fooling the Eyes of Autonomous Vehicles: Robust Physical Adversarial Examples Against Traffic Sign Recognition Systems},
-  author={Jia, W. and Lu, Z. and Zhang, H. and Liu, Z. and Wang, J. and Qu, G.},
-  booktitle={Proceedings 2022 Network and Distributed System Security Symposium},
-  year={2022},
-  doi={10.14722/NDSS.2022.24130}
-}
-
-@inproceedings{kumar2020adversarial,
-  title={Adversarial Machine Learning-Industry Perspectives},
-  author={Kumar, R. S. S. and Nyström, M. and Lambert, J. and Marshall, A. and Goertzel, M. and Comissoneru, A. and Swann, M. and Xia, S.},
-  booktitle={2020 IEEE Security and Privacy Workshops (SPW)},
-  year={2020},
-  doi={10.2139/SSRN.3532474}
-}
-
-@inproceedings{kurakin2016adversarial,
-  title={Adversarial Machine Learning at Scale},
-  author={Kurakin, A. and Goodfellow, I. and Bengio, S.},
-  booktitle={International Conference on Learning Representations},
-  year={2016}
-}
-
-@inproceedings{li2020sok,
-  title={SoK: Certified Robustness for Deep Neural Networks},
-  author={Li, L. and Li, L. and Xie, T. and Li, B.},
-  booktitle={IEEE Symposium on Security and Privacy},
-  year={2020},
-  doi={10.1109/SP46215.2023.10179303}
-}
-
-@article{li2024analyzing,
-  title={Analyzing Inference Privacy Risks Through Gradients in Machine Learning},
-  author={Li, Z. and Lowy, A. M. and Liu, J. and Koike‐Akino, T. and Parsons, K. and Malin, B. and Wang, Y.},
-  journal={ArXiv.Org},
-  year={2024},
-  doi={10.48550/ARXIV.2408.16913}
-}
-
-@article{liu2024precurious,
-  title={PreCurious: How Innocent Pre-Trained Language Models Turn into Privacy Traps},
-  author={Liu, R. and Wang, T. and Cao, Y. and Xiong, L.},
-  journal={ArXiv.Org},
-  year={2024},
-  doi={10.48550/ARXIV.2403.09562}
-}
-
-@inproceedings{madry2017towards,
-  title={Towards Deep Learning Models Resistant to Adversarial Attacks},
-  author={Madry, A. and Makelov, A. and Schmidt, L. and Tsipras, D. and Vladu, A.},
-  booktitle={International Conference on Learning Representations},
-  year={2017}
-}
-
-@article{madry2018towards,
-  title={Towards Deep Learning Models Resistant to Adversarial Attacks},
-  author={Mądry, A. and Makelov, A. and Schmidt, L. and Tsipras, D. and Vladu, A.},
-  journal={ArXiv (Cornell University)},
-  year={2018}
-}
-
-@inproceedings{meng2017magnet,
-  title={MagNet: A Two-Pronged Defense against Adversarial Examples},
-  author={Meng, D. and Chen, H.},
-  booktitle={Computer and Communications Security},
-  year={2017},
-  doi={10.1145/3133956.3134057}
-}
-
-@article{metzen2017detecting,
-  title={On Detecting Adversarial Perturbations},
-  author={Metzen, J. H. and Genewein, T. and Fischer, V. and Bischoff, B.},
-  journal={ArXiv: Machine Learning},
-  year={2017}
-}
-
-@inproceedings{mink2023security,
-  title={"Security is not my field, I'm a stats guy": A Qualitative Root Cause Analysis of Barriers to Adversarial Machine Learning Defenses in Industry},
-  author={Mink, Jaron and others},
-  booktitle={32nd USENIX Security Symposium (USENIX Security 23)},
-  year={2023}
-}
-
-@inproceedings{moosavi2015deepfool,
-  title={DeepFool: A Simple and Accurate Method to Fool Deep Neural Networks},
-  author={Moosavi-Dezfooli, S.-M. and Fawzi, A. and Frossard, P.},
-  booktitle={Computer Vision and Pattern Recognition},
-  year={2015},
-  doi={10.1109/CVPR.2016.282}
+  note={arXiv:1412.6572, December 20, 2014}
 }
 
 @inproceedings{moosavi2016deepfool,
-  title={DeepFool: A Simple and Accurate Method to Fool Deep Neural Networks},
-  author={Moosavi-Dezfooli, S.-M. and Fawzi, A. and Frossard, P.},
+  title={{DeepFool}: A Simple and Accurate Method to Fool Deep Neural Networks},
+  author={Moosavi-Dezfooli, Seyed-Mohsen and Fawzi, Alhussein and Frossard, Pascal},
+  booktitle={IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
+  pages={2574--2582},
   year={2016},
-  doi={10.1109/CVPR.2016.282}
+  doi={10.1109/CVPR.2016.282},
+  note={arXiv:1511.04599, November 14, 2015}
 }
 
-@inproceedings{papernot2016practical,
-  title={Practical Black-Box Attacks against Machine Learning},
-  author={Papernot, N. and McDaniel, P. and Goodfellow, I. and Jha, S. and Celik, Z. B. and Swami, A.},
-  booktitle={ACM Asia Conference on Computer and Communications Security},
-  year={2016},
-  doi={10.1145/3052973.3053009}
-}
-
-@inproceedings{papernot2017practical,
-  title={Practical Black-Box Attacks against Machine Learning},
-  author={Papernot, N. and McDaniel, P. and Goodfellow, I. and Jha, S. and Celik, Z. B. and Swami, A.},
-  booktitle={Computer and Communications Security},
+@inproceedings{carlini2017towards,
+  title={Towards Evaluating the Robustness of Neural Networks},
+  author={Carlini, Nicholas and Wagner, David},
+  booktitle={IEEE Symposium on Security and Privacy (SP)},
+  pages={39--57},
   year={2017},
-  doi={10.1145/3052973.3053009}
+  doi={10.1109/SP.2017.49},
+  note={arXiv:1608.04644, August 16, 2016}
 }
 
-@inproceedings{papernot2015limitations,
-  title={The Limitations of Deep Learning in Adversarial Settings},
-  author={Papernot, N. and McDaniel, P. and Jha, S. and Fredrikson, M. and Celik, Z. B. and Swami, A.},
-  booktitle={European Symposium on Security and Privacy},
-  year={2015},
-  doi={10.1109/EUROSP.2016.36}
-}
-
-@inproceedings{papernot2016limitations,
-  title={The Limitations of Deep Learning in Adversarial Settings},
-  author={Papernot, N. and McDaniel, P. and Jha, S. and Fredrikson, M. and Celik, Z. B. and Swami, A.},
-  year={2016},
-  doi={10.1109/EUROSP.2016.36}
-}
-
-@inproceedings{papernot2015distillation,
-  title={Distillation as a Defense to Adversarial Perturbations Against Deep Neural Networks},
-  author={Papernot, N. and McDaniel, P. and Wu, X. and Jha, S. and Swami, A.},
-  booktitle={IEEE Symposium on Security and Privacy},
-  year={2015},
-  doi={10.1109/SP.2016.41}
+@inproceedings{madry2018towards,
+  title={Towards Deep Learning Models Resistant to Adversarial Attacks},
+  author={Madry, Aleksander and Makelov, Aleksandar and Schmidt, Ludwig and Tsipras, Dimitris and Vladu, Adrian},
+  booktitle={International Conference on Learning Representations (ICLR)},
+  year={2018},
+  note={arXiv:1706.06083, June 19, 2017}
 }
 
 @inproceedings{papernot2016distillation,
   title={Distillation as a Defense to Adversarial Perturbations Against Deep Neural Networks},
-  author={Papernot, N. and McDaniel, P. and Wu, X. and Jha, S. and Swami, A.},
+  author={Papernot, Nicolas and McDaniel, Patrick and Wu, Xi and Jha, Somesh and Swami, Ananthram},
+  booktitle={IEEE Symposium on Security and Privacy (SP)},
+  pages={582--597},
   year={2016},
   doi={10.1109/SP.2016.41}
 }
 
-@inproceedings{pasquini2021eluding,
-  title={Eluding Secure Aggregation in Federated Learning via Model Inconsistency},
-  author={Pasquini, D. and Francati, D. and Ateniese, G.},
-  booktitle={Conference on Computer and Communications Security},
-  year={2021},
-  doi={10.1145/3548606.3560557}
+@inproceedings{kurakin2017physical,
+  title={Adversarial Examples in the Physical World},
+  author={Kurakin, Alexey and Goodfellow, Ian J and Bengio, Samy},
+  booktitle={International Conference on Learning Representations (ICLR) Workshop},
+  year={2017},
+  note={arXiv:1607.02533, July 8, 2016}
 }
 
-@inproceedings{pasquini2022insecurity,
-  title={On the (In)security of Peer-to-Peer Decentralized Machine Learning},
-  author={Pasquini, D. and Raynal, M. and Troncoso, C.},
-  booktitle={IEEE Symposium on Security and Privacy},
-  year={2022},
-  doi={10.1109/SP46215.2023.10179291}
+@inproceedings{eykholt2018robust,
+  title={Robust Physical-World Attacks on Deep Learning Visual Classification},
+  author={Eykholt, Kevin and Evtimov, Ivan and Fernandes, Earlence and Li, Bo and Rahmati, Amir and Xiao, Chaowei and Prakash, Atul and Kohno, Tadayoshi and Song, Dawn},
+  booktitle={IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
+  pages={1625--1634},
+  year={2018},
+  doi={10.1109/CVPR.2018.00175}
 }
 
-@inproceedings{salem2022sok,
-  title={SoK: Let the Privacy Games Begin! A Unified Treatment of Data Inference Privacy in Machine Learning},
-  author={Salem, A. and Cherubin, G. and Evans, D. and Köpf, B. and Paverd, A. and Suri, A. and Tople, S. and Zanella-Béguelin, S.},
-  booktitle={IEEE Symposium on Security and Privacy},
-  year={2022},
-  doi={10.48550/ARXIV.2212.10986}
+% -----------------------------------------------------------------------------
+% PRIVACY AND INTEGRITY ATTACKS
+% -----------------------------------------------------------------------------
+
+@inproceedings{shokri2017membership,
+  title={Membership Inference Attacks Against Machine Learning Models},
+  author={Shokri, Reza and Stronati, Marco and Song, Congzheng and Shmatikov, Vitaly},
+  booktitle={IEEE Symposium on Security and Privacy (SP)},
+  pages={3--18},
+  year={2017},
+  doi={10.1109/SP.2017.41}
 }
 
-@inproceedings{szegedy2013intriguing,
-  title={Intriguing properties of neural networks},
-  author={Szegedy, C. and Zaremba, W. and Sutskever, I. and Bruna, J. and Erhan, D. and Goodfellow, I. and Fergus, R.},
-  booktitle={International Conference on Learning Representations},
-  year={2013}
+@inproceedings{tramer2016stealing,
+  title={Stealing Machine Learning Models via Prediction {API}s},
+  author={Tram{\`e}r, Florian and Zhang, Fan and Juels, Ari and Reiter, Michael K and Ristenpart, Thomas},
+  booktitle={25th USENIX Security Symposium},
+  pages={601--618},
+  year={2016}
 }
 
-@inproceedings{tao2024distribution,
-  title={Distribution Preserving Backdoor Attack in Self-supervised Learning},
-  author={Tao, G. and Wang, Z. and Feng, S. and Shen, G. and Ma, S. and Zhang, X.},
-  booktitle={IEEE Symposium on Security and Privacy},
-  year={2024},
-  doi={10.1109/SP54263.2024.00029}
+@inproceedings{carlini2021extracting,
+  title={Extracting Training Data from Large Language Models},
+  author={Carlini, Nicholas and Tram{\`e}r, Florian and Wallace, Eric and Jagielski, Matthew and Herbert-Voss, Ariel and Lee, Katherine and Roberts, Adam and Brown, Tom and Song, Dawn and Erlingsson, {\'U}lfar and others},
+  booktitle={30th USENIX Security Symposium},
+  pages={2633--2650},
+  year={2021}
 }
 
-@inproceedings{tramer2017ensemble,
-  title={Ensemble Adversarial Training: Attacks and Defenses},
-  author={Tramèr, F. and Kurakin, A. and Papernot, N. and Boneh, D. and McDaniel, P.},
-  booktitle={International Conference on Learning Representations},
+@article{gu2017badnets,
+  title={{BadNets}: Identifying Vulnerabilities in the Machine Learning Model Supply Chain},
+  author={Gu, Tianyu and Dolan-Gavitt, Brendan and Garg, Siddharth},
+  journal={arXiv preprint arXiv:1708.06733},
   year={2017}
 }
 
-@inproceedings{tramer2022truth,
-  title={Truth Serum: Poisoning Machine Learning Models to Reveal Their Secrets},
-  author={Tramèr, F. and Shokri, R. and Joaquin, A. S. and Le, H. M. and Jagielski, M. and Hong, S. and Carlini, N.},
-  booktitle={Conference on Computer and Communications Security},
+@inproceedings{bagdasaryan2020backdoor,
+  title={How to Backdoor Federated Learning},
+  author={Bagdasaryan, Eugene and Veit, Andreas and Hua, Yiqing and Estrin, Deborah and Shmatikov, Vitaly},
+  booktitle={International Conference on Artificial Intelligence and Statistics (AISTATS)},
+  pages={2938--2948},
+  year={2020}
+}
+
+@article{jia2021badencoder,
+  title={{BadEncoder}: Backdoor Attacks to Pre-trained Encoders in Self-Supervised Learning},
+  author={Jia, Jinyuan and Liu, Yupei and Gong, Neil Zhenqiang},
+  journal={arXiv preprint arXiv:2108.00352},
+  year={2021}
+}
+
+@inproceedings{zhang2017dolphinattack,
+  title={{DolphinAttack}: Inaudible Voice Commands},
+  author={Zhang, Guoming and Yan, Chen and Ji, Xiaoyu and Zhang, Tianchen and Zhang, Taimin and Xu, Wenyuan},
+  booktitle={ACM Conference on Computer and Communications Security (CCS)},
+  pages={103--117},
+  year={2017},
+  doi={10.1145/3133956.3134052},
+  note={ACM CCS 2017 Best Paper Award}
+}
+
+% -----------------------------------------------------------------------------
+% LLM SECURITY - PROMPT INJECTION AND JAILBREAKING
+% -----------------------------------------------------------------------------
+
+@inproceedings{perez2022ignore,
+  title={Ignore This Title and {HackAPrompt}: Exposing Systemic Vulnerabilities of {LLM}s through a Global Scale Prompt Hacking Competition},
+  author={Perez, F{\'a}bio and Ribeiro, Ian},
+  booktitle={NeurIPS 2022 Workshop on Machine Learning Safety},
   year={2022},
-  doi={10.1145/3548606.3560554}
+  note={arXiv:2211.09527}
 }
 
-@inproceedings{weber2020rab,
-  title={RAB: Provable Robustness Against Backdoor Attacks},
-  author={Weber, M. and Xu, X. and Karlaš, B. and Zhang, C. and Li, B.},
-  booktitle={IEEE Symposium on Security and Privacy},
-  year={2020},
-  doi={10.1109/SP46215.2023.10179451}
+@inproceedings{greshake2023indirect,
+  title={Not What You've Signed Up For: Compromising Real-World {LLM}-Integrated Applications with Indirect Prompt Injection},
+  author={Greshake, Kai and Abdelnabi, Sahar and Mishra, Shailesh and Endres, Christoph and Holz, Thorsten and Fritz, Mario},
+  booktitle={ACM Workshop on Artificial Intelligence and Security (AISec)},
+  year={2023},
+  doi={10.1145/3605764.3623985},
+  note={arXiv:2302.12173, February 23, 2023}
 }
 
-@inproceedings{ye2021enhanced,
-  title={Enhanced Membership Inference Attacks against Machine Learning Models},
-  author={Ye, J. and Maddi, A. and Murakonda, S. K. and Bindschaedler, V. and Shokri, R.},
-  booktitle={Conference on Computer and Communications Security},
-  year={2021},
-  doi={10.1145/3548606.3560675}
+@inproceedings{zou2023universal,
+  title={Universal and Transferable Adversarial Attacks on Aligned Language Models},
+  author={Zou, Andy and Wang, Zifan and Kolter, J Zico and Fredrikson, Matt},
+  booktitle={Advances in Neural Information Processing Systems (NeurIPS)},
+  year={2023},
+  note={Spotlight paper; arXiv:2307.15043, July 27, 2023}
 }
 
-@inproceedings{zhang2024no,
-  title={No Privacy Left Outside: On the (In-)Security of TEE-Shielded DNN Partition for On-Device ML},
-  author={Zhang, Z. and Gong, C. and Cai, Y. and Yuan, Y. and Liu, B. and Ding, L. and Guo, Y. and Chen, X.},
-  booktitle={IEEE Symposium on Security and Privacy},
+@article{chao2024jailbreaking,
+  title={Jailbreaking Black Box Large Language Models in Twenty Queries},
+  author={Chao, Patrick and Robey, Alexander and Dobriban, Edgar and Hassani, Hamed and Pappas, George J and Wong, Eric},
+  journal={arXiv preprint arXiv:2310.08419},
   year={2024},
-  doi={10.1109/SP54263.2024.00052}
+  note={Introduced PAIR attack}
+}
+
+@article{mehrotra2024tree,
+  title={Tree of Attacks: Jailbreaking Black-Box {LLM}s with Depth-First Search},
+  author={Mehrotra, Anay and Zampetakis, Manolis and Kassianik, Paul and Nelson, Blaine and Anderson, Hyrum and Singer, Yaron and Karbasi, Amin},
+  journal={arXiv preprint arXiv:2312.02119},
+  year={2024},
+  note={Introduced TAP attack}
+}
+
+@inproceedings{schulhoff2023hackaprompt,
+  title={Ignore This Title and {HackAPrompt}: Exposing Systemic Vulnerabilities of {LLM}s through a Global Scale Prompt Hacking Competition},
+  author={Schulhoff, Sander and Pinto, Jeremy and Khan, Anaum and Bouchard, Louis-Fran{\c{c}}ois and Si, Chenglei and others},
+  booktitle={Conference on Empirical Methods in Natural Language Processing (EMNLP)},
+  year={2024},
+  note={137,000+ adversarial interactions, 44 defenses all eventually bypassed}
+}
+
+% -----------------------------------------------------------------------------
+% LLM DEFENSES AND ALIGNMENT
+% -----------------------------------------------------------------------------
+
+@article{ouyang2022instructgpt,
+  title={Training Language Models to Follow Instructions with Human Feedback},
+  author={Ouyang, Long and Wu, Jeffrey and Jiang, Xu and Almeida, Diogo and Wainwright, Carroll and Mishkin, Pamela and Zhang, Chong and Agarwal, Sandhini and Slama, Katarina and Ray, Alex and others},
+  journal={Advances in Neural Information Processing Systems (NeurIPS)},
+  volume={35},
+  pages={27730--27744},
+  year={2022},
+  note={arXiv:2203.02155, March 4, 2022}
+}
+
+@article{bai2022constitutional,
+  title={Constitutional {AI}: Harmlessness from {AI} Feedback},
+  author={Bai, Yuntao and Kadavath, Saurav and Kundu, Sandipan and Askell, Amanda and Kernion, Jackson and Jones, Andy and Chen, Anna and Goldie, Anna and Mirhoseini, Azalia and McKinnon, Cameron and others},
+  journal={arXiv preprint arXiv:2212.08073},
+  year={2022},
+  note={December 15, 2022}
+}
+
+@article{inan2023llamaguard,
+  title={{Llama Guard}: {LLM}-based Input-Output Safeguard for Human-{AI} Conversations},
+  author={Inan, Hakan and Upasani, Kartikeya and Chi, Jianfeng and Rungta, Rashi and Iyer, Krithika and Mao, Yuning and Tontchev, Michael and Hu, Qing and Fuller, Brian and Testuggine, Davide and others},
+  journal={arXiv preprint arXiv:2312.06674},
+  year={2023},
+  note={Released December 7, 2023}
+}
+
+% -----------------------------------------------------------------------------
+% DEFENSES AND EVALUATION
+% -----------------------------------------------------------------------------
+
+@inproceedings{croce2020autoattack,
+  title={Reliable Evaluation of Adversarial Robustness with an Ensemble of Diverse Parameter-free Attacks},
+  author={Croce, Francesco and Hein, Matthias},
+  booktitle={International Conference on Machine Learning (ICML)},
+  pages={2206--2216},
+  year={2020},
+  note={arXiv:2003.01690, March 3, 2020}
+}
+
+@inproceedings{croce2021robustbench,
+  title={{RobustBench}: A Standardized Adversarial Robustness Benchmark},
+  author={Croce, Francesco and Andriushchenko, Maksym and Sehwag, Vikash and Debenedetti, Edoardo and Flammarion, Nicolas and Chiang, Mung and Mittal, Prateek and Hein, Matthias},
+  booktitle={Advances in Neural Information Processing Systems (NeurIPS) Datasets and Benchmarks Track},
+  year={2021},
+  note={arXiv:2010.09670, October 2020}
+}
+
+@inproceedings{mazeika2024harmbench,
+  title={{HarmBench}: A Standardized Evaluation Framework for Automated Red Teaming and Robust Refusal},
+  author={Mazeika, Mantas and Phan, Long and Yin, Xuwang and Zou, Andy and Wang, Zifan and Mu, Norman and Sachan, Mrinmaya and Fredrikson, Matt},
+  booktitle={International Conference on Machine Learning (ICML)},
+  year={2024},
+  note={February 2024}
+}
+
+@inproceedings{cohen2019certified,
+  title={Certified Adversarial Robustness via Randomized Smoothing},
+  author={Cohen, Jeremy and Rosenfeld, Elan and Kolter, Zico},
+  booktitle={International Conference on Machine Learning (ICML)},
+  pages={1310--1320},
+  year={2019},
+  note={arXiv:1902.02918, February 8, 2019}
+}
+
+% -----------------------------------------------------------------------------
+% THEORY-PRACTICE GAP STUDIES
+% -----------------------------------------------------------------------------
+
+@inproceedings{apruzzese2023real,
+  title={``Real Attackers Don't Compute Gradients'': Bridging the Gap Between Adversarial {ML} Research and Practice},
+  author={Apruzzese, Giovanni and Anderson, Hyrum S and Dambra, Savino and Freeman, David and Pierazzi, Fabio and Roundy, Kevin},
+  booktitle={IEEE Conference on Secure and Trustworthy Machine Learning (SaTML)},
+  pages={339--364},
+  year={2023},
+  doi={10.1109/SaTML54575.2023.00031}
+}
+
+@inproceedings{kumar2020adversarial,
+  title={Adversarial Machine Learning -- Industry Perspectives},
+  author={Kumar, Ram Shankar Siva and Nystr{\"o}m, Magnus and Lambert, John and Marshall, Andrew and Goertzel, Mario and Comissoneru, Andi and Swann, Matt and Xia, Sharon},
+  booktitle={IEEE Security and Privacy Workshops (SPW)},
+  pages={69--75},
+  year={2020},
+  doi={10.1109/SPW50608.2020.00028},
+  note={arXiv:2002.05646; 28 organizations surveyed}
+}
+
+@article{grosse2023mlsecurity,
+  title={Machine Learning Security in Industry: A Quantitative Survey},
+  author={Grosse, Kathrin and Bieringer, Lukas and Besold, Tarek R and Biggio, Battista and Krombholz, Katharina},
+  journal={IEEE Transactions on Information Forensics and Security},
+  volume={18},
+  pages={1749--1762},
+  year={2023},
+  doi={10.1109/TIFS.2023.3251842},
+  note={139 practitioners surveyed; 5\% experienced AI-specific attacks, 86\% concerned}
+}
+
+@inproceedings{mink2023security,
+  title={``Security is not my field, I'm a stats guy'': A Qualitative Root Cause Analysis of Barriers to Adversarial Machine Learning Defenses in Industry},
+  author={Mink, Jaron and Kaur, Harjot and Schmid, Juliane and Fahl, Sascha and Acar, Yasemin},
+  booktitle={32nd USENIX Security Symposium},
+  pages={3763--3780},
+  year={2023},
+  note={21 semi-structured interviews}
+}
+
+@inproceedings{arp2022dosdonts,
+  title={Dos and Don'ts of Machine Learning in Computer Security},
+  author={Arp, Daniel and Quiring, Erwin and Pendlebury, Feargus and Warnecke, Alexander and Pierazzi, Fabio and Wressnegger, Christian and Cavallaro, Lorenzo and Rieck, Konrad},
+  booktitle={31st USENIX Security Symposium},
+  pages={3971--3988},
+  year={2022}
+}
+
+% -----------------------------------------------------------------------------
+% INDUSTRY TOOLS
+% -----------------------------------------------------------------------------
+
+@techreport{papernot2016cleverhans,
+  title={cleverhans v2.0.0: an adversarial machine learning library},
+  author={Papernot, Nicolas and Faghri, Fartash and Carlini, Nicholas and Goodfellow, Ian and Feinman, Reuben and Kurakin, Alexey and Xie, Cihang and Sharma, Yash and Brown, Tom and Roy, Aurko and others},
+  institution={arXiv preprint arXiv:1610.00768},
+  year={2016},
+  note={October 2016}
+}
+
+@article{nicolae2018art,
+  title={Adversarial Robustness Toolbox v1.0.0},
+  author={Nicolae, Maria-Irina and Sinn, Mathieu and Tran, Minh Ngoc and Buesser, Beat and Rawat, Ambrish and Wistuba, Martin and Zantedeschi, Valentina and Baracaldo, Nathalie and Chen, Bryant and Ludwig, Heiko and others},
+  journal={arXiv preprint arXiv:1807.01069},
+  year={2018},
+  note={July 3, 2018; LF AI donation July 2020; graduated February 2022}
+}
+
+@article{pyrit2024,
+  title={{PyRIT}: Python Risk Identification Tool for Generative {AI}},
+  author={{Microsoft Security}},
+  year={2024},
+  note={Released February 22, 2024; arXiv:2410.02828}
+}
+
+% -----------------------------------------------------------------------------
+% REGULATORY FRAMEWORKS
+% -----------------------------------------------------------------------------
+
+@misc{mitreatlas2024,
+  title={{MITRE ATLAS}: Adversarial Threat Landscape for {AI} Systems},
+  author={{MITRE Corporation}},
+  year={2024},
+  howpublished={\url{https://atlas.mitre.org/}},
+  note={Launched June 2021; 66 techniques, 33 case studies as of 2024}
+}
+
+@techreport{nist2023airisk,
+  title={Artificial Intelligence Risk Management Framework ({AI RMF} 1.0)},
+  author={{National Institute of Standards and Technology}},
+  institution={NIST},
+  year={2023},
+  number={AI 100-1},
+  doi={10.6028/NIST.AI.100-1},
+  note={Published January 26, 2023}
+}
+
+@techreport{nist2024genai,
+  title={{AI RMF} Generative {AI} Profile},
+  author={{National Institute of Standards and Technology}},
+  institution={NIST},
+  year={2024},
+  number={AI 600-1},
+  note={Published July 26, 2024}
+}
+
+@misc{euaiact2024,
+  title={Regulation ({EU}) 2024/1689 laying down harmonised rules on artificial intelligence (Artificial Intelligence Act)},
+  author={{European Parliament and Council}},
+  year={2024},
+  howpublished={Official Journal of the European Union},
+  note={Entry into force August 1, 2024; high-risk requirements effective August 2, 2026}
+}
+
+@misc{owasp2024llm,
+  title={{OWASP} Top 10 for {LLM} Applications 2025},
+  author={{OWASP Foundation}},
+  year={2024},
+  howpublished={\url{https://owasp.org/www-project-top-10-for-large-language-model-applications/}},
+  note={v1.0 August 2023, v2.0 November 18, 2024}
+}
+
+% -----------------------------------------------------------------------------
+% REAL-WORLD INCIDENTS
+% -----------------------------------------------------------------------------
+
+@misc{anthropic2025claude,
+  title={Detecting and Countering Malicious Uses of {Claude}: November 2025},
+  author={{Anthropic}},
+  year={2025},
+  howpublished={\url{https://www.anthropic.com/research/malicious-uses-nov-2025}},
+  note={First documented large-scale AI-orchestrated cyber campaign; disclosed November 13-14, 2025}
+}
+
+@misc{keenlab2019tesla,
+  title={Experimental Security Research of {Tesla} Autopilot},
+  author={{Tencent Keen Security Lab}},
+  year={2019},
+  howpublished={\url{https://keenlab.tencent.com/en/2019/03/29/Tencent-Keen-Security-Lab-Experimental-Security-Research-of-Tesla-Autopilot/}},
+  note={Published March 29, 2019}
+}
+
+@misc{mcafee2020tesla,
+  title={Model Hacking {ADAS} to Pave Safer Roads for Autonomous Vehicles},
+  author={{McAfee Advanced Threat Research}},
+  year={2020},
+  howpublished={McAfee Labs Blog},
+  note={Published February 19, 2020; 58\% success rate with tape modification}
+}
+
+@article{nasr2023extracting,
+  title={Scalable Extraction of Training Data from (Production) Language Models},
+  author={Nasr, Milad and Carlini, Nicholas and Hayase, Jonathan and Jagielski, Matthew and Cooper, A Feder and Ippolito, Daphne and Choquette-Choo, Christopher A and Wallace, Eric and Tram{\`e}r, Florian and Lee, Katherine},
+  journal={arXiv preprint arXiv:2311.17035},
+  year={2023},
+  note={November 28, 2023; extracted several MB from ChatGPT for ~\$200}
+}
+
+% -----------------------------------------------------------------------------
+% BACKGROUND AND SURVEYS
+% -----------------------------------------------------------------------------
+
+@article{biggio2018wild,
+  title={Wild Patterns: Ten Years After the Rise of Adversarial Machine Learning},
+  author={Biggio, Battista and Roli, Fabio},
+  journal={Pattern Recognition},
+  volume={84},
+  pages={317--331},
+  year={2018},
+  doi={10.1016/j.patcog.2018.07.023}
+}
+
+@techreport{grother2019frvt,
+  title={Face Recognition Vendor Test ({FRVT}) Part 2: Identification},
+  author={Grother, Patrick and Ngan, Mei and Hanaoka, Kayee},
+  institution={NIST},
+  number={Interagency Report 8271},
+  year={2019}
+}
+
+@article{dalpozzolo2015fraud,
+  title={Calibrating Probability with Undersampling for Unbalanced Classification},
+  author={Dal Pozzolo, Andrea and Caelen, Olivier and Johnson, Reid A and Bontempi, Gianluca},
+  journal={IEEE Symposium on Computational Intelligence and Data Mining (CIDM)},
+  pages={159--166},
+  year={2015},
+  note={Credit card fraud detection}
+}
+
+@article{gorwa2020algorithmic,
+  title={Algorithmic Content Moderation: Technical and Political Challenges in the Automation of Platform Governance},
+  author={Gorwa, Robert and Binns, Reuben and Katzenbach, Christian},
+  journal={Big Data \& Society},
+  volume={7},
+  number={1},
+  year={2020},
+  doi={10.1177/2053951719897945}
+}
+
+% -----------------------------------------------------------------------------
+% ADDITIONAL FOUNDATIONAL REFERENCES
+% -----------------------------------------------------------------------------
+
+@article{carlini2017adversarial,
+  title={Adversarial Examples Are Not Easily Detected: Bypassing Ten Detection Methods},
+  author={Carlini, Nicholas and Wagner, David},
+  booktitle={ACM Workshop on Artificial Intelligence and Security (AISec)},
+  pages={3--14},
+  year={2017},
+  doi={10.1145/3128572.3140444}
+}
+
+@inproceedings{athalye2018obfuscated,
+  title={Obfuscated Gradients Give a False Sense of Security: Circumventing Defenses to Adversarial Examples},
+  author={Athalye, Anish and Carlini, Nicholas and Wagner, David},
+  booktitle={International Conference on Machine Learning (ICML)},
+  pages={274--283},
+  year={2018},
+  note={Defeated 7 of 9 ICLR 2018 defenses}
+}
+
+@article{carlini2019evaluating,
+  title={On Evaluating Adversarial Robustness},
+  author={Carlini, Nicholas and Athalye, Anish and Papernot, Nicolas and Brendel, Wieland and Rauber, Jonas and Tsipras, Dimitris and Goodfellow, Ian and Madry, Aleksander and Kurakin, Alexey},
+  journal={arXiv preprint arXiv:1902.06705},
+  year={2019}
+}
+
+@inproceedings{papernot2017practical,
+  title={Practical Black-Box Attacks against Machine Learning},
+  author={Papernot, Nicolas and McDaniel, Patrick and Goodfellow, Ian and Jha, Somesh and Celik, Z Berkay and Swami, Ananthram},
+  booktitle={ACM Asia Conference on Computer and Communications Security (ASIACCS)},
+  pages={506--519},
+  year={2017},
+  doi={10.1145/3052973.3053009}
+}
+
+@inproceedings{brown2017adversarial,
+  title={Adversarial Patch},
+  author={Brown, Tom B and Man{\'e}, Dandelion and Roy, Aurko and Abadi, Mart{\'\i}n and Gilmer, Justin},
+  booktitle={NeurIPS Workshop on Machine Learning and Computer Security},
+  year={2017}
+}
+
+% -----------------------------------------------------------------------------
+% DOMAIN-SPECIFIC REFERENCES
+% -----------------------------------------------------------------------------
+
+@inproceedings{anderson2018ember,
+  title={{EMBER}: An Open Dataset for Training Static {PE} Malware Machine Learning Models},
+  author={Anderson, Hyrum S and Roth, Phil},
+  booktitle={arXiv preprint arXiv:1804.04637},
+  year={2018}
+}
+
+@inproceedings{pierazzi2020intriguing,
+  title={Intriguing Properties of Adversarial {ML} Attacks in the Problem Space},
+  author={Pierazzi, Fabio and Pendlebury, Feargus and Cortellazzi, Jacopo and Cavallaro, Lorenzo},
+  booktitle={IEEE Symposium on Security and Privacy (SP)},
+  pages={1332--1349},
+  year={2020},
+  doi={10.1109/SP40000.2020.00073}
+}
+
+% -----------------------------------------------------------------------------
+% MARKET AND INDUSTRY
+% -----------------------------------------------------------------------------
+
+@misc{hiddenlayer2023funding,
+  title={{HiddenLayer} raises \$50M for its {AI}-defending cybersecurity tools},
+  author={{TechCrunch}},
+  year={2023},
+  howpublished={TechCrunch},
+  note={September 19, 2023; largest Series A for AI security in 2023}
+}
+
+@misc{protectai2025acquisition,
+  title={Palo Alto Networks to Acquire {Protect AI}},
+  author={{Palo Alto Networks}},
+  year={2025},
+  howpublished={Press Release},
+  note={Announced April 28, 2025; estimated \$500-700M}
+}
+
+@misc{robustintelligence2024acquisition,
+  title={Cisco to Acquire {Robust Intelligence}},
+  author={{Cisco}},
+  year={2024},
+  howpublished={Press Release},
+  note={Announced August 28, 2024; approximately \$400M}
+}
+
+@misc{calypsoai2025acquisition,
+  title={F5 to Acquire {CalypsoAI}},
+  author={{F5}},
+  year={2025},
+  howpublished={Press Release},
+  note={September 2025; \$180M}
 }
