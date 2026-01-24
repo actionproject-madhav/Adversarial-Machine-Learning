@@ -12,37 +12,64 @@
 \begin{document}
 \maketitle
 
-\section{How to Select Papers}
+\section{Artifact Selection Criteria}
 
-You do NOT randomly pick papers. You work backwards from industry artifacts.
+Papers are selected based on adoption by the following artifacts:
 
-\subsection{Step 1: Go to Each Artifact and Find Papers They Cite}
+\subsection{Tools (Criterion: $\geq$1,000 GitHub stars)}
 
-\begin{tabular}{p{3cm}p{4.5cm}p{5cm}}
+\begin{tabular}{p{4cm}p{2cm}p{6cm}}
 \toprule
-\textbf{Artifact} & \textbf{Where to Look} & \textbf{What to Extract} \\
+\textbf{Tool} & \textbf{Stars} & \textbf{Description} \\
 \midrule
-CleverHans & GitHub README, docstrings & Paper citations for each attack \\
-IBM ART & Documentation, attacks/ folder & Paper citations for each technique \\
-Foolbox & Docs, source code & Paper citations \\
-TextAttack & Docs, source code & Paper citations \\
-PyRIT & Docs, source code & Paper citations \\
-\midrule
-RobustBench & Leaderboard entries & Defense papers on leaderboard \\
-AutoAttack & The AutoAttack paper & Component attack papers \\
-HarmBench & HarmBench paper/GitHub & Red-teaming method papers \\
-\midrule
-MITRE ATLAS & atlas.mitre.org technique pages & ``References'' on each page \\
-NIST AI RMF & The PDF document & Bibliography \\
-OWASP LLM Top 10 & The PDF & References for each vulnerability \\
+CleverHans & 6,401 & Adversarial example library (Toronto) \\
+IBM ART & 5,789 & Adversarial Robustness Toolbox \\
+TextAttack & 3,348 & NLP adversarial attacks \\
+PyRIT & 3,343 & LLM red-teaming (Microsoft) \\
+Foolbox & 2,936 & Adversarial attacks (Bethge Lab) \\
 \bottomrule
 \end{tabular}
 
-\subsection{Step 2: For Each Paper You Find, Record It}
+\subsection{Benchmarks (Criterion: Peer-reviewed publication)}
 
-If CleverHans implements FGSM and cites Goodfellow et al.\ 2015, that paper goes in your dataset.
+\begin{tabular}{p{4cm}p{3cm}p{5cm}}
+\toprule
+\textbf{Benchmark} & \textbf{Venue} & \textbf{Description} \\
+\midrule
+RobustBench & NeurIPS 2021 & Adversarial robustness leaderboard \\
+AutoAttack & ICML 2020 & Standardized attack evaluation \\
+HarmBench & ICML 2024 & LLM jailbreak evaluation \\
+\bottomrule
+\end{tabular}
 
-\textbf{Your $\sim$100 papers = all papers cited by these artifacts.}
+\subsection{Regulatory (Criterion: Industry threat framework)}
+
+\begin{tabular}{p{4cm}p{6cm}}
+\toprule
+\textbf{Framework} & \textbf{Description} \\
+\midrule
+MITRE ATLAS & Adversarial ML tactics/techniques (like ATT\&CK) \\
+\bottomrule
+\end{tabular}
+
+\subsection{Not Included (Manual Extraction Required)}
+
+\begin{tabular}{p{4cm}p{6cm}}
+\toprule
+\textbf{Framework} & \textbf{Reason} \\
+\midrule
+NIST AI 100-2 & PDF document, not machine-readable \\
+OWASP LLM Top 10 & PDF document, not machine-readable \\
+\bottomrule
+\end{tabular}
+
+\section{Paper Selection Criteria}
+
+\textbf{71 papers selected for coding:}
+\begin{enumerate}
+    \item \textbf{61 papers} cited by 2+ artifacts (strongest adoption evidence)
+    \item \textbf{10 papers} from MITRE ATLAS only (regulatory adoption)
+\end{enumerate}
 
 \section{The 12 Coding Columns}
 
@@ -98,69 +125,46 @@ Q3 & Tested against defenses? & Yes / No / N/A & \textbf{Yes} = tested vs.\ adve
 \bottomrule
 \end{tabular}
 
-\section{Adoption Tracking}
+\section{Pre-filled Columns (Auto-extracted)}
 
-For each paper, also record:
+The following columns are already filled:
 
-\begin{tabular}{p{3.5cm}p{9cm}}
+\begin{tabular}{p{4cm}p{8cm}}
 \toprule
-\textbf{Column} & \textbf{What It Means} \\
+\textbf{Column} & \textbf{Description} \\
 \midrule
-Artifact & Which artifact cites this paper (e.g., ``CleverHans'', ``MITRE ATLAS'') \\
-Artifact Type & Tool / Benchmark / Regulatory / Vendor \\
-Adoption Date & When did artifact add this? (Git commit date or document date) \\
-Adoption Lag & Months between paper publication and artifact adoption \\
-\bottomrule
-\end{tabular}
-
-\section{Concrete Example: FGSM Paper}
-
-\textbf{You find:} CleverHans GitHub cites ``Explaining and Harnessing Adversarial Examples'' (Goodfellow 2015) for FGSM.
-
-\textbf{You code:}
-
-\begin{tabular}{lll}
-\toprule
-\textbf{Column} & \textbf{Value} & \textbf{Why} \\
-\midrule
-G1 & Attack & Paper proposes an attack \\
-G2 & Evasion & Fools classifier at test time \\
-G3 & Vision & Tested on MNIST, ImageNet \\
-G4 & ML & Published at ICLR \\
-G5 & Yes & Code exists on GitHub \\
-G6 & At-pub & Released with paper \\
-G7 & 2015 & Published 2015 \\
-\midrule
-T1 & White & Uses target model gradients \\
-T2 & Yes & Gradient-based attack \\
-\midrule
-Q1 & No & Only tested on benchmarks \\
-Q2 & No & No runtime/query count reported \\
-Q3 & No & No defense evaluation \\
-\midrule
-Artifact & CleverHans & Where you found it \\
-Artifact Type & Tool & It's a library \\
-Adoption Date & Oct 2016 & First CleverHans commit with FGSM \\
-Adoption Lag & 22 months & Oct 2016 $-$ Dec 2014 \\
+arxiv\_id & arXiv identifier \\
+paper\_title & Full paper title \\
+paper\_authors & Author names \\
+paper\_pub\_date & Publication date (YYYY-MM-DD) \\
+found\_in\_artifacts & Which artifacts cite this paper \\
+num\_artifacts & How many artifacts cite it \\
+first\_adoption\_date & When first artifact added it \\
+first\_adoption\_artifact & Which artifact adopted first \\
+adoption\_lag\_months & Months from paper to adoption \\
+selection\_reason & Why paper was selected \\
 \bottomrule
 \end{tabular}
 
 \section{Your Workflow}
 
 \begin{enumerate}
-    \item \textbf{Pick an artifact} (e.g., IBM ART)
-    \item \textbf{Find all papers it cites} (from docs, code, README)
-    \item \textbf{For each paper:} fill in G1--G7, T1--T2, Q1--Q3, plus adoption info
-    \item \textbf{Repeat} for all 11 artifacts
-    \item \textbf{Remove duplicates} (same paper cited by multiple artifacts = one row, multiple adoption events)
+    \item Open \texttt{papers\_for\_coding\_71.csv}
+    \item For each paper, fill in: G1, G2, G3, G4, G5, G6, G7, T1, T2, Q1, Q2, Q3
+    \item Use arXiv link to read the paper: \texttt{https://arxiv.org/abs/[arxiv\_id]}
+    \item Estimated time: 20--30 minutes per paper
 \end{enumerate}
 
-\section{Spreadsheet Columns}
+\section{Files}
 
-\begin{verbatim}
-paper_id, title, authors, venue, pub_date, technique_name,
-G1, G2, G3, G4, G5, G6, G7, T1, T2, Q1, Q2, Q3,
-artifact_name, artifact_type, adoption_date, adoption_lag_months
-\end{verbatim}
+\begin{tabular}{p{5cm}p{7cm}}
+\toprule
+\textbf{File} & \textbf{Purpose} \\
+\midrule
+papers\_for\_coding\_71.csv & 71 papers for manual coding \\
+papers\_all.csv & Full 277 papers (for statistics) \\
+papers\_by\_artifact.csv & Sorted by artifact (for verification) \\
+\bottomrule
+\end{tabular}
 
 \end{document}

@@ -45,17 +45,34 @@ FILE_EXTENSIONS = ['.py', '.md', '.rst', '.txt', '.json', '.yaml', '.yml', '.bib
 
 # All artifacts with their repos
 ARTIFACTS = [
-    ('cleverhans', 'CleverHans', 'Tool'),
-    ('adversarial-robustness-toolbox', 'IBM ART', 'Tool'),
-    ('foolbox', 'Foolbox', 'Tool'),
-    ('TextAttack', 'TextAttack', 'Tool'),
-    ('PyRIT', 'PyRIT', 'Tool'),
-    ('robustbench', 'RobustBench', 'Benchmark'),
-    ('HarmBench', 'HarmBench', 'Benchmark'),
-    ('auto-attack', 'AutoAttack', 'Benchmark'),  # Added!
+    # Tools (≥1,000 GitHub stars)
+    ('cleverhans', 'CleverHans', 'Tool'),           # 6,401 stars
+    ('adversarial-robustness-toolbox', 'IBM ART', 'Tool'),  # 5,789 stars
+    ('foolbox', 'Foolbox', 'Tool'),                 # 2,936 stars
+    ('TextAttack', 'TextAttack', 'Tool'),           # 3,348 stars
+    ('PyRIT', 'PyRIT', 'Tool'),                     # 3,343 stars
+    # Benchmarks (peer-reviewed publications)
+    ('robustbench', 'RobustBench', 'Benchmark'),    # NeurIPS 2021
+    ('HarmBench', 'HarmBench', 'Benchmark'),        # ICML 2024
+    ('auto-attack', 'AutoAttack', 'Benchmark'),     # ICML 2020
+    # Regulatory (MITRE ATLAS)
+    ('atlas-data', 'MITRE ATLAS', 'Regulatory'),    # Industry threat framework
 ]
 
 ARTIFACT_TO_REPO = {art[1]: art[0] for art in ARTIFACTS}
+
+# Artifact metadata for documentation
+ARTIFACT_METADATA = {
+    'CleverHans': {'stars': 6401, 'criterion': '≥1,000 stars'},
+    'IBM ART': {'stars': 5789, 'criterion': '≥1,000 stars'},
+    'Foolbox': {'stars': 2936, 'criterion': '≥1,000 stars'},
+    'TextAttack': {'stars': 3348, 'criterion': '≥1,000 stars'},
+    'PyRIT': {'stars': 3343, 'criterion': '≥1,000 stars'},
+    'RobustBench': {'stars': 761, 'criterion': 'NeurIPS 2021'},
+    'HarmBench': {'stars': 841, 'criterion': 'ICML 2024'},
+    'AutoAttack': {'stars': 734, 'criterion': 'ICML 2020'},
+    'MITRE ATLAS': {'stars': 'N/A', 'criterion': 'Industry threat framework'},
+}
 
 # Non-AML papers to exclude (optimizers, architectures, unrelated)
 EXCLUDE_ARXIV_IDS = {
