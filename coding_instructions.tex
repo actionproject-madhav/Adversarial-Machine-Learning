@@ -1,160 +1,161 @@
 \documentclass[11pt]{article}
-\usepackage[margin=1in]{geometry}
+\usepackage[margin=0.8in]{geometry}
 \usepackage{booktabs}
 \usepackage{enumitem}
 \usepackage{hyperref}
-\usepackage{xcolor}
+\usepackage{longtable}
+\usepackage{array}
 
 \title{Paper Coding Instructions}
-\author{Quick Reference Guide}
 \date{}
 
 \begin{document}
 \maketitle
 
-\section*{Overview}
+\section{How to Select Papers}
 
-You are coding papers that have been adopted by industry artifacts (tools, benchmarks, regulations). Each paper takes 20--30 minutes.
+You do NOT randomly pick papers. You work backwards from industry artifacts.
 
-\section*{Step 1: Paper Selection}
+\subsection{Step 1: Go to Each Artifact and Find Papers They Cite}
 
-Papers come from these artifacts (you don't select randomly):
-
-\begin{enumerate}[noitemsep]
-    \item \textbf{Tools:} IBM ART, CleverHans, Foolbox, TextAttack, PyRIT
-    \item \textbf{Benchmarks:} RobustBench, AutoAttack, HarmBench  
-    \item \textbf{Regulatory:} MITRE ATLAS, NIST AI RMF, OWASP LLM Top 10
-    \item \textbf{Vendor:} AWS, Azure, GCP, OpenAI, Anthropic security docs
-\end{enumerate}
-
-For each artifact, find techniques with paper citations $\rightarrow$ those papers are your sample.
-
-\section*{Step 2: Record Metadata}
-
-For each paper, record:
-\begin{itemize}[noitemsep]
-    \item Title
-    \item Authors
-    \item DOI or arXiv ID
-    \item Publication date (earliest of arXiv or venue)
-    \item Venue name
-    \item Technique name (e.g., ``FGSM'', ``GCG'', ``PGD'')
-\end{itemize}
-
-\section*{Step 3: Code the Paper}
-
-\subsection*{Research Characteristics (G1--G7)}
-
-\begin{tabular}{p{1.5cm}p{4cm}p{6cm}}
+\begin{tabular}{p{3cm}p{4.5cm}p{5cm}}
 \toprule
-\textbf{Code} & \textbf{Values} & \textbf{How to Decide} \\
+\textbf{Artifact} & \textbf{Where to Look} & \textbf{What to Extract} \\
 \midrule
-G1 & Attack / Defense / Evaluation & What is the main contribution? \\
-G2 & Evasion / Poisoning / Privacy / N/A & N/A if defense. Evasion = test-time. Poisoning = training-time. Privacy = data leakage. \\
-G3 & Vision / NLP / Malware / Audio / Tabular / LLM / Cross-domain & What data/models are tested? Cross-domain = 2+ domains. \\
-G4 & ML / Security / Journal / arXiv-only & See venue list below. \\
-G5 & Yes / No & Does code exist NOW? Check paper + GitHub. \\
-G6 & At-pub / Post-pub / Never & At-pub = within 1 month of paper date. \\
-G7 & 2014--2025 & Year of earliest public version. \\
+CleverHans & GitHub README, docstrings & Paper citations for each attack \\
+IBM ART & Documentation, attacks/ folder & Paper citations for each technique \\
+Foolbox & Docs, source code & Paper citations \\
+TextAttack & Docs, source code & Paper citations \\
+PyRIT & Docs, source code & Paper citations \\
+\midrule
+RobustBench & Leaderboard entries & Defense papers on leaderboard \\
+AutoAttack & The AutoAttack paper & Component attack papers \\
+HarmBench & HarmBench paper/GitHub & Red-teaming method papers \\
+\midrule
+MITRE ATLAS & atlas.mitre.org technique pages & ``References'' on each page \\
+NIST AI RMF & The PDF document & Bibliography \\
+OWASP LLM Top 10 & The PDF & References for each vulnerability \\
 \bottomrule
 \end{tabular}
 
-\vspace{1em}
-\textbf{Venue Classification:}
-\begin{itemize}[noitemsep]
-    \item \textbf{ML:} NeurIPS, ICML, ICLR, CVPR, ECCV, ICCV, ACL, EMNLP, NAACL
-    \item \textbf{Security:} IEEE S\&P, ACM CCS, USENIX Security, NDSS, IEEE SaTML
-    \item \textbf{Journal:} TPAMI, TIFS, TDSC, Pattern Recognition, etc.
-    \item \textbf{arXiv-only:} Never published at peer-reviewed venue
-\end{itemize}
+\subsection{Step 2: For Each Paper You Find, Record It}
 
-\subsection*{Threat Model (T1--T2) -- Attack Papers Only}
+If CleverHans implements FGSM and cites Goodfellow et al.\ 2015, that paper goes in your dataset.
 
-\begin{tabular}{p{1.5cm}p{4cm}p{6cm}}
+\textbf{Your $\sim$100 papers = all papers cited by these artifacts.}
+
+\section{The 12 Coding Columns}
+
+\subsection{Group 1: Basic Info (G1--G7)}
+
+\begin{longtable}{p{1cm}p{3.5cm}p{3.5cm}p{4.5cm}}
 \toprule
-\textbf{Code} & \textbf{Values} & \textbf{How to Decide} \\
+\textbf{Col} & \textbf{Question} & \textbf{Options} & \textbf{How to Decide} \\
 \midrule
-T1 & White / Gray / Black & White = uses target model gradients. Gray = uses surrogate gradients. Black = queries only, no gradients. \\
-T2 & Yes / No & Are gradients computed at ANY stage? \\
+\endhead
+G1 & Is this an attack, defense, or evaluation? & Attack / Defense / Evaluation & Read abstract. What did they build? \\
+\midrule
+G2 & What type of attack? & Evasion / Poisoning / Privacy / N/A & \textbf{Evasion} = fool model at test time. \textbf{Poisoning} = corrupt training data. \textbf{Privacy} = steal data/model. \textbf{N/A} = defense papers \\
+\midrule
+G3 & What domain? & Vision / NLP / Malware / Audio / Tabular / LLM / Cross-domain & What data did they test on? ImageNet = Vision. Text = NLP. ChatGPT = LLM. \\
+\midrule
+G4 & Where published? & ML / Security / Journal / arXiv-only & \textbf{ML} = NeurIPS, ICML, ICLR, CVPR, ACL. \textbf{Security} = S\&P, CCS, USENIX, NDSS. \\
+\midrule
+G5 & Is code available NOW? & Yes / No & Google ``paper name github''. Is there code? \\
+\midrule
+G6 & When was code released? & At-pub / Post-pub / Never & \textbf{At-pub} = within 1 month of paper. \textbf{Post-pub} = later. \\
+\midrule
+G7 & Publication year & 2014--2025 & Year of first public version \\
+\bottomrule
+\end{longtable}
+
+\subsection{Group 2: Threat Model (T1--T2) --- Attack Papers Only}
+
+\begin{tabular}{p{1cm}p{3.5cm}p{3cm}p{5cm}}
+\toprule
+\textbf{Col} & \textbf{Question} & \textbf{Options} & \textbf{How to Decide} \\
+\midrule
+T1 & How much model access? & White / Gray / Black & \textbf{White} = has weights/gradients. \textbf{Gray} = surrogate model. \textbf{Black} = queries only \\
+\midrule
+T2 & Uses gradients? & Yes / No & If they compute $\nabla L$ anywhere, it's Yes \\
 \bottomrule
 \end{tabular}
 
 \vspace{0.5em}
 \textbf{Leave T1 and T2 blank for defense papers.}
 
-\subsection*{Practical Evaluation (Q1--Q3)}
+\subsection{Group 3: Practical Evaluation (Q1--Q3)}
 
-\begin{tabular}{p{1.5cm}p{4cm}p{6cm}}
+\begin{tabular}{p{1cm}p{3.5cm}p{3cm}p{5cm}}
 \toprule
-\textbf{Code} & \textbf{Values} & \textbf{How to Decide} \\
+\textbf{Col} & \textbf{Question} & \textbf{Options} & \textbf{How to Decide} \\
 \midrule
-Q1 & Yes / Partial / No & Yes = tested on production system (API, deployed car). Partial = realistic simulation. No = CIFAR/ImageNet only. \\
-Q2 & Yes / No & Does paper report FLOPs, runtime, or query count? \\
-Q3 & Yes / No / N/A & N/A for defenses. Yes = tests against adaptive defenses or AutoAttack. \\
+Q1 & Tested on real system? & Yes / Partial / No & \textbf{Yes} = Google API, Tesla, ChatGPT. \textbf{Partial} = realistic sim. \textbf{No} = CIFAR/ImageNet only \\
+\midrule
+Q2 & Reported cost? & Yes / No & Did they say ``X queries'' or ``Y seconds''? \\
+\midrule
+Q3 & Tested against defenses? & Yes / No / N/A & \textbf{Yes} = tested vs.\ adversarial training. \textbf{N/A} = for defense papers \\
 \bottomrule
 \end{tabular}
 
-\section*{Step 4: Record Adoption Events}
+\section{Adoption Tracking}
 
-For each artifact where this paper appears, record:
-\begin{itemize}[noitemsep]
-    \item Artifact name (e.g., ``IBM ART'')
-    \item Artifact type (Tool / Benchmark / Regulatory / Vendor)
-    \item Adoption date (Git commit date, or document date)
-\end{itemize}
+For each paper, also record:
 
-\section*{Step 5: Calculate Adoption Lag}
+\begin{tabular}{p{3.5cm}p{9cm}}
+\toprule
+\textbf{Column} & \textbf{What It Means} \\
+\midrule
+Artifact & Which artifact cites this paper (e.g., ``CleverHans'', ``MITRE ATLAS'') \\
+Artifact Type & Tool / Benchmark / Regulatory / Vendor \\
+Adoption Date & When did artifact add this? (Git commit date or document date) \\
+Adoption Lag & Months between paper publication and artifact adoption \\
+\bottomrule
+\end{tabular}
 
-\[
-\text{Adoption Lag (months)} = \frac{\text{Adoption Date} - \text{Publication Date}}{30}
-\]
+\section{Concrete Example: FGSM Paper}
 
-For papers in multiple artifacts, record:
-\begin{itemize}[noitemsep]
-    \item First adoption lag (minimum)
-    \item Regulatory adoption lag (if MITRE/NIST/OWASP)
-\end{itemize}
+\textbf{You find:} CleverHans GitHub cites ``Explaining and Harnessing Adversarial Examples'' (Goodfellow 2015) for FGSM.
 
-\section*{Quick Decision Rules}
+\textbf{You code:}
 
-\begin{enumerate}[noitemsep]
-    \item \textbf{Paper has both attack and defense?} Code G1 based on which has more experiments.
-    \item \textbf{Can't find threat model section?} Look for ``Adversary Capabilities'' or ``Assumptions.''
-    \item \textbf{Unsure if White/Gray/Black?} If paper says ``transfer attack,'' it's Gray. If ``query-based,'' it's Black.
-    \item \textbf{LLM jailbreak with no gradients?} T1 = Black, T2 = No.
-    \item \textbf{Paper tested on ``Google Cloud Vision API''?} Q1 = Yes (production system).
-    \item \textbf{Paper tested on ``ImageNet''?} Q1 = No (standard benchmark).
+\begin{tabular}{lll}
+\toprule
+\textbf{Column} & \textbf{Value} & \textbf{Why} \\
+\midrule
+G1 & Attack & Paper proposes an attack \\
+G2 & Evasion & Fools classifier at test time \\
+G3 & Vision & Tested on MNIST, ImageNet \\
+G4 & ML & Published at ICLR \\
+G5 & Yes & Code exists on GitHub \\
+G6 & At-pub & Released with paper \\
+G7 & 2015 & Published 2015 \\
+\midrule
+T1 & White & Uses target model gradients \\
+T2 & Yes & Gradient-based attack \\
+\midrule
+Q1 & No & Only tested on benchmarks \\
+Q2 & No & No runtime/query count reported \\
+Q3 & No & No defense evaluation \\
+\midrule
+Artifact & CleverHans & Where you found it \\
+Artifact Type & Tool & It's a library \\
+Adoption Date & Oct 2016 & First CleverHans commit with FGSM \\
+Adoption Lag & 22 months & Oct 2016 $-$ Dec 2014 \\
+\bottomrule
+\end{tabular}
+
+\section{Your Workflow}
+
+\begin{enumerate}
+    \item \textbf{Pick an artifact} (e.g., IBM ART)
+    \item \textbf{Find all papers it cites} (from docs, code, README)
+    \item \textbf{For each paper:} fill in G1--G7, T1--T2, Q1--Q3, plus adoption info
+    \item \textbf{Repeat} for all 11 artifacts
+    \item \textbf{Remove duplicates} (same paper cited by multiple artifacts = one row, multiple adoption events)
 \end{enumerate}
 
-\section*{Example: Coding FGSM Paper}
-
-\textbf{Paper:} Goodfellow et al., ``Explaining and Harnessing Adversarial Examples,'' ICLR 2015
-
-\begin{tabular}{ll}
-\toprule
-\textbf{Variable} & \textbf{Value} \\
-\midrule
-G1: Type & Attack \\
-G2: Threat & Evasion \\
-G3: Domain & Vision \\
-G4: Venue & ML \\
-G5: Code & Yes \\
-G6: Timing & At-pub \\
-G7: Year & 2015 \\
-T1: Access & White \\
-T2: Gradient & Yes \\
-Q1: Real-world & No \\
-Q2: Cost & No \\
-Q3: Defense-aware & No \\
-\midrule
-Adoption & CleverHans (Oct 2016) \\
-Lag & 22 months \\
-\bottomrule
-\end{tabular}
-
-\section*{Data Recording Template}
-
-Create a spreadsheet with these columns:
+\section{Spreadsheet Columns}
 
 \begin{verbatim}
 paper_id, title, authors, venue, pub_date, technique_name,
