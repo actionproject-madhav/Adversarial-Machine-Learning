@@ -122,23 +122,25 @@ The following columns are already filled:
 \toprule
 \textbf{Column} & \textbf{Description} \\
 \midrule
+selection\_reason & Why paper was selected (2+ artifacts / MITRE ATLAS) \\
+is\_aml\_paper & Always YES for this dataset \\
 arxiv\_id & arXiv identifier \\
+found\_in\_artifacts & Which artifacts cite this paper \\
+num\_artifacts & How many artifacts cite it \\
 paper\_title & Full paper title \\
 paper\_authors & Author names \\
 paper\_pub\_date & Publication date (YYYY-MM-DD) \\
-found\_in\_artifacts & Which artifacts cite this paper \\
-num\_artifacts & How many artifacts cite it \\
 first\_adoption\_date & When first artifact added it \\
 first\_adoption\_artifact & Which artifact adopted first \\
-adoption\_lag\_months & Months from paper to adoption \\
-selection\_reason & Why paper was selected \\
+all\_adoptions & All adoption events (artifact:date pairs) \\
+adoption\_lag\_months & Months from paper to first adoption \\
 \bottomrule
 \end{tabular}
 
 \section{Your Workflow}
 
 \begin{enumerate}
-    \item Open \texttt{papers\_for\_coding\_71.csv}
+    \item Open \texttt{extraction\_runs/run1/papers\_for\_coding\_71.csv}
     \item For each paper, fill in: G1, G2, G3, G4, G5, G6, G7, T1, T2, Q1, Q2, Q3
     \item Use arXiv link to read the paper: \texttt{https://arxiv.org/abs/[arxiv\_id]}
     \item Estimated time: 20--30 minutes per paper
@@ -146,12 +148,14 @@ selection\_reason & Why paper was selected \\
 
 \section{Files}
 
+All files are in \texttt{extraction\_runs/run1/}:
+
 \begin{tabular}{p{5cm}p{7cm}}
 \toprule
 \textbf{File} & \textbf{Purpose} \\
 \midrule
 papers\_for\_coding\_71.csv & 71 papers for manual coding \\
-papers\_all.csv & Full 277 papers (for statistics) \\
+papers\_all.csv & Full 277 AML papers (for statistics) \\
 papers\_by\_artifact.csv & Sorted by artifact (for verification) \\
 \bottomrule
 \end{tabular}

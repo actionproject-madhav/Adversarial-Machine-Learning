@@ -189,15 +189,17 @@ def fetch_arxiv_metadata(arxiv_id):
     
     return None
 
-def get_first_commit_date(repo_path, file_path):
-    """Get first commit date for a file."""
+def get_first_commit_date_for_string(repo_path, search_string):
+    """Get first commit date when a specific string was added to the repo."""
     try:
+        # Use -S to find when the string was first introduced
         result = subprocess.run(
-            ['git', 'log', '--follow', '--format=%aI', '--', file_path],
-            cwd=repo_path, capture_output=True, text=True, timeout=30
+            ['git', 'log', '--all', '--format=%aI', '-S', search_string],
+            cwd=repo_path, capture_output=True, text=True, timeout=60
         )
         if result.returncode == 0 and result.stdout.strip():
             dates = result.stdout.strip().split('\n')
+            # Get the earliest (last in list) date when string was introduced
             oldest_date = dates[-1][:10]
             # Sanity check: date should be in the past
             if oldest_date <= datetime.now().strftime('%Y-%m-%d'):
@@ -273,23 +275,50 @@ def run_extraction(output_dir):
     print(f"\nValid papers: {len(papers)}")
     
     # Step 3: Get adoption dates
+    # Use -S search only for MITRE ATLAS (slow but accurate for aggregated files)
+    # Use file-based approach for other repos (fast and accurate for individual files)
     print("\nStep 3: Getting adoption dates from git history...")
     
-    for paper in papers:
+    for i, paper in enumerate(papers):
         arxiv_id = paper['arxiv_id']
         sources = arxiv_to_sources.get(arxiv_id, [])
+        artifacts = arxiv_to_artifacts.get(arxiv_id, set())
+        
+        if (i + 1) % 50 == 0:
+            print(f"  Processing {i+1}/{len(papers)}...")
         
         adoption_dates = []
+        
+        # For MITRE ATLAS, use -S search (more accurate for aggregated YAML files)
+        if 'MITRE ATLAS' in artifacts:
+            repo_path = REPO_DIR / 'atlas-data'
+            date = get_first_commit_date_for_string(repo_path, arxiv_id)
+            if date:
+                adoption_dates.append({'artifact': 'MITRE ATLAS', 'date': date})
+        
+        # For other artifacts, use file-based approach
         for source in sources:
             artifact = source['artifact']
+            if artifact == 'MITRE ATLAS':
+                continue  # Already handled above
             source_file = source['source_file']
             repo_name = ARTIFACT_TO_REPO.get(artifact)
             
             if repo_name:
                 repo_path = REPO_DIR / repo_name
-                date = get_first_commit_date(repo_path, source_file)
-                if date:
-                    adoption_dates.append({'artifact': artifact, 'date': date})
+                # Use file-based git log for most repos
+                try:
+                    result = subprocess.run(
+                        ['git', 'log', '--follow', '--format=%aI', '--', source_file],
+                        cwd=repo_path, capture_output=True, text=True, timeout=30
+                    )
+                    if result.returncode == 0 and result.stdout.strip():
+                        dates = result.stdout.strip().split('\n')
+                        oldest_date = dates[-1][:10]
+                        if oldest_date <= datetime.now().strftime('%Y-%m-%d'):
+                            adoption_dates.append({'artifact': artifact, 'date': oldest_date})
+                except:
+                    pass
         
         if adoption_dates:
             # Filter out future dates
