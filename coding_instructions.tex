@@ -1,0 +1,165 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{xcolor}
+
+\title{Paper Coding Instructions}
+\author{Quick Reference Guide}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Overview}
+
+You are coding papers that have been adopted by industry artifacts (tools, benchmarks, regulations). Each paper takes 20--30 minutes.
+
+\section*{Step 1: Paper Selection}
+
+Papers come from these artifacts (you don't select randomly):
+
+\begin{enumerate}[noitemsep]
+    \item \textbf{Tools:} IBM ART, CleverHans, Foolbox, TextAttack, PyRIT
+    \item \textbf{Benchmarks:} RobustBench, AutoAttack, HarmBench  
+    \item \textbf{Regulatory:} MITRE ATLAS, NIST AI RMF, OWASP LLM Top 10
+    \item \textbf{Vendor:} AWS, Azure, GCP, OpenAI, Anthropic security docs
+\end{enumerate}
+
+For each artifact, find techniques with paper citations $\rightarrow$ those papers are your sample.
+
+\section*{Step 2: Record Metadata}
+
+For each paper, record:
+\begin{itemize}[noitemsep]
+    \item Title
+    \item Authors
+    \item DOI or arXiv ID
+    \item Publication date (earliest of arXiv or venue)
+    \item Venue name
+    \item Technique name (e.g., ``FGSM'', ``GCG'', ``PGD'')
+\end{itemize}
+
+\section*{Step 3: Code the Paper}
+
+\subsection*{Research Characteristics (G1--G7)}
+
+\begin{tabular}{p{1.5cm}p{4cm}p{6cm}}
+\toprule
+\textbf{Code} & \textbf{Values} & \textbf{How to Decide} \\
+\midrule
+G1 & Attack / Defense / Evaluation & What is the main contribution? \\
+G2 & Evasion / Poisoning / Privacy / N/A & N/A if defense. Evasion = test-time. Poisoning = training-time. Privacy = data leakage. \\
+G3 & Vision / NLP / Malware / Audio / Tabular / LLM / Cross-domain & What data/models are tested? Cross-domain = 2+ domains. \\
+G4 & ML / Security / Journal / arXiv-only & See venue list below. \\
+G5 & Yes / No & Does code exist NOW? Check paper + GitHub. \\
+G6 & At-pub / Post-pub / Never & At-pub = within 1 month of paper date. \\
+G7 & 2014--2025 & Year of earliest public version. \\
+\bottomrule
+\end{tabular}
+
+\vspace{1em}
+\textbf{Venue Classification:}
+\begin{itemize}[noitemsep]
+    \item \textbf{ML:} NeurIPS, ICML, ICLR, CVPR, ECCV, ICCV, ACL, EMNLP, NAACL
+    \item \textbf{Security:} IEEE S\&P, ACM CCS, USENIX Security, NDSS, IEEE SaTML
+    \item \textbf{Journal:} TPAMI, TIFS, TDSC, Pattern Recognition, etc.
+    \item \textbf{arXiv-only:} Never published at peer-reviewed venue
+\end{itemize}
+
+\subsection*{Threat Model (T1--T2) -- Attack Papers Only}
+
+\begin{tabular}{p{1.5cm}p{4cm}p{6cm}}
+\toprule
+\textbf{Code} & \textbf{Values} & \textbf{How to Decide} \\
+\midrule
+T1 & White / Gray / Black & White = uses target model gradients. Gray = uses surrogate gradients. Black = queries only, no gradients. \\
+T2 & Yes / No & Are gradients computed at ANY stage? \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.5em}
+\textbf{Leave T1 and T2 blank for defense papers.}
+
+\subsection*{Practical Evaluation (Q1--Q3)}
+
+\begin{tabular}{p{1.5cm}p{4cm}p{6cm}}
+\toprule
+\textbf{Code} & \textbf{Values} & \textbf{How to Decide} \\
+\midrule
+Q1 & Yes / Partial / No & Yes = tested on production system (API, deployed car). Partial = realistic simulation. No = CIFAR/ImageNet only. \\
+Q2 & Yes / No & Does paper report FLOPs, runtime, or query count? \\
+Q3 & Yes / No / N/A & N/A for defenses. Yes = tests against adaptive defenses or AutoAttack. \\
+\bottomrule
+\end{tabular}
+
+\section*{Step 4: Record Adoption Events}
+
+For each artifact where this paper appears, record:
+\begin{itemize}[noitemsep]
+    \item Artifact name (e.g., ``IBM ART'')
+    \item Artifact type (Tool / Benchmark / Regulatory / Vendor)
+    \item Adoption date (Git commit date, or document date)
+\end{itemize}
+
+\section*{Step 5: Calculate Adoption Lag}
+
+\[
+\text{Adoption Lag (months)} = \frac{\text{Adoption Date} - \text{Publication Date}}{30}
+\]
+
+For papers in multiple artifacts, record:
+\begin{itemize}[noitemsep]
+    \item First adoption lag (minimum)
+    \item Regulatory adoption lag (if MITRE/NIST/OWASP)
+\end{itemize}
+
+\section*{Quick Decision Rules}
+
+\begin{enumerate}[noitemsep]
+    \item \textbf{Paper has both attack and defense?} Code G1 based on which has more experiments.
+    \item \textbf{Can't find threat model section?} Look for ``Adversary Capabilities'' or ``Assumptions.''
+    \item \textbf{Unsure if White/Gray/Black?} If paper says ``transfer attack,'' it's Gray. If ``query-based,'' it's Black.
+    \item \textbf{LLM jailbreak with no gradients?} T1 = Black, T2 = No.
+    \item \textbf{Paper tested on ``Google Cloud Vision API''?} Q1 = Yes (production system).
+    \item \textbf{Paper tested on ``ImageNet''?} Q1 = No (standard benchmark).
+\end{enumerate}
+
+\section*{Example: Coding FGSM Paper}
+
+\textbf{Paper:} Goodfellow et al., ``Explaining and Harnessing Adversarial Examples,'' ICLR 2015
+
+\begin{tabular}{ll}
+\toprule
+\textbf{Variable} & \textbf{Value} \\
+\midrule
+G1: Type & Attack \\
+G2: Threat & Evasion \\
+G3: Domain & Vision \\
+G4: Venue & ML \\
+G5: Code & Yes \\
+G6: Timing & At-pub \\
+G7: Year & 2015 \\
+T1: Access & White \\
+T2: Gradient & Yes \\
+Q1: Real-world & No \\
+Q2: Cost & No \\
+Q3: Defense-aware & No \\
+\midrule
+Adoption & CleverHans (Oct 2016) \\
+Lag & 22 months \\
+\bottomrule
+\end{tabular}
+
+\section*{Data Recording Template}
+
+Create a spreadsheet with these columns:
+
+\begin{verbatim}
+paper_id, title, authors, venue, pub_date, technique_name,
+G1, G2, G3, G4, G5, G6, G7, T1, T2, Q1, Q2, Q3,
+artifact_name, artifact_type, adoption_date, adoption_lag_months
+\end{verbatim}
+
+\end{document}
