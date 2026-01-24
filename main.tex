@@ -150,86 +150,108 @@ Before extracting any papers, we define and freeze the set of industry artifacts
 
 \subsubsection{Open-Source Security Tools}
 
-We include open-source AML tools satisfying at least one of the following criteria:
+We include open-source AML tools satisfying the criterion of $\geq$1,000 GitHub stars, ensuring broad community adoption and active maintenance. Based on this criterion, we analyze five tools (Table~\ref{tab:tools}):
 
-\begin{itemize}[noitemsep]
-    \item $\geq$1,000 GitHub stars, or
-    \item $\geq$100 academic citations (via Semantic Scholar)
-\end{itemize}
+\begin{table}[H]
+\centering
+\small
+\caption{Selected open-source AML tools}
+\label{tab:tools}
+\begin{tabular}{lrl}
+\toprule
+\textbf{Tool} & \textbf{Stars} & \textbf{Description} \\
+\midrule
+CleverHans & 6,401 & First major AML library (University of Toronto) \\
+IBM ART & 5,789 & Adversarial Robustness Toolbox (Linux Foundation) \\
+TextAttack & 3,348 & NLP adversarial attacks \\
+PyRIT & 3,343 & LLM red-teaming toolkit (Microsoft) \\
+Foolbox & 2,936 & Adversarial attacks (Bethge Lab) \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-Based on these criteria, we analyze five tools:
-
-\begin{enumerate}[noitemsep]
-    \item \textbf{IBM Adversarial Robustness Toolbox (ART)}~\citep{nicolae2018art}: 4,800+ stars, Linux Foundation AI project (graduated February 2022)
-    
-    \item \textbf{CleverHans}~\citep{papernot2016cleverhans}: 6,100+ stars, first major AML library (October 2016)
-    
-    \item \textbf{Foolbox}: 2,700+ stars, extensive attack implementations
-    
-    \item \textbf{TextAttack}: 2,900+ stars, NLP-specific attacks
-    
-    \item \textbf{Microsoft PyRIT}~\citep{pyrit2024}: LLM red-teaming toolkit (February 2024)
-\end{enumerate}
-
-For each tool, we extract: (a) technique name, (b) source paper citation from documentation/docstrings, (c) date of first Git commit implementing the technique (via \texttt{git log --follow}), and (d) release version containing the technique.
+For each tool, we clone the Git repository and programmatically extract arXiv references from source code, documentation, docstrings, and bibliography files. Adoption dates are determined via \texttt{git log --follow} to identify the first commit referencing each paper.
 
 \subsubsection{Standardized Benchmarks}
 
-We include benchmarks that evaluate AML attacks or defenses as named techniques and are used in peer-reviewed research or cited by industry:
+We include benchmarks that are (1) published in peer-reviewed venues and (2) evaluate AML attacks or defenses as named techniques with explicit paper citations:
 
-\begin{enumerate}[noitemsep]
-    \item \textbf{RobustBench}~\citep{croce2021robustbench}: Leaderboard tracking 120+ defense models with paper citations. We record when each defense was added to the leaderboard (via GitHub commit history).
-    
-    \item \textbf{AutoAttack}~\citep{croce2020autoattack}: Ensemble evaluation method with component attacks (APGD, FAB, Square Attack). We extract source papers for each component.
-    
-    \item \textbf{HarmBench}~\citep{mazeika2024harmbench}: Standardized jailbreak evaluation across 33 LLMs, evaluating 18 red-teaming methods with source paper citations.
-\end{enumerate}
+\begin{table}[H]
+\centering
+\small
+\caption{Selected AML benchmarks}
+\label{tab:benchmarks}
+\begin{tabular}{llp{5.5cm}}
+\toprule
+\textbf{Benchmark} & \textbf{Venue} & \textbf{Description} \\
+\midrule
+RobustBench & NeurIPS 2021 & Adversarial robustness leaderboard (120+ models) \\
+AutoAttack & ICML 2020 & Standardized attack ensemble evaluation \\
+HarmBench & ICML 2024 & LLM jailbreak evaluation (33 LLMs, 18 methods) \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-Only techniques explicitly evaluated and attributed to specific academic papers are included.
+Only techniques explicitly evaluated and attributed to specific academic papers are included. Adoption dates are extracted from Git commit history of benchmark repositories.
 
 \subsubsection{Regulatory and Threat Frameworks}
 
-We analyze the following frameworks:
+We include MITRE ATLAS~\citep{mitreatlas2024}, the industry-standard adversarial ML threat framework modeled after ATT\&CK. ATLAS catalogs 66 adversarial ML techniques with explicit academic references, providing structured machine-readable data via its public GitHub repository (\texttt{atlas-data}). We programmatically extract technique IDs, names, and cited papers from this repository.
 
-\begin{enumerate}[noitemsep]
-    \item \textbf{MITRE ATLAS}~\citep{mitreatlas2024}: 66 adversarial ML techniques with academic references. We extract technique ID, name, and cited papers. Technique page creation dates determined via Wayback Machine archives.
-    
-    \item \textbf{NIST AI RMF Adversarial ML Taxonomy} (AI 100-2e2025): Technique categorization with literature references. Publication date: January 2023 (v1.0), updated July 2024 (GenAI Profile).
-    
-    \item \textbf{OWASP Top 10 for LLM Applications}~\citep{owasp2024llm}: Vulnerability descriptions citing foundational research. Version 1.0 (August 2023) and Version 2.0 (November 2024) analyzed.
-\end{enumerate}
+Two additional frameworks---NIST AI RMF (AI 100-2e2025) and OWASP Top 10 for LLM Applications~\citep{owasp2024llm}---are included in our analysis but require manual extraction due to their PDF format. These frameworks provide complementary regulatory coverage but are not amenable to automated Git-based extraction.
 
-We extract only techniques explicitly linked to academic references. Descriptive categories without citations are excluded.
+\subsubsection{Artifact Summary}
 
-\subsubsection{Vendor Security Documentation}
+Table~\ref{tab:artifacts-summary} summarizes the nine Git-searchable artifacts included in our automated extraction pipeline, along with their selection criteria.
 
-We analyze publicly available security documentation from major cloud and AI providers:
+\begin{table}[H]
+\centering
+\small
+\caption{Summary of artifacts and selection criteria}
+\label{tab:artifacts-summary}
+\begin{tabular}{llp{5cm}}
+\toprule
+\textbf{Category} & \textbf{Criterion} & \textbf{Artifacts} \\
+\midrule
+Tools & $\geq$1,000 GitHub stars & CleverHans, IBM ART, TextAttack, PyRIT, Foolbox \\
+Benchmarks & Peer-reviewed publication & RobustBench, AutoAttack, HarmBench \\
+Regulatory & Industry threat framework & MITRE ATLAS \\
+\bottomrule
+\end{tabular}
+\end{table}
 
+\subsection{Automated Paper Extraction}
+
+For each of the nine Git-searchable artifacts, we clone the repository and programmatically extract arXiv references using comprehensive regular expression patterns that capture:
 \begin{itemize}[noitemsep]
-    \item AWS SageMaker security documentation
-    \item Microsoft Azure AI security whitepapers and Responsible AI documentation  
-    \item Google Cloud Vertex AI security guides
-    \item OpenAI system cards and security disclosures
-    \item Anthropic system cards and security disclosures
+    \item Direct arXiv URLs (\texttt{arxiv.org/abs/}, \texttt{arxiv.org/pdf/})
+    \item BibTeX \texttt{eprint} fields
+    \item Inline citations (e.g., ``arXiv:2401.12345'')
 \end{itemize}
 
-Only documents that explicitly reference AML techniques or academic work are included. For each reference, we record: (a) technique name, (b) document URL, (c) document publication date, and (d) cited academic paper (if any).
+We scan all relevant file types: Python source (\texttt{.py}), documentation (\texttt{.md}, \texttt{.rst}, \texttt{.txt}), configuration (\texttt{.json}, \texttt{.yaml}, \texttt{.yml}), and bibliography (\texttt{.bib}) files. Each extracted arXiv ID is resolved to a canonical paper record via the arXiv API, retrieving title, authors, and publication date.
 
-\subsection{Paper Extraction and Validation}
+\textbf{Exclusions:} We exclude non-AML papers (e.g., foundational ML papers like Adam, ResNet, VGGNet) based on a predefined exclusion list validated against paper abstracts.
 
-For each artifact, we extract tuples of the form: $(\text{artifact\_name}, \text{artifact\_type}, \text{technique\_name}, \text{cited\_reference})$. Extraction rules:
+\subsection{Paper Selection Criteria}
+
+From the full set of 277 AML papers extracted from the nine artifacts, we select papers for manual coding using a tiered approach:
 
 \begin{enumerate}[noitemsep]
-    \item The technique must be named explicitly (e.g., ``FGSM,'' ``Carlini--Wagner,'' ``GCG'').
-    \item The artifact must cite a paper directly or attribute the technique to identifiable authors.
-    \item Techniques lacking an academic anchor are excluded.
+    \item \textbf{Multi-artifact papers (61 papers):} Papers cited by $\geq$2 artifacts provide the strongest evidence of cross-ecosystem adoption.
+    
+    \item \textbf{MITRE ATLAS-only papers (10 papers):} Papers cited exclusively by MITRE ATLAS represent regulatory adoption without tool/benchmark integration, capturing a distinct adoption pathway.
 \end{enumerate}
 
-Each extracted reference is resolved to a canonical paper record with DOI (or arXiv ID) and publication date (first arXiv submission if it precedes peer review, otherwise conference/journal date). Papers are validated to ensure they introduce the technique (not merely apply it), the technique name matches the artifact reference, and the paper is publicly accessible.
+This yields a final sample of \textbf{71 papers} for manual coding, balancing methodological rigor (multi-artifact validation) with coverage of regulatory adoption patterns.
+
+\subsection{Paper Validation}
+
+Each extracted reference is validated to ensure: (1) the paper introduces the technique (not merely applies or evaluates it), (2) the technique name corresponds to the artifact reference, and (3) the paper is publicly accessible via arXiv or DOI.
 
 \subsection{Adoption Event Definition}
 
-We define four observable adoption events, each treated independently:
+We define three observable adoption events, corresponding to our artifact categories:
 
 \begin{table}[H]
 \centering
@@ -239,10 +261,9 @@ We define four observable adoption events, each treated independently:
 \toprule
 \textbf{Adoption Event} & \textbf{Operational Definition} \\
 \midrule
-Tool adoption & First Git commit implementing the technique \\
-Benchmark adoption & Technique evaluated as a named method \\
-Regulatory adoption & Technique referenced in regulatory framework \\
-Vendor acknowledgment & Technique referenced in vendor security documentation \\
+Tool adoption & First Git commit referencing the paper \\
+Benchmark adoption & Paper cited in benchmark repository \\
+Regulatory adoption & Paper referenced in MITRE ATLAS \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -259,10 +280,9 @@ For each (paper, adoption event) pair, we compute:
 
 Artifact dates are defined as:
 \begin{itemize}[noitemsep]
-    \item \textbf{Tools:} Git commit timestamp (UTC)
-    \item \textbf{Benchmarks:} Leaderboard inclusion date or paper publication date
-    \item \textbf{Regulatory:} Framework publication or technique page creation date (Wayback Machine)
-    \item \textbf{Vendor:} Document publication date (from document metadata or press release)
+    \item \textbf{Tools:} First Git commit timestamp referencing the paper (UTC)
+    \item \textbf{Benchmarks:} First Git commit timestamp referencing the paper (UTC)
+    \item \textbf{Regulatory:} First Git commit timestamp in MITRE ATLAS repository (UTC)
 \end{itemize}
 
 Publication dates are defined as:
@@ -271,7 +291,7 @@ Publication dates are defined as:
     \item \textbf{arXiv-first:} First arXiv submission date
 \end{itemize}
 
-For papers appearing in multiple artifacts, we report: (a) \textit{first adoption lag} (minimum across all events), (b) \textit{median adoption lag}, and (c) \textit{regulatory adoption lag} (time to MITRE/NIST/OWASP inclusion, if any).
+For papers cited by multiple artifacts, we record all adoption events and use the \textit{earliest} adoption date for computing first adoption lag. This captures when a paper first entered the practitioner ecosystem, regardless of which artifact adopted it first.
 
 \subsection{Paper Coding Scheme}
 
@@ -336,7 +356,7 @@ Q3: Defense-aware & Yes / No / N/A & N/A for defense papers \\
 
 We address each research question through pre-specified analyses:
 
-\textbf{RQ1 (Adoption Lag):} We report distributions of first-adoption lag and median-adoption lag, stratified by artifact type (tool, benchmark, regulatory, vendor). We compare lags across publication eras (2014--2017, 2018--2021, 2022--2025) using Kruskal-Wallis tests with post-hoc Dunn tests.
+\textbf{RQ1 (Adoption Lag):} We report distributions of first-adoption lag, stratified by artifact type (tool, benchmark, regulatory). We compare lags across publication eras (2014--2017, 2018--2021, 2022--2025) using Kruskal-Wallis tests with post-hoc Dunn tests.
 
 \textbf{RQ2 (Domain Variation):} We compare adoption lags across domains using pairwise Mann-Whitney U tests with Bonferroni correction ($\alpha = 0.05 / \binom{n}{2}$ for $n$ domains). Primary hypothesis: LLM security papers show significantly shorter lags than computer vision papers.
 
@@ -348,37 +368,35 @@ We address each research question through pre-specified analyses:
 
 \textbf{Data release:} All extracted metadata, coding decisions, and artifact URLs will be released as a structured CSV dataset with accompanying codebook.
 
-\textbf{Limitations:} (1) By construction, our sample excludes papers never adopted---we measure adoption timelines, not adoption rates. (2) Our five open-source tools may miss proprietary implementations; timelines represent lower bounds. (3) Vendor documentation dates may reflect updates rather than first publication. (4) Observational design precludes causal claims. (5) We focus on English-language publications and Western regulatory frameworks.
+\textbf{Limitations:} (1) By construction, our sample excludes papers never adopted---we measure adoption timelines, not adoption rates. (2) Our nine Git-searchable artifacts may miss proprietary implementations; adoption timelines represent lower bounds. (3) Git commit dates represent code-level adoption, which may lag behind internal awareness. (4) Observational design precludes causal claims. (5) We focus on English-language publications and arXiv-indexed papers.
 
 %==============================================================================
 \section{Artifact Timeline}
-\label{sec:tools}
+\label{sec:artifact-timeline}
 %==============================================================================
 
-Table~\ref{tab:tools} documents the artifacts we analyze, with release dates verified from GitHub releases and official announcements. These dates establish the timeline against which we measure research adoption.
+Table~\ref{tab:artifact-timeline} documents the nine artifacts included in our automated extraction, with first public release dates verified from GitHub and official announcements. These dates establish the timeline against which we measure research adoption.
 
 \begin{table}[H]
 \centering
 \small
 \caption{Artifact release timeline}
-\label{tab:tools}
+\label{tab:artifact-timeline}
 \begin{tabular}{llll}
 \toprule
-\textbf{Category} & \textbf{Artifact} & \textbf{Release} & \textbf{Source} \\
+\textbf{Category} & \textbf{Artifact} & \textbf{First Release} & \textbf{Stars/Venue} \\
 \midrule
-\multirow{5}{*}{Tools} & CleverHans & Oct 2016 & GitHub \\
-& Foolbox & Jul 2017 & GitHub \\
-& IBM ART & Jul 2018 & GitHub \\
-& TextAttack & May 2020 & GitHub \\
-& PyRIT & Feb 2024 & GitHub \\
+\multirow{5}{*}{Tools} & CleverHans & Oct 2016 & 6,401 stars \\
+& Foolbox & Jul 2017 & 2,936 stars \\
+& IBM ART & Jul 2018 & 5,789 stars \\
+& TextAttack & May 2020 & 3,348 stars \\
+& PyRIT & Feb 2024 & 3,343 stars \\
 \midrule
-\multirow{3}{*}{Benchmarks} & AutoAttack & Mar 2020 & arXiv \\
-& RobustBench & Oct 2020 & GitHub \\
-& HarmBench & Feb 2024 & GitHub \\
+\multirow{3}{*}{Benchmarks} & AutoAttack & Mar 2020 & ICML 2020 \\
+& RobustBench & Oct 2020 & NeurIPS 2021 \\
+& HarmBench & Feb 2024 & ICML 2024 \\
 \midrule
-\multirow{3}{*}{Regulatory} & MITRE ATLAS & Jun 2021 & Website \\
-& NIST AI RMF & Jan 2023 & NIST \\
-& OWASP LLM Top 10 & Aug 2023 & Website \\
+Regulatory & MITRE ATLAS & Jun 2021 & Industry framework \\
 \bottomrule
 \end{tabular}
 \end{table}
