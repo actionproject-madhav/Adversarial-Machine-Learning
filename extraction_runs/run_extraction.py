@@ -359,12 +359,12 @@ def run_extraction(output_dir):
         'paper_title', 'paper_authors', 'paper_pub_date', 
         'first_adoption_date', 'first_adoption_artifact', 'all_adoptions', 
         'adoption_lag_months',
-        'G1', 'G2', 'G3', 'G4', 'G5', 'G6', 'G7', 'T1', 'T2', 'Q1', 'Q2', 'Q3'
+        'G1', 'G2', 'G3', 'G4', 'G5', 'G6', 'T1', 'T2', 'Q1'
     ]
     
     # Add empty coding columns
     for paper in papers:
-        for col in ['G1', 'G2', 'G3', 'G4', 'G5', 'G6', 'G7', 'T1', 'T2', 'Q1', 'Q2', 'Q3']:
+        for col in ['G1', 'G2', 'G3', 'G4', 'G5', 'G6', 'T1', 'T2', 'Q1']:
             paper[col] = ''
     
     # Write full dataset

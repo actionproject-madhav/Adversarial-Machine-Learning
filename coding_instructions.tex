@@ -60,9 +60,9 @@ MITRE ATLAS & Adversarial ML tactics/techniques (like ATT\&CK) \\
     \item \textbf{10 papers} from MITRE ATLAS only (regulatory adoption)
 \end{enumerate}
 
-\section{The 12 Coding Columns}
+\section{The 9 Coding Columns}
 
-\subsection{Group 1: Basic Info (G1--G7)}
+\subsection{Group 1: Research Characteristics (G1--G6)}
 
 \begin{longtable}{p{1cm}p{3.5cm}p{3.5cm}p{4.5cm}}
 \toprule
@@ -80,8 +80,6 @@ G4 & Where published? & ML / Security / Journal / arXiv-only & \textbf{ML} = Neu
 G5 & Is code available NOW? & Yes / No & Google ``paper name github''. Is there code? \\
 \midrule
 G6 & When was code released? & At-pub / Post-pub / Never & \textbf{At-pub} = within 1 month of paper. \textbf{Post-pub} = later. \\
-\midrule
-G7 & Publication year & 2014--2025 & Year of first public version \\
 \bottomrule
 \end{longtable}
 
@@ -100,17 +98,13 @@ T2 & Uses gradients? & Yes / No & If they compute $\nabla L$ anywhere, it's Yes 
 \vspace{0.5em}
 \textbf{Leave T1 and T2 blank for defense papers.}
 
-\subsection{Group 3: Practical Evaluation (Q1--Q3)}
+\subsection{Group 3: Practical Evaluation (Q1)}
 
 \begin{tabular}{p{1cm}p{3.5cm}p{3cm}p{5cm}}
 \toprule
 \textbf{Col} & \textbf{Question} & \textbf{Options} & \textbf{How to Decide} \\
 \midrule
 Q1 & Tested on real system? & Yes / Partial / No & \textbf{Yes} = Google API, Tesla, ChatGPT. \textbf{Partial} = realistic sim. \textbf{No} = CIFAR/ImageNet only \\
-\midrule
-Q2 & Reported cost? & Yes / No & Did they say ``X queries'' or ``Y seconds''? \\
-\midrule
-Q3 & Tested against defenses? & Yes / No / N/A & \textbf{Yes} = tested vs.\ adversarial training. \textbf{N/A} = for defense papers \\
 \bottomrule
 \end{tabular}
 
@@ -141,9 +135,9 @@ adoption\_lag\_months & Months from paper to first adoption \\
 
 \begin{enumerate}
     \item Open \texttt{extraction\_runs/run1/papers\_for\_coding\_71.csv}
-    \item For each paper, fill in: G1, G2, G3, G4, G5, G6, G7, T1, T2, Q1, Q2, Q3
+    \item For each paper, fill in: G1, G2, G3, G4, G5, G6, T1, T2, Q1
     \item Use arXiv link to read the paper: \texttt{https://arxiv.org/abs/[arxiv\_id]}
-    \item Estimated time: 20--30 minutes per paper
+    \item Estimated time: 15--20 minutes per paper
 \end{enumerate}
 
 \section{Files}

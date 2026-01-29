@@ -298,13 +298,13 @@ Each paper is coded along three dimensions using a fixed codebook (Table~\ref{ta
 \begin{table}[H]
 \centering
 \small
-\caption{Complete codebook for paper coding}
+\caption{Codebook for paper coding (9 variables)}
 \label{tab:codebook}
 \begin{tabular}{p{2.2cm}p{3.2cm}p{4.3cm}}
 \toprule
 \textbf{Variable} & \textbf{Values} & \textbf{Coding Rule} \\
 \midrule
-\multicolumn{3}{l}{\textit{Research Characteristics (G1--G7)}} \\
+\multicolumn{3}{l}{\textit{Research Characteristics (G1--G6)}} \\
 \midrule
 G1: Type & Attack / Defense / Evaluation & Primary contribution \\
 G2: Threat category & Evasion / Poisoning / Privacy / N/A & Attack category; N/A for defenses \\
@@ -312,18 +312,15 @@ G3: Domain & Vision / NLP / Malware / Audio / Tabular / LLM / Cross-domain & Pri
 G4: Venue & ML / Security / Journal / arXiv-only & See venue list below \\
 G5: Code available & Yes / No & Code link exists at time of coding \\
 G6: Code timing & At-pub / Post-pub / Never & At-pub = within 1 month of paper \\
-G7: Year & 2014--2025 & Earliest of arXiv or venue date \\
 \midrule
 \multicolumn{3}{l}{\textit{Threat Model (T1--T2) -- Attack papers only}} \\
 \midrule
 T1: Access level & White / Gray / Black & White = full model access \\
 T2: Gradient required & Yes / No & Gradients used at any stage \\
 \midrule
-\multicolumn{3}{l}{\textit{Practical Evaluation (Q1--Q3)}} \\
+\multicolumn{3}{l}{\textit{Practical Evaluation (Q1)}} \\
 \midrule
 Q1: Real-world eval & Yes / Partial / No & Yes = production system tested \\
-Q2: Cost reported & Yes / No & Explicit FLOPs, time, or queries \\
-Q3: Defense-aware & Yes / No / N/A & N/A for defense papers \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -344,11 +341,9 @@ Q3: Defense-aware & Yes / No / N/A & N/A for defense papers \\
     \item \textbf{T1/T2:} For defense papers, leave blank (these apply to attacks only). White-box = gradients from target model. Gray-box = surrogate model gradients transferred to target. Black-box = query access only, no gradients.
     
     \item \textbf{Q1:} ``Yes'' = tested on production system (commercial API, deployed vehicle). ``Partial'' = realistic simulation or industry dataset. ``No'' = standard benchmarks only (CIFAR, ImageNet, etc.).
-    
-    \item \textbf{Q3:} For defense papers, code ``N/A.'' For attacks, ``Yes'' = tests against adaptive defenses or AutoAttack.
 \end{enumerate}
 
-\textbf{Coding procedure:} For each paper: (1) record metadata (title, authors, DOI/arXiv, publication date, venue); (2) read abstract and introduction to identify technique name and G1 (type); (3) locate threat model section to code T1 and T2 (attack papers only); (4) review experiments to code G3, Q1, Q2, Q3; (5) check code availability for G5, G6; (6) record adoption events with dates from artifacts; (7) calculate adoption lag in months. Estimated time: 20--30 minutes per paper.
+\textbf{Coding procedure:} For each paper: (1) read abstract and introduction to identify G1 (type) and G2 (threat category); (2) locate threat model section to code T1 and T2 (attack papers only); (3) review experiments to code G3 and Q1; (4) check code availability for G5, G6; (5) verify venue for G4. Estimated time: 15--20 minutes per paper.
 
 \subsection{Statistical Analysis}
 
