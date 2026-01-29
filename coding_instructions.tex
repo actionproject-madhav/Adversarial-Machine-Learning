@@ -133,13 +133,13 @@ adoption\_lag\_months & Months from paper to first adoption \\
 
 \section{Your Workflow}
 
-\textbf{Dual coding:} Both coders independently code all 71 papers. Do NOT discuss papers until both are done.
+\textbf{Dual coding:} Both coders independently verify all 71 papers. Do NOT discuss until both are done.
 
 \begin{enumerate}
-    \item Open \texttt{extraction\_runs/run1/papers\_for\_coding\_71.csv}
-    \item For each paper, fill in: G1, G2, G3, G4, G5, G6, T1, T2, Q1
+    \item Open \texttt{extraction\_runs/run1/papers\_coded\_verified.csv}
+    \item For each paper, verify/correct: G1, G2, G3, G4, G5, G6, T1, T2, Q1
     \item Use arXiv link to read the paper: \texttt{https://arxiv.org/abs/[arxiv\_id]}
-    \item Estimated time: 15--20 minutes per paper
+    \item Estimated time: 5--10 minutes per paper (faster since pre-coded)
     \item After both coders finish: compare codes, resolve disagreements, compute Cohen's $\kappa$
 \end{enumerate}
 
@@ -147,14 +147,19 @@ adoption\_lag\_months & Months from paper to first adoption \\
 
 All files are in \texttt{extraction\_runs/run1/}:
 
-\begin{tabular}{p{5cm}p{7cm}}
+\begin{tabular}{p{5.5cm}p{6.5cm}}
 \toprule
 \textbf{File} & \textbf{Purpose} \\
 \midrule
-papers\_for\_coding\_71.csv & 71 papers for manual coding \\
+papers\_for\_coding\_71.csv & 71 papers (blank coding columns) \\
+papers\_coded\_verified.csv & GPT-4o coded + manually verified \\
+papers\_coded\_gpt4o.csv & Original GPT-4o coding \\
+coding\_corrections.csv & 39 corrections made to GPT-4o output \\
 papers\_all.csv & Full 277 AML papers (for statistics) \\
-papers\_by\_artifact.csv & Sorted by artifact (for verification) \\
 \bottomrule
 \end{tabular}
+
+\vspace{1em}
+\textbf{Recommendation:} Use \texttt{papers\_coded\_verified.csv} as your starting point. It has been pre-coded by GPT-4o and verified/corrected for known errors. You should still manually verify each coding.
 
 \end{document}

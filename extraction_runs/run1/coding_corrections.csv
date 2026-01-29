@@ -1,0 +1,40 @@
+arxiv_id,paper_title,field,gpt4o_value,correct_value,reason
+1312.6199,Intriguing properties of neural networks,G1,Defense,Attack,This is THE foundational paper that discovered adversarial examples - clearly an attack paper
+1312.6199,Intriguing properties of neural networks,G4,arXiv-only,ML,Published at ICLR 2014
+1412.6572,Explaining and Harnessing Adversarial Examples,G1,Evaluation,Attack,Introduces FGSM attack - primary contribution is the attack method
+1412.6572,Explaining and Harnessing Adversarial Examples,G3,Cross-domain,Vision,Tested on MNIST and ImageNet - both vision
+1511.04599,DeepFool,G1,Defense,Attack,DeepFool is an attack algorithm that finds minimal perturbations
+1511.04599,DeepFool,G4,arXiv-only,ML,Published at CVPR 2016
+1511.05122,Adversarial Manipulation of Deep Representations,G4,Security,ML,Published at ICLR 2016
+1608.04644,Towards Evaluating the Robustness of Neural Networks,G1,Defense,Attack,This is the famous Carlini & Wagner (C&W) attack paper
+1608.04644,Towards Evaluating the Robustness of Neural Networks,G4,arXiv-only,Security,Published at IEEE S&P 2017
+1705.07204,Ensemble Adversarial Training,G1,Attack,Defense,Primary contribution is ensemble adversarial training defense
+1706.06083,Towards Deep Learning Models Resistant to Adversarial Attacks,G4,Security,ML,Published at ICLR 2018
+1709.04114,EAD: Elastic-Net Attacks,G1,Defense,Attack,EAD is an attack method using elastic-net regularization
+1712.09665,Adversarial Patch,G1,Defense,Attack,Adversarial Patch is an attack method for physical perturbations
+1805.12152,Robustness May Be at Odds with Accuracy,G4,arXiv-only,ML,Published at ICLR 2019
+1810.12715,Interval Bound Propagation,G4,arXiv-only,ML,Published at ICLR 2019
+1811.09600,Decoupling Direction and Norm (DDN),G4,arXiv-only,ML,Published at CVPR 2019
+1901.08573,TRADES,G4,arXiv-only,ML,Published at ICML 2019
+1902.06705,On Evaluating Adversarial Robustness,G1,Defense,Evaluation,This paper is about evaluation methodology for robustness
+1904.00887,Adversarial Defense by Restricting Hidden Space,G4,arXiv-only,ML,Published at ICCV 2019
+1905.10510,k-Winners-Take-All,G4,arXiv-only,ML,Published at NeurIPS 2019
+1905.13736,Unlabeled Data Improves Robustness,G4,arXiv-only,ML,Published at NeurIPS 2019
+1906.06316,CROWN-IBP,G4,arXiv-only,ML,Published at ICLR 2020
+1912.00049,Square Attack,G4,arXiv-only,ML,Published at ECCV 2020
+2002.08347,On Adaptive Attacks,G1,Attack,Evaluation,Paper evaluates defenses with adaptive attacks - evaluation methodology
+2002.11242,Attacks Which Do Not Kill Training,G4,arXiv-only,ML,Published at ICML 2020
+2002.11569,Overfitting in adversarially robust deep learning,G1,Attack,Evaluation,Paper studies overfitting phenomenon - not proposing attacks
+2002.11569,Overfitting in adversarially robust deep learning,G4,Security,ML,Published at ICML 2020
+2003.04286,Manifold Regularization,G4,arXiv-only,ML,Published at NeurIPS 2020
+2003.09461,AOOD,G4,arXiv-only,ML,Published at NeurIPS 2020
+2003.12862,Adversarial Robustness from Self-Supervised Pre-Training,G4,arXiv-only,ML,Published at NeurIPS 2020
+2010.00467,Bag of Tricks,G4,arXiv-only,ML,Published at ICLR 2021
+2010.01279,Do Wider Networks Help,G1,Attack,Evaluation,Paper evaluates width-robustness relationship
+2010.01279,Do Wider Networks Help,G4,arXiv-only,ML,Published at NeurIPS 2021
+2011.11164,LBGAT,G4,arXiv-only,ML,Published at CVPR 2021
+2106.09947,Indicators of Attack Failure,G1,Defense,Evaluation,Paper about debugging/evaluating attacks
+2106.09947,Indicators of Attack Failure,G4,ML,Security,Published at USENIX Security 2022
+2004.15015,Imitation Attacks on MT,G1,Cross-domain,Attack,Cross-domain is not valid for G1 - this is an attack paper
+2004.15015,Imitation Attacks on MT,G3,Vision,NLP,Paper is about machine translation - NLP domain
+2101.06896,DeepPayload,G1,Defense,Attack,DeepPayload is a backdoor attack method
