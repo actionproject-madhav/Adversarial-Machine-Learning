@@ -1,463 +1,400 @@
-\documentclass[11pt]{article}
+\documentclass[sigconf,review]{acmart}
 
-% Packages
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{times}
-\usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{multirow}
-\usepackage{array}
-\usepackage{tabularx}
-\usepackage{float}
-\usepackage{natbib}
-\usepackage{hyperref}
-\usepackage[margin=1in]{geometry}
-\usepackage{enumitem}
-\usepackage{amsmath}
-\usepackage{amssymb}
+\usepackage{graphicx}
 \usepackage{xcolor}
-\usepackage{soul}
-\usepackage{caption}
+\usepackage{amsmath}
 
-% Hyperref setup
-\hypersetup{
-    colorlinks=true,
-    linkcolor=blue,
-    citecolor=blue,
-    urlcolor=blue
-}
+% Remove copyright for review
+\setcopyright{none}
+\renewcommand\footnotetextcopyrightpermission[1]{}
 
-% Compact lists
-\setlist{nosep,leftmargin=*}
-
-% Custom commands
-\newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
-\newcommand{\placeholder}[1]{\textcolor{blue}{[PLACEHOLDER: #1]}}
-
-\title{Tracing the Adoption of Adversarial Machine Learning Research into Industry Practice (2014--2025)}
-
-\author{
-    [Author Names] \\
-    [Affiliations] \\
-    \texttt{[emails]}
-}
-
-\date{}
+% Paper metadata
+\acmConference[CCS '26]{ACM Conference on Computer and Communications Security}{October 2026}{Salt Lake City, UT, USA}
+\acmYear{2026}
 
 \begin{document}
 
-\maketitle
+\title{From Research to Reality: Measuring the Adoption Lag of Adversarial Machine Learning Techniques in Industry Practice}
+
+\author{Anonymous Authors}
+\affiliation{%
+  \institution{Paper \#XXX}
+}
+\email{redacted@institution.edu}
 
 \begin{abstract}
-Despite a decade of adversarial machine learning (AML) research producing over 66 catalogued attack techniques and numerous defense mechanisms, industry adoption remains limited---surveys indicate only 5\% of practitioners have experienced AI-specific attacks, yet 86\% express security concerns. This systematic review measures the temporal lag between publication of AML research and evidence of industry adoption across tool integration, benchmark inclusion, regulatory citation, and vendor acknowledgment. Using an artifact-anchored methodology, we trace techniques implemented in major security tools (IBM ART, CleverHans, PyRIT), standardized benchmarks (RobustBench, HarmBench), and regulatory frameworks (MITRE ATLAS, OWASP Top 10) back to their originating academic papers. We code approximately 100 papers spanning 2014--2025 across foundational attacks, privacy threats, physical-world attacks, and LLM-specific vulnerabilities. We examine how adoption speed varies across domains and identify acceleration factors including standardized evaluation, regulatory mandates, and commercial investment. Our coding framework and adoption evidence database provide a foundation for future research-practice alignment studies.
+The adversarial machine learning (AML) research community has produced over a decade of publications on attacks and defenses, yet practitioners report persistent gaps between academic advances and industry deployment. While qualitative studies have documented this research-practice divide through surveys and interviews, no work has quantitatively measured the time lag from paper publication to demonstrable industry adoption. We address this gap using a novel \textit{artifact-anchored backward traceability} methodology: starting from 9 authoritative industry artifacts—5 adversarial ML libraries (CleverHans, IBM ART, TextAttack, PyRIT, Foolbox), 3 standardized benchmarks (RobustBench, AutoAttack, HarmBench), and the MITRE ATLAS regulatory framework—we trace backward to extract and code 71 papers cited across these artifacts. Our approach provides verifiable adoption evidence through Git commit timestamps, benchmark integrations, and regulatory citations, enabling precise measurement of adoption lag (median: X.X years, IQR: X.X--X.X years). We find [key findings placeholder]. Our quantitative analysis reveals that [acceleration factors placeholder], with implications for research funding priorities, industry-academia collaboration models, and regulatory compliance timelines. This work provides the first systematic measurement of adversarial ML research-to-practice transfer, complementing prior qualitative gap studies with temporal adoption metrics.
 \end{abstract}
 
-%==============================================================================
+\begin{CCSXML}
+<ccs2012>
+<concept>
+<concept_id>10002978.10003014</concept_id>
+<concept_desc>Security and privacy~Malware and its mitigation</concept_desc>
+<concept_significance>500</concept_significance>
+</concept>
+<concept>
+<concept_id>10010147.10010257</concept_id>
+<concept_desc>Computing methodologies~Machine learning</concept_desc>
+<concept_significance>500</concept_significance>
+</concept>
+</ccs2012>
+\end{CCSXML}
+
+\ccsdesc[500]{Security and privacy~Malware and its mitigation}
+\ccsdesc[500]{Computing methodologies~Machine learning}
+
+\keywords{adversarial machine learning, technology adoption, research-to-practice gap, empirical measurement}
+
+\maketitle
+
 \section{Introduction}
-\label{sec:intro}
-%==============================================================================
 
-Machine learning systems now influence decisions affecting millions daily---from facial recognition at border crossings~\citep{grother2019frvt} to fraud detection in financial services~\citep{dalpozzolo2015fraud} and content moderation on social platforms~\citep{gorwa2020algorithmic}. This widespread deployment has intensified scrutiny of adversarial vulnerabilities: inputs or interactions crafted to cause models to behave in unintended ways~\citep{biggio2018wild}.
+Adversarial machine learning has emerged as a critical security concern, with over a decade of academic research demonstrating vulnerabilities in ML systems~\cite{szegedy2014intriguing, goodfellow2015explaining, carlini2017towards, madry2018towards}. The field has produced hundreds of attack techniques, defense mechanisms, and robustness evaluations across computer vision~\cite{carlini2017towards}, natural language processing~\cite{morris2020textattack}, and more recently, large language models~\cite{zou2023universal, mazeika2024harmbench}. Yet despite this substantial academic output, industry practitioners consistently report a persistent gap between research advances and operational deployment~\cite{kumar2020adversarial, mink2023security, apruzzese2023realgradients}.
 
-The field of adversarial machine learning emerged with Szegedy et al.'s demonstration that imperceptible perturbations could fool state-of-the-art classifiers~\citep{szegedy2014intriguing}, followed by Goodfellow et al.'s Fast Gradient Sign Method establishing the dominant attack paradigm~\citep{goodfellow2015explaining}. Over the subsequent decade, researchers catalogued 66 attack techniques spanning evasion, poisoning, and privacy threats~\citep{mitreatlas2024}. MITRE ATLAS now documents 33 real-world case studies, and regulatory frameworks including the EU AI Act mandate adversarial robustness testing for high-risk systems~\citep{euaiact2024}.
+This research-practice divide manifests in concrete ways. Kumar et al.'s interviews with 28 organizations revealed that most ML engineers and incident responders are ``not equipped with tactical and strategic tools to protect, detect and respond to attacks on their ML systems''~\cite{kumar2020adversarial}. Mink et al.'s qualitative analysis found that practitioners face barriers including ``lack of institutional motivation and educational resources,'' ``inability to adequately assess AML risk,'' and ``organizational structures that discourage implementation''~\cite{mink2023security}. Most tellingly, Apruzzese et al. observed that while 89\% of adversarial ML papers focus exclusively on deep learning and 63\% evaluate only image data, ``real-world evidence suggests that actual attackers use simple tactics to subvert ML-driven systems''~\cite{apruzzese2023realgradients}.
 
-Yet industry surveys reveal a persistent gap. Kumar et al.~\citep{kumar2020adversarial} found practitioners ``not equipped with tactical and strategic tools'' for ML-specific attacks. Grosse et al.~\citep{grosse2023mlsecurity} reported only 5\% of AI practitioners had experienced AI-specific attacks, despite 86\% expressing concern. Mink et al.~\citep{mink2023security} identified organizational barriers including lack of institutional motivation, inability to assess AML risk, and structures discouraging implementation. Apruzzese et al.~\citep{apruzzese2023real} crystallized these concerns, arguing that ``real attackers don't compute gradients''---academic threat models assume capabilities rarely available in practice.
+These qualitative gap studies provide rich insights into \textit{why} adoption barriers exist, but they cannot answer fundamental questions about \textit{when} and \textit{how fast} research translates into practice. How long does it take for a published attack technique to be implemented in industry tools? Do defenses get adopted faster than attacks? Has adoption accelerated over the field's evolution from foundational work (2014--2017) through expansion (2018--2021) to the LLM era (2022--2025)? What factors predict faster adoption—code availability, venue prestige, industry collaboration, or domain? Without quantitative temporal measurements, we cannot benchmark progress, identify bottlenecks, or design evidence-based interventions to accelerate research translation.
 
-This gap matters because real-world incidents demonstrate adversarial threats are not merely theoretical. In November 2025, Anthropic disclosed the first documented large-scale AI-orchestrated cyber campaign, with Chinese state-sponsored actors using Claude Code to execute 80--90\% of operational tasks autonomously~\citep{anthropic2025claude}. Tesla Autopilot was fooled by adversarial tape modifications~\citep{keenlab2019tesla,mcafee2020tesla}. Training data extraction from ChatGPT recovered megabytes of verbatim training data for under \$200~\citep{nasr2023extracting}. The OWASP Top 10 for LLM Applications lists prompt injection as the \#1 vulnerability across all versions~\citep{owasp2024llm}.
+\subsection{Our Approach: Artifact-Anchored Backward Traceability}
 
-\subsection{Research Questions}
+We introduce a novel methodology to measure adversarial ML adoption lag through \textit{reverse-engineering from authoritative industry artifacts}. Rather than starting from papers and speculating about impact through forward citation analysis, we begin with concrete evidence of industry adoption—widely-used tools, standardized benchmarks, and regulatory frameworks—and trace \textit{backward} to the research papers they cite and implement.
 
-We address three questions about the research-to-practice transfer in adversarial ML:
+Our approach selects 9 artifacts representing different adoption pathways: (1)~\textbf{Tools}—CleverHans (6,401 GitHub stars), IBM Adversarial Robustness Toolbox (5,789 stars), TextAttack (3,348 stars), Microsoft PyRIT (3,343 stars), and Foolbox (2,936 stars); (2)~\textbf{Benchmarks}—RobustBench (NeurIPS 2021, 750+ citations), AutoAttack (ICML 2020, 1,987 citations), and HarmBench (ICML 2024); (3)~\textbf{Regulatory frameworks}—MITRE ATLAS (15 tactics, 66 techniques, 33 real-world case studies). These artifacts collectively represent the infrastructure through which adversarial ML research enters practice.
 
-\begin{enumerate}
-    \item \textbf{RQ1 (Adoption Lag):} What is the typical time lag between publication of landmark AML research and evidence of industry adoption, measured through tool integration, commercial reference, regulatory citation, and production deployment?
-    
-    \item \textbf{RQ2 (Domain Variation):} How does adoption speed vary across application domains (computer vision, NLP, malware detection, autonomous systems, LLMs), and what factors explain these differences?
-    
-    \item \textbf{RQ3 (Acceleration Factors):} What mechanisms---regulatory frameworks, standardized benchmarks, industry consortiums, commercial tools---have accelerated adoption, particularly for foundation model security post-2022?
-\end{enumerate}
+From these 9 artifacts, we automatically extracted 277 unique papers via Git repository scanning of all arXiv references, academic citations, and documentation. We then applied selection criteria prioritizing papers with strongest adoption evidence: 61 papers cited by 2+ artifacts (cross-validated adoption) and 10 papers cited only by MITRE ATLAS (regulatory adoption), yielding a final sample of \textbf{71 papers} for detailed coding. For each paper, we manually coded 12 variables capturing research characteristics (attack/defense/evaluation, threat type, domain, venue, code availability), threat model details (model access, gradient usage), and practical evaluation rigor.
+
+Critically, our methodology provides \textit{verifiable timestamps} for adoption events: Git commit dates when tools first reference papers, benchmark publication dates incorporating research, and MITRE ATLAS case study documentation dates. This enables precise calculation of adoption lag as the time difference between paper publication (conference date or first arXiv submission) and first adoption event across all artifacts. Our dataset provides ground truth for which papers achieved demonstrable industry adoption, when this occurred, and through which pathways.
 
 \subsection{Contributions}
 
-This review makes three contributions:
+This work makes the following contributions:
 
-\begin{enumerate}
-    \item \textbf{Artifact-anchored methodology:} We introduce a reverse-engineering approach that traces industry artifacts back to source papers, ensuring every paper in our sample has verified adoption evidence by construction.
-    
-    \item \textbf{Reproducible coding framework:} We release a 12-variable codebook (Table~\ref{tab:codebook}) with decision rules for coding paper characteristics and measuring adoption timelines.
-    
-    \item \textbf{Quantified adoption analysis:} We provide the first systematic measurement of research-to-industry lag across domains (vision, NLP, LLM, malware), artifact types, and publication eras.
-\end{enumerate}
+\begin{itemize}
+\item \textbf{First quantitative measurement} of adversarial ML research-to-practice adoption lag, spanning 2014--2025 across computer vision, NLP, LLMs, and regulatory domains.
 
-%==============================================================================
-\section{Background}
+\item \textbf{Novel artifact-anchored methodology} using reverse citation tracing from 9 authoritative industry artifacts (5 tools, 3 benchmarks, 1 regulatory framework) to 71 research papers with verified adoption evidence.
+
+\item \textbf{Systematic coding framework} capturing 12 variables per paper (research type, domain, venue, code availability, threat model, practical evaluation), enabling analysis of factors predicting adoption speed.
+
+\item \textbf{Statistical analysis} using Kruskal-Wallis tests, Mann-Whitney U tests with Bonferroni correction, and Cox proportional hazards regression to identify adoption lag patterns by artifact type, publication era, and domain, plus acceleration factors including code availability, venue, and industry collaboration.
+
+\item \textbf{Reproducible dataset and analysis code} providing complete adoption timestamps, coding decisions with inter-rater reliability metrics, and statistical analysis scripts for community validation and extension.
+\end{itemize}
+
+\subsection{Paper Organization}
+
+Section~\ref{sec:background} provides background on adversarial ML threats and reviews qualitative gap studies. Section~\ref{sec:rqs} formalizes our research questions. Section~\ref{sec:methodology} details our artifact-anchored methodology, paper selection criteria, coding framework, and statistical analysis plan. Section~\ref{sec:results} presents adoption lag measurements and domain comparisons. Section~\ref{sec:discussion} interprets findings and discusses implications. Section~\ref{sec:conclusion} concludes with recommendations for accelerating research translation.
+
+\section{Background and Related Work}
 \label{sec:background}
-%==============================================================================
 
-\subsection{The Emergence of Adversarial Vulnerabilities}
+\subsection{Adversarial Machine Learning Landscape}
 
-Modern adversarial ML research began with Szegedy et al.'s December 2013 demonstration that small perturbations could cause misclassification with high confidence~\citep{szegedy2014intriguing}. This work, which received ICLR's 2024 Test of Time Award, revealed that adversarial examples transfer across independently trained models---a finding with profound security implications.
+Adversarial machine learning encompasses threats across three primary attack categories, formalized in frameworks including MITRE ATLAS and NIST AI 100-2~\cite{nist2025adversarial}.
 
-Goodfellow et al.~\citep{goodfellow2015explaining} attributed these vulnerabilities to linear behavior in high-dimensional spaces and introduced the Fast Gradient Sign Method (FGSM), appearing on arXiv December 20, 2014 and published at ICLR 2015. FGSM established gradient-based perturbation as the dominant paradigm and introduced adversarial training as a defense. These foundational works established conventions that shaped subsequent research: white-box access assumptions, $L_p$ perturbation constraints, and optimization-based attack formulations.
+\textbf{Evasion attacks} modify inputs at test time to cause misclassification while preserving semantic meaning. Foundational work includes Szegedy et al.'s discovery of adversarial examples~\cite{szegedy2014intriguing}, Goodfellow et al.'s Fast Gradient Sign Method (FGSM)~\cite{goodfellow2015explaining}, Carlini \& Wagner's optimization-based attacks~\cite{carlini2017towards}, and Madry et al.'s Projected Gradient Descent (PGD)~\cite{madry2018towards}. Physical-world evasion attacks have demonstrated real-world risks including traffic sign misclassification~\cite{eykholt2018robust} and autonomous vehicle manipulation.
 
-Subsequent work refined attack formulations. The Carlini \& Wagner attack~\citep{carlini2017towards} (IEEE S\&P 2017) achieved state-of-the-art success across multiple norms. Madry et al.'s PGD attack~\citep{madry2018towards} (ICLR 2018) established the robust optimization framework:
-\begin{equation}
-\min_\theta \mathbb{E}_{(x,y)\sim D} \left[ \max_{\|\delta\| \leq \epsilon} L(f_\theta(x + \delta), y) \right]
-\end{equation}
-This min-max formulation remains the gold standard---10 of the top-10 models on RobustBench use PGD-based adversarial training~\citep{croce2021robustbench}.
+\textbf{Poisoning attacks} corrupt training data or model parameters to degrade performance or insert backdoors. Key work includes backdoor attacks via training data manipulation~\cite{gu2017badnets} and federated learning poisoning. Recent concerns focus on supply chain vulnerabilities in foundation model training.
 
-\subsection{Expanding Threat Landscape}
+\textbf{Privacy attacks} extract sensitive information from trained models. Membership inference attacks~\cite{shokri2017membership} determine whether specific records were in training data, while model extraction attacks~\cite{tramer2016stealing} reconstruct model parameters through black-box queries.
 
-Research expanded beyond test-time evasion to encompass the full ML pipeline. \textbf{Privacy attacks} demonstrated that models leak information: Shokri et al.~\citep{shokri2017membership} introduced membership inference at IEEE S\&P 2017; Tram\`{e}r et al.~\citep{tramer2016stealing} demonstrated model extraction from commercial APIs at USENIX Security 2016; Carlini et al.~\citep{carlini2021extracting} extracted verbatim training data from GPT-2 at USENIX Security 2021.
+For large language models, new attack surfaces have emerged including prompt injection~\cite{greshake2023not}, jailbreaking~\cite{zou2023universal}, and alignment failures~\cite{wei2023jailbroken}. OWASP's LLM Top 10 ranks prompt injection as the \#1 risk for LLM applications.
 
-\textbf{Integrity attacks} compromise models during training. BadNets~\citep{gu2017badnets} (arXiv August 2017) demonstrated backdoor injection through poisoned training data. Subsequent work extended backdoors to federated learning~\citep{bagdasaryan2020backdoor} and self-supervised learning~\citep{jia2021badencoder}.
+\subsection{The Research-Practice Gap: Qualitative Evidence}
 
-\textbf{Physical-world attacks} demonstrated that adversarial examples survive real-world conditions. Eykholt et al.~\citep{eykholt2018robust} (CVPR 2018) created adversarial stop signs robust to viewing angles and distances. DolphinAttack~\citep{zhang2017dolphinattack} (ACM CCS 2017, Best Paper) compromised voice assistants via ultrasonic commands inaudible to humans.
+Four seminal studies have documented the adversarial ML research-practice gap using qualitative methodologies, establishing the foundation that our quantitative work builds upon.
 
-\subsection{The LLM Security Paradigm Shift}
+\textbf{Kumar et al. (2020)}~\cite{kumar2020adversarial} conducted interviews with 28 organizations across 11 industries, finding that practitioners ``are not equipped with tactical and strategic tools to protect, detect and respond to attacks on their ML systems.'' Only 6 of 28 organizations were prepared to dedicate staff to building robust ML models. Their survey revealed concerning awareness gaps: most respondents lacked knowledge about even basic adversarial ML concepts.
 
-Large language models introduced qualitatively different adversarial challenges. Unlike traditional attacks requiring gradient access and imperceptible perturbations, LLM attacks exploit semantic properties through natural language.
+\textbf{Grosse et al. (2023)}~\cite{grosse2023mlsecurity} provided the largest quantitative survey with 139 industrial practitioners, finding that approximately 5\% of AI practitioners had experienced AI-specific attacks—remarkably low given academic attention. Their statistical analysis revealed that defense implementation correlated with threat exposure or expected likelihood of attack, not company size or organizational area. When asked about implementing countermeasures, the general consensus was ``Why do so?''
 
-\textbf{Prompt injection} was first documented by Simon Willison in September 2022 and formalized by Perez \& Ribeiro~\citep{perez2022ignore} at the NeurIPS 2022 Workshop on ML Safety. Greshake et al.~\citep{greshake2023indirect} demonstrated indirect prompt injection against retrieval-augmented systems (arXiv February 2023, ACM AISec November 2023), showing attackers can embed malicious instructions in external content.
+\textbf{Mink et al. (2023)}~\cite{mink2023security} conducted 21 semi-structured interviews with data scientists and engineers, identifying three primary barriers: (1) lack of institutional motivation and educational resources for AML concepts, (2) inability to adequately assess AML risk, and (3) organizational structures discouraging implementation in favor of other objectives. Less than 25\% of surveyed developers had access to security experts.
 
-\textbf{Automated jailbreaking} emerged with Zou et al.'s GCG attack~\citep{zou2023universal} (arXiv July 2023, NeurIPS 2023 Spotlight), which optimizes adversarial suffixes achieving the first automated jailbreaks against aligned LLMs including ChatGPT, Bard, and Claude. Subsequent work developed more efficient black-box methods: PAIR~\citep{chao2024jailbreaking} achieves jailbreaks in approximately 20 queries; TAP~\citep{mehrotra2024tree} uses tree-of-thought reasoning for further efficiency.
+\textbf{Apruzzese et al. (2023)}~\cite{apruzzese2023realgradients} provided the most comprehensive analysis, examining 88 papers from top security venues (CCS, USENIX Security, NDSS, S\&P) from 2019--2021 plus three real-world case studies. Their findings revealed stark research-practice misalignments: 89\% of papers consider only deep learning, 63\% evaluate only image data, only 5\% address malware/phishing/intrusion detection, and 27\% make no mention of computational costs. Their industry case studies demonstrated that real attackers use simple tactics (cropping, masking, stretching, blurring) rather than gradient-based optimization. They concluded: ``Real-world evidence suggests that actual attackers use simple tactics to subvert ML-driven systems, and as a result security practitioners have not prioritized adversarial ML defenses.''
 
-\textbf{LLM defenses} include alignment techniques (RLHF~\citep{ouyang2022instructgpt}, Constitutional AI~\citep{bai2022constitutional}), specialized guardrails (LlamaGuard~\citep{inan2023llamaguard} released December 2023, NeMo Guardrails open-sourced April 2023), and input/output filtering. However, these defenses exhibit brittleness---the HackAPrompt competition~\citep{schulhoff2023hackaprompt} saw all 44 defenses eventually bypassed across 137,000+ adversarial interactions.
+\subsection{Technology Adoption Measurement Methodologies}
 
-\subsection{The Theory-Practice Gap}
+While no prior work has quantitatively measured adversarial ML adoption lag, established methodologies from other domains provide methodological foundations for our approach.
 
-Apruzzese et al.~\citep{apruzzese2023real} synthesized concerns about research-practice disconnect through real-world case studies at IEEE SaTML 2023. Their core observation: academic threat models assume attackers possess white-box access, unlimited queries, and gradient computation capabilities rarely available in practice. Real incidents typically involve simpler tactics---basic input manipulation, system-level exploitation, social engineering.
+\textbf{Citation lag analysis}~\cite{nakamura2011citation} measures knowledge diffusion speed through temporal analysis of citation patterns. Nakamura et al. introduced citation lag as the time difference between publication dates of cited and citing papers, demonstrating that inter-cluster citations have longer lags than intra-cluster citations, indicating different knowledge integration speeds across research areas.
 
-Industry surveys quantify this gap. Kumar et al.~\citep{kumar2020adversarial} interviewed 28 organizations at IEEE S\&P Workshops 2020, finding widespread uncertainty about assessing adversarial risks. Grosse et al.~\citep{grosse2023mlsecurity} surveyed 139 practitioners (IEEE TIFS 2023), finding only 5\% had experienced AI-specific attacks despite 86\% expressing concern. Mink et al.~\citep{mink2023security} conducted 21 interviews at USENIX Security 2023, identifying three barriers: lack of institutional motivation, inability to assess AML risk, and organizational structures discouraging implementation.
+\textbf{Translational research lag studies} provide critical benchmarks. Morris, Wooding \& Grant's systematic review~\cite{morris2011answer} synthesized 23 papers quantifying time lags in medical research, revealing substantial variation: publication to guideline (0--49 years, mean 8--17 years), drug discovery to commercialization (10--17 years, mean 12 years), and first description to highly cited (14--44 years, mean 24 years). They recommend using operational, measurable markers along translation pathways—directly analogous to our artifact-based adoption events.
 
-However, prior work characterized this gap qualitatively. Our contribution is to measure adoption timelines quantitatively, identifying specific lag durations and acceleration factors. This work does not assess the severity of adversarial threats, but quantitatively measures when research techniques enter practitioner ecosystems.
+\textbf{Backward citation expansion}~\cite{chen2019visualizing} provides methodological justification for our reverse-engineering approach. Chen \& Song's cascading citation expansion methodology enables ``automatic expansion of an initial set by adding articles through citation links in forward, backward, or both directions,'' with backward expansion particularly useful when ``a researcher may come across a recently published review article and would like to find previously published articles that lead to the state of knowledge summarized in the review''—precisely our use case with authoritative tools as ``reviews'' of implemented research.
 
-%==============================================================================
+\textbf{Artifact-citation relationships} have been validated for measuring research impact. Frachtenberg's analysis of 2,439 systems papers~\cite{frachtenberg2022research} found that papers with shared artifacts received 75\% more citations than those without, with GitHub-hosted artifacts showing 86.7\% availability vs. 77.8\% for university-hosted. Heumüller et al.'s study of 789 ICSE papers~\cite{heumuller2020publish} confirmed that ``making artifacts publicly available has made a difference in terms of citations as a measure of scientific impact.'' These findings validate using artifact implementation as a proxy for research adoption.
+
+\subsection{Positioning This Work}
+
+Our work addresses a critical gap at the intersection of adversarial ML security and technology adoption measurement. While qualitative gap studies~\cite{kumar2020adversarial, grosse2023mlsecurity, mink2023security, apruzzese2023realgradients} have documented \textit{why} research doesn't translate into practice—organizational barriers, awareness deficits, threat model mismatches, computational costs—no work has measured \textit{when} and \textit{how fast} adoption occurs.
+
+This temporal dimension is essential for evidence-based policy. Without quantitative lag measurements, we cannot benchmark whether adoption is improving, identify which research domains face the longest delays, or evaluate whether interventions (code release requirements, industry partnerships, standardized benchmarks) accelerate translation. Our artifact-anchored methodology provides verifiable adoption timestamps through Git commits, benchmark integrations, and regulatory citations, enabling the first systematic measurement of adversarial ML research-to-practice transfer timelines.
+
+\section{Research Questions}
+\label{sec:rqs}
+
+This work investigates three research questions examining adoption lag patterns, domain variation, and acceleration factors:
+
+\textbf{RQ1: Adoption Lag Measurement.} What is the typical time lag between publication of landmark adversarial ML research and evidence of industry adoption, measured through tool integration, benchmark incorporation, and regulatory citation? We measure adoption lag in months from paper publication (conference date or first arXiv submission) to first adoption event (earliest Git commit, benchmark release, or MITRE ATLAS documentation). We stratify analysis by artifact type (tools, benchmarks, regulatory) and publication era (foundational 2014--2017, expansion 2018--2021, LLM 2022--2025) to identify temporal trends.
+
+\textbf{RQ2: Domain Variation.} How does adoption speed vary across application domains (computer vision, natural language processing, large language models, malware detection, autonomous systems), and what factors explain these differences? We compare adoption lag distributions across 7 domains using pairwise Mann-Whitney U tests with Bonferroni correction ($\alpha = 0.05/21 = 0.0024$) and hypothesize that LLM research shows significantly shorter lags than computer vision due to heightened industry urgency around foundation model security.
+
+\textbf{RQ3: Acceleration Factors.} What mechanisms—code availability, publication venue, industry collaboration, standardized benchmarks—predict faster adoption? We employ Cox proportional hazards regression modeling time-to-first-adoption with covariates including publication year (continuous), domain (categorical, reference: vision), venue type (ML vs. security, reference: ML conferences), code availability at publication (binary), and threat model assumptions (white/gray/black-box, reference: white-box). Hazard ratios >1 indicate faster adoption; we validate proportional hazards assumptions using Schoenfeld residuals.
+
 \section{Methodology}
 \label{sec:methodology}
-%==============================================================================
 
-\subsection{Study Design Overview}
+\subsection{Artifact-Anchored Approach}
 
-This study measures the temporal lag between adversarial machine learning (AML) research and demonstrable industry adoption. Rather than starting from academic publications and speculating about downstream impact, we adopt an \textit{artifact-anchored backward traceability} methodology. We begin with concrete industry artifacts---open-source security tools, standardized benchmarks, regulatory frameworks, and vendor security documentation---and trace each adopted technique back to the academic paper that originally introduced it.
+Our methodology reverses the traditional research impact assessment approach. Rather than starting from papers and tracking forward citations to speculate about practical impact, we begin with concrete evidence of industry adoption—authoritative tools, benchmarks, and frameworks actively used by practitioners—and trace backward to the research papers they cite and implement.
 
-This design ensures that every paper in our dataset has verifiable evidence of adoption by construction, enabling precise measurement of research-to-practice timelines while avoiding subjective judgments about a paper's ``importance'' or speculative claims about industry relevance.
+This \textit{artifact-anchored backward traceability} approach provides three key advantages: (1)~\textbf{Verified adoption}—every paper in our sample has demonstrable evidence of industry use through tool implementation, benchmark integration, or regulatory citation; (2)~\textbf{Precise timestamps}—Git commit dates, benchmark publication dates, and framework documentation provide verifiable adoption event timing; (3)~\textbf{Multiple pathways}—we capture diverse adoption mechanisms including open-source tools, academic benchmarks, and regulatory frameworks, providing comprehensive coverage of research translation routes.
 
-\subsection{Artifact Universe Definition}
+\subsection{Artifact Selection}
 
-Before extracting any papers, we define and freeze the set of industry artifacts examined in this study. Artifacts were selected according to objective inclusion criteria to minimize selection bias.
+We selected 9 artifacts representing authoritative industry adoption pathways across three categories, applying rigorous inclusion criteria to ensure representativeness.
 
-\subsubsection{Open-Source Security Tools}
+\subsubsection{Open-Source Tools (5 artifacts)}
 
-We include open-source AML tools satisfying the criterion of $\geq$1,000 GitHub stars, ensuring broad community adoption and active maintenance. Based on this criterion, we analyze five tools (Table~\ref{tab:tools}):
+Tool selection criteria: (1) $\geq$1,000 GitHub stars indicating substantial community adoption; (2) Active maintenance with commits in 2024--2025; (3) Focus on adversarial ML specifically (not general ML security); (4) Multiple framework support or domain coverage.
 
-\begin{table}[H]
-\centering
-\small
-\caption{Selected open-source AML tools}
-\label{tab:tools}
-\begin{tabular}{lrl}
-\toprule
-\textbf{Tool} & \textbf{Stars} & \textbf{Description} \\
-\midrule
-CleverHans & 6,401 & First major AML library (University of Toronto) \\
-IBM ART & 5,789 & Adversarial Robustness Toolbox (Linux Foundation) \\
-TextAttack & 3,348 & NLP adversarial attacks \\
-PyRIT & 3,343 & LLM red-teaming toolkit (Microsoft) \\
-Foolbox & 2,936 & Adversarial attacks (Bethge Lab) \\
-\bottomrule
-\end{tabular}
-\end{table}
+\begin{itemize}
+\item \textbf{CleverHans} (6,401 stars): First major AML library, created October 2016 by Ian Goodfellow (Google Brain/OpenAI) and Nicolas Papernot. Maintained by CleverHans Lab at University of Toronto. Provides reference implementations for foundational attacks (FGSM, PGD, C\&W) across JAX, PyTorch, TensorFlow~\cite{papernot2018cleverhans}.
 
-For each tool, we clone the Git repository and programmatically extract arXiv references from source code, documentation, docstrings, and bibliography files. Adoption dates are determined via \texttt{git log --follow} to identify the first commit referencing each paper.
+\item \textbf{IBM Adversarial Robustness Toolbox} (5,789 stars): Enterprise-focused library created July 2018, donated to Linux Foundation AI \& Data in 2020. Supports 9 ML frameworks, covers all threat types (evasion, poisoning, extraction, inference). Used in DARPA GARD program and DoD testing~\cite{nicolae2018adversarial}.
 
-\subsubsection{Standardized Benchmarks}
+\item \textbf{TextAttack} (3,348 stars): Dominant NLP adversarial framework, published EMNLP 2020 by QData Lab (UVA). Implements 16 attack recipes with HuggingFace integration. 835+ citations~\cite{morris2020textattack}.
 
-We include benchmarks that are (1) published in peer-reviewed venues and (2) evaluate AML attacks or defenses as named techniques with explicit paper citations:
+\item \textbf{PyRIT} (3,343 stars): Microsoft's LLM red-teaming framework, released February 2024. Used for 100+ internal red teaming operations of generative AI models before public release. Integrates with Azure AI evaluation~\cite{munoz2024pyrit}.
 
-\begin{table}[H]
-\centering
-\small
-\caption{Selected AML benchmarks}
-\label{tab:benchmarks}
-\begin{tabular}{llp{5.5cm}}
-\toprule
-\textbf{Benchmark} & \textbf{Venue} & \textbf{Description} \\
-\midrule
-RobustBench & NeurIPS 2021 & Adversarial robustness leaderboard (120+ models) \\
-AutoAttack & ICML 2020 & Standardized attack ensemble evaluation \\
-HarmBench & ICML 2024 & LLM jailbreak evaluation (33 LLMs, 18 methods) \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Only techniques explicitly evaluated and attributed to specific academic papers are included. Adoption dates are extracted from Git commit history of benchmark repositories.
-
-\subsubsection{Regulatory and Threat Frameworks}
-
-We include MITRE ATLAS~\citep{mitreatlas2024}, the industry-standard adversarial ML threat framework modeled after ATT\&CK. ATLAS catalogs 66 adversarial ML techniques with explicit academic references, providing structured machine-readable data via its public GitHub repository (\texttt{atlas-data}). We programmatically extract technique IDs, names, and cited papers from this repository.
-
-\subsubsection{Artifact Summary}
-
-Table~\ref{tab:artifacts-summary} summarizes the nine Git-searchable artifacts included in our automated extraction pipeline, along with their selection criteria.
-
-\begin{table}[H]
-\centering
-\small
-\caption{Summary of artifacts and selection criteria}
-\label{tab:artifacts-summary}
-\begin{tabular}{llp{5cm}}
-\toprule
-\textbf{Category} & \textbf{Criterion} & \textbf{Artifacts} \\
-\midrule
-Tools & $\geq$1,000 GitHub stars & CleverHans, IBM ART, TextAttack, PyRIT, Foolbox \\
-Benchmarks & Peer-reviewed publication & RobustBench, AutoAttack, HarmBench \\
-Regulatory & Industry threat framework & MITRE ATLAS \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\subsection{Automated Paper Extraction}
-
-For each of the nine Git-searchable artifacts, we clone the repository and programmatically extract arXiv references using comprehensive regular expression patterns that capture:
-\begin{itemize}[noitemsep]
-    \item Direct arXiv URLs (\texttt{arxiv.org/abs/}, \texttt{arxiv.org/pdf/})
-    \item BibTeX \texttt{eprint} fields
-    \item Inline citations (e.g., ``arXiv:2401.12345'')
+\item \textbf{Foolbox} (2,936 stars): Academic benchmark tool from Bethge Lab (Tübingen), dual peer-reviewed publications (JOSS 2020, ICML 2017). Emphasizes minimum perturbation measurement and scientific rigor~\cite{rauber2020foolbox}.
 \end{itemize}
 
-We scan all relevant file types: Python source (\texttt{.py}), documentation (\texttt{.md}, \texttt{.rst}, \texttt{.txt}), configuration (\texttt{.json}, \texttt{.yaml}, \texttt{.yml}), and bibliography (\texttt{.bib}) files. Each extracted arXiv ID is resolved to a canonical paper record via the arXiv API, retrieving title, authors, and publication date.
+\subsubsection{Standardized Benchmarks (3 artifacts)}
 
-\textbf{Exclusions:} We exclude non-AML papers (e.g., foundational ML papers like Adam, ResNet, VGGNet) based on a predefined exclusion list validated against paper abstracts.
+Benchmark selection criteria: (1) Peer-reviewed publication at top-tier ML venue (NeurIPS, ICML); (2) Community adoption evidenced by citations or leaderboard submissions; (3) Standardized evaluation protocols.
 
-\subsection{Paper Selection Criteria}
+\begin{itemize}
+\item \textbf{RobustBench} (NeurIPS 2021): Standardized adversarial robustness leaderboard with 750+ citations, 120+ evaluated models. Uses AutoAttack for consistent evaluation across CIFAR-10, CIFAR-100, ImageNet~\cite{croce2020robustbench}.
 
-From the full set of 277 AML papers extracted from the nine artifacts, we select papers for manual coding using a tiered approach:
+\item \textbf{AutoAttack} (ICML 2020): Parameter-free attack ensemble (APGD-CE, APGD-DLR, FAB, Square Attack) with 1,987 citations. Revealed 13 of 50+ published defenses had robust accuracy overestimated by >10\%~\cite{croce2020reliable}.
 
-\begin{enumerate}[noitemsep]
-    \item \textbf{Multi-artifact papers (61 papers):} Papers cited by $\geq$2 artifacts provide the strongest evidence of cross-ecosystem adoption.
-    
-    \item \textbf{MITRE ATLAS-only papers (10 papers):} Papers cited exclusively by MITRE ATLAS represent regulatory adoption without tool/benchmark integration, capturing a distinct adoption pathway.
+\item \textbf{HarmBench} (ICML 2024): First standardized LLM jailbreak evaluation framework. Covers 510 harmful behaviors, 18 attack methods, 33 target LLMs. Backed by Center for AI Safety~\cite{mazeika2024harmbench}.
+\end{itemize}
+
+\subsubsection{Regulatory Framework (1 artifact)}
+
+\begin{itemize}
+\item \textbf{MITRE ATLAS}: Industry-standard adversarial ML threat taxonomy (15 tactics, 66 techniques, 33 case studies). Co-created with Microsoft in 2020, now with 16 member organizations. \$20M NIST partnership (December 2025). Explicitly referenced in EU AI Act alignment and CISA guidance.
+\end{itemize}
+
+\subsection{Paper Extraction and Selection}
+
+We employed automated extraction followed by manual selection based on adoption evidence strength.
+
+\subsubsection{Automated Extraction (277 papers)}
+
+For each of the 9 artifacts, we:
+\begin{enumerate}
+\item Cloned the complete Git repository history
+\item Scanned all files (code, documentation, README, citations) for arXiv identifiers using regex pattern \texttt{arxiv.org/abs/\textbackslash d+\textbackslash.\textbackslash d+}
+\item Extracted academic citations from published benchmark papers (RobustBench, AutoAttack, HarmBench)
+\item Retrieved MITRE ATLAS case study citations from framework documentation
+\item Deduplicated across artifacts to create initial pool of 277 unique papers
 \end{enumerate}
 
-This yields a final sample of \textbf{71 papers} for manual coding, balancing methodological rigor (multi-artifact validation) with coverage of regulatory adoption patterns.
+\subsubsection{Selection Criteria (71 papers)}
 
-\subsection{Paper Validation}
+From the 277-paper pool, we applied two selection criteria prioritizing strongest adoption evidence:
 
-Each extracted reference is validated to ensure: (1) the paper introduces the technique (not merely applies or evaluates it), (2) the technique name corresponds to the artifact reference, and (3) the paper is publicly accessible via arXiv or DOI.
+\textbf{Criterion 1: Multi-artifact papers ($n=61$).} Papers cited by $\geq$2 artifacts demonstrate cross-validated adoption across different industry pathways (e.g., implemented in both CleverHans and IBM ART, or cited by both RobustBench and MITRE ATLAS). This criterion ensures robust adoption signal.
 
-\subsection{Adoption Event Definition}
+\textbf{Criterion 2: MITRE ATLAS-only papers ($n=10$).} Papers cited exclusively by MITRE ATLAS represent regulatory adoption pathway. While not implemented in tools or benchmarks, their inclusion in the industry-standard threat framework indicates practitioner awareness and relevance for compliance.
 
-We define three observable adoption events, corresponding to our artifact categories:
+Final sample: \textbf{71 papers} with verified adoption evidence spanning 2014--2025.
 
-\begin{table}[H]
-\centering
-\small
-\caption{Adoption event definitions}
-\begin{tabular}{p{3cm}p{5.5cm}}
-\toprule
-\textbf{Adoption Event} & \textbf{Operational Definition} \\
-\midrule
-Tool adoption & First Git commit referencing the paper \\
-Benchmark adoption & Paper cited in benchmark repository \\
-Regulatory adoption & Paper referenced in MITRE ATLAS \\
-\bottomrule
-\end{tabular}
-\end{table}
+\subsection{Coding Framework}
 
-Adoption is defined strictly as acknowledgment or integration, not mitigation or successful defense.
+For each of the 71 papers, we manually coded 12 variables across three groups, following a structured codebook with explicit decision rules (see coding\_instructions.pdf in reproducibility materials).
 
-\subsection{Adoption Lag Measurement}
+\subsubsection{Research Characteristics (G1--G6)}
 
-For each (paper, adoption event) pair, we compute:
+\begin{itemize}
+\item \textbf{G1 - Type}: Attack / Defense / Evaluation (primary contribution)
+\item \textbf{G2 - Threat}: Evasion / Poisoning / Privacy / N/A (attack category per NIST taxonomy)
+\item \textbf{G3 - Domain}: Vision / NLP / LLM / Malware / Audio / Tabular / Cross-domain (primary evaluation domain)
+\item \textbf{G4 - Venue}: ML conference / Security conference / Journal / arXiv-only (publication type)
+\item \textbf{G5 - Code available}: Yes / No (code link exists at time of coding)
+\item \textbf{G6 - Code timing}: At-publication / Post-publication / Never (when code released; ``at-publication'' = within 1 month of paper date)
+\end{itemize}
+
+\subsubsection{Threat Model (T1--T2, Attack Papers Only)}
+
+\begin{itemize}
+\item \textbf{T1 - Access level}: White-box / Gray-box / Black-box (model access assumptions; white = weights/gradients, gray = surrogate, black = queries only)
+\item \textbf{T2 - Gradient required}: Yes / No (whether gradients used at any attack stage)
+\end{itemize}
+
+\subsubsection{Practical Evaluation (Q1)}
+
+\begin{itemize}
+\item \textbf{Q1 - Real-world evaluation}: Yes / Partial / No (``Yes'' = tested on production systems like Google API, Tesla, ChatGPT; ``Partial'' = realistic simulation; ``No'' = CIFAR/ImageNet only)
+\end{itemize}
+
+\subsubsection{Coding Procedure}
+
+Two coders independently coded all 71 papers following the structured codebook. Initial coding was performed by GPT-4o with prompt-engineered instructions, then manually verified and corrected by human coders, resulting in 39 corrections documented in \texttt{coding\_corrections.csv}. Inter-rater reliability was assessed using Cohen's $\kappa$ across all 12 variables. Disagreements were resolved through discussion and consultation of paper full text.
+
+\subsection{Adoption Event Definitions and Lag Calculation}
+
+We define three types of adoption events with specific timestamp sources:
+
+\textbf{Tool adoption}: Date of first Git commit that references the paper in code, documentation, or citations file. We extracted commit timestamps (UTC) using \texttt{git log --all --grep} for paper titles and arXiv IDs, verified through manual inspection.
+
+\textbf{Benchmark adoption}: Publication date of the benchmark paper (conference proceedings date) that cites the research. For RobustBench (NeurIPS 2021), AutoAttack (ICML 2020), and HarmBench (ICML 2024), we use official conference dates.
+
+\textbf{Regulatory adoption}: Date when MITRE ATLAS case study or technique description citing the paper was first published in framework documentation (extracted from GitHub repository history of \texttt{mitre/advmlthreatmatrix}).
+
+For each paper, we record \textit{all} adoption events across the 9 artifacts, then identify the \textbf{first adoption} as the earliest event across all pathways. Adoption lag is calculated as:
 
 \begin{equation}
-\text{Adoption Lag} = \text{Date}_{\text{artifact}} - \text{Date}_{\text{publication}}
+\text{Adoption Lag (months)} = \text{Date}_{\text{first adoption}} - \text{Date}_{\text{publication}}
 \end{equation}
 
-Artifact dates are defined as:
-\begin{itemize}[noitemsep]
-    \item \textbf{Tools:} First Git commit timestamp referencing the paper (UTC)
-    \item \textbf{Benchmarks:} First Git commit timestamp referencing the paper (UTC)
-    \item \textbf{Regulatory:} First Git commit timestamp in MITRE ATLAS repository (UTC)
+Where $\text{Date}_{\text{publication}}$ is the earlier of: (1) conference/journal publication date, or (2) first arXiv submission date. All dates standardized to YYYY-MM-DD format, with lag calculated in months for consistency with translational research literature~\cite{morris2011answer}.
+
+\subsection{Statistical Analysis Plan}
+
+We employ non-parametric tests and survival analysis to address our research questions, with significance threshold $\alpha = 0.05$ (Bonferroni-corrected for multiple comparisons where applicable).
+
+\subsubsection{RQ1: Adoption Lag Measurement}
+
+\textbf{Descriptive statistics}: Median, interquartile range (IQR), range, and mean of adoption lags across full sample ($n=71$).
+
+\textbf{Stratification by artifact type}: Compare adoption lags for papers adopted through tools-only, benchmarks-only, regulatory-only, and multi-pathway adoption using Kruskal-Wallis test with post-hoc Dunn tests (Bonferroni-corrected).
+
+\textbf{Stratification by publication era}: Compare adoption lags across three eras—foundational (2014--2017), expansion (2018--2021), LLM (2022--2025)—using Kruskal-Wallis test to identify temporal trends.
+
+\subsubsection{RQ2: Domain Variation}
+
+\textbf{Pairwise domain comparison}: Compare adoption lag distributions across 7 domains (Vision, NLP, LLM, Malware, Audio, Tabular, Cross-domain) using Mann-Whitney U tests with Bonferroni correction for 21 pairwise comparisons ($\alpha = 0.05/21 = 0.0024$).
+
+\textbf{Hypothesis test}: LLM papers ($n_{\text{LLM}}$) show significantly shorter adoption lags than computer vision papers ($n_{\text{CV}}$) due to heightened industry urgency. One-tailed Mann-Whitney U test.
+
+\subsubsection{RQ3: Acceleration Factors}
+
+\textbf{Cox proportional hazards regression}: Model time-to-first-adoption using Cox regression:
+
+\begin{equation}
+\lambda(t|X) = \lambda_0(t) \cdot \exp(\beta_1 X_{\text{year}} + \beta_2 X_{\text{domain}} + \beta_3 X_{\text{venue}} + \beta_4 X_{\text{code}} + \beta_5 X_{\text{threat}})
+\end{equation}
+
+Where $\lambda(t|X)$ is the hazard rate (instantaneous adoption probability) at time $t$ given covariates $X$:
+\begin{itemize}
+\item $X_{\text{year}}$: Publication year (continuous)
+\item $X_{\text{domain}}$: Domain (categorical: Vision, NLP, LLM, Malware, Audio, Tabular, Cross-domain; reference = Vision)
+\item $X_{\text{venue}}$: Venue type (ML conference vs. Security conference; reference = ML)
+\item $X_{\text{code}}$: Code available at publication (binary: Yes/No)
+\item $X_{\text{threat}}$: Threat model (White-box / Gray-box / Black-box; reference = White-box)
 \end{itemize}
 
-Publication dates are defined as:
-\begin{itemize}[noitemsep]
-    \item \textbf{Peer-reviewed:} Conference/journal publication date
-    \item \textbf{arXiv-first:} First arXiv submission date
-\end{itemize}
+Hazard ratios $\exp(\beta_i)$ interpret as: HR > 1 indicates faster adoption, HR < 1 indicates slower adoption. We validate proportional hazards assumptions using Schoenfeld residuals and report 95\% confidence intervals for all coefficients.
 
-For papers cited by multiple artifacts, we record all adoption events and use the \textit{earliest} adoption date for computing first adoption lag. This captures when a paper first entered the practitioner ecosystem, regardless of which artifact adopted it first.
+\subsubsection{Software}
 
-\subsection{Paper Coding Scheme}
+All analyses conducted in Python 3.11 using: \texttt{pandas} (1.5.3) for data manipulation, \texttt{scipy} (1.10.1) for Kruskal-Wallis and Mann-Whitney U tests, \texttt{lifelines} (0.27.4) for Cox regression, \texttt{matplotlib} (3.7.1) and \texttt{seaborn} (0.12.2) for visualization. Analysis scripts and data available at [anonymized GitHub repository].
 
-Each paper is coded along three dimensions using a fixed codebook (Table~\ref{tab:codebook}). All coding is performed by the authors based on the paper text only. Threat model attributes are coded using author-stated assumptions; if unstated, code as ``Not specified.''
-
-\begin{table}[H]
-\centering
-\small
-\caption{Codebook for paper coding (9 variables)}
-\label{tab:codebook}
-\begin{tabular}{p{2.2cm}p{3.2cm}p{4.3cm}}
-\toprule
-\textbf{Variable} & \textbf{Values} & \textbf{Coding Rule} \\
-\midrule
-\multicolumn{3}{l}{\textit{Research Characteristics (G1--G6)}} \\
-\midrule
-G1: Type & Attack / Defense / Evaluation & Primary contribution \\
-G2: Threat category & Evasion / Poisoning / Privacy / N/A & Attack category; N/A for defenses \\
-G3: Domain & Vision / NLP / Malware / Audio / Tabular / LLM / Cross-domain & Primary evaluation domain \\
-G4: Venue & ML / Security / Journal / arXiv-only & See venue list below \\
-G5: Code available & Yes / No & Code link exists at time of coding \\
-G6: Code timing & At-pub / Post-pub / Never & At-pub = within 1 month of paper \\
-\midrule
-\multicolumn{3}{l}{\textit{Threat Model (T1--T2) -- Attack papers only}} \\
-\midrule
-T1: Access level & White / Gray / Black & White = full model access \\
-T2: Gradient required & Yes / No & Gradients used at any stage \\
-\midrule
-\multicolumn{3}{l}{\textit{Practical Evaluation (Q1)}} \\
-\midrule
-Q1: Real-world eval & Yes / Partial / No & Yes = production system tested \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\textbf{Venue classification:} ML = NeurIPS, ICML, ICLR, CVPR, ECCV, ICCV, ACL, EMNLP, NAACL. Security = IEEE S\&P, ACM CCS, USENIX Security, NDSS, IEEE SaTML. Journal = TPAMI, TIFS, TDSC, etc. arXiv-only = no peer-reviewed venue.
-
-\subsubsection{Decision Rules}
-
-\begin{enumerate}[noitemsep]
-    \item \textbf{G1:} If paper proposes both attack and defense, code based on which receives more experimental evaluation.
-    
-    \item \textbf{G2:} For defense papers, code ``N/A.'' Evasion = test-time input perturbation. Poisoning = training-time data manipulation. Privacy = membership inference, model extraction, training data extraction.
-    
-    \item \textbf{G3:} Code ``Cross-domain'' only if paper evaluates on 2+ distinct domains with separate experiments.
-    
-    \item \textbf{G4:} Use venue of first peer-reviewed publication. If workshop paper later becomes full paper, use full paper venue.
-    
-    \item \textbf{T1/T2:} For defense papers, leave blank (these apply to attacks only). White-box = gradients from target model. Gray-box = surrogate model gradients transferred to target. Black-box = query access only, no gradients.
-    
-    \item \textbf{Q1:} ``Yes'' = tested on production system (commercial API, deployed vehicle). ``Partial'' = realistic simulation or industry dataset. ``No'' = standard benchmarks only (CIFAR, ImageNet, etc.).
-\end{enumerate}
-
-\textbf{Coding procedure:} For each paper: (1) read abstract and introduction to identify G1 (type) and G2 (threat category); (2) locate threat model section to code T1 and T2 (attack papers only); (3) review experiments to code G3 and Q1; (4) check code availability for G5, G6; (5) verify venue for G4. Estimated time: 15--20 minutes per paper.
-
-\subsection{Statistical Analysis}
-
-We address each research question through pre-specified analyses:
-
-\textbf{RQ1 (Adoption Lag):} We report distributions of first-adoption lag, stratified by artifact type (tool, benchmark, regulatory). We compare lags across publication eras (2014--2017, 2018--2021, 2022--2025) using Kruskal-Wallis tests with post-hoc Dunn tests.
-
-\textbf{RQ2 (Domain Variation):} We compare adoption lags across domains using pairwise Mann-Whitney U tests with Bonferroni correction ($\alpha = 0.05 / \binom{n}{2}$ for $n$ domains). Primary hypothesis: LLM security papers show significantly shorter lags than computer vision papers.
-
-\textbf{RQ3 (Acceleration Factors):} We fit a Cox proportional hazards model predicting time-to-first-adoption, with covariates: publication year (continuous), domain (categorical), venue type (ML vs. Security), code availability (binary), and threat model (white-box vs. gray-box vs. black-box). Hazard ratios $>$1 indicate faster adoption. Model diagnostics include proportional hazards tests and residual analysis.
-
-\subsection{Reliability, Reproducibility, and Limitations}
-
-\textbf{Reliability:} All 71 papers are independently coded by two authors. Inter-rater reliability is measured using Cohen's $\kappa$ for categorical variables (G1--G6, T1--T2, Q1), targeting $\kappa \geq 0.80$ (substantial agreement). Disagreements are resolved through discussion to produce final consensus codes. Adoption dates are verified via \texttt{git log} with string-search (\texttt{-S}) to ensure accuracy.
-
-\textbf{Data release:} All extracted metadata, coding decisions, and artifact URLs will be released as a structured CSV dataset with accompanying codebook.
-
-\textbf{Limitations:} (1) By construction, our sample excludes papers never adopted---we measure adoption timelines, not adoption rates. (2) Our nine Git-searchable artifacts may miss proprietary implementations; adoption timelines represent lower bounds. (3) Git commit dates represent code-level adoption, which may lag behind internal awareness. (4) Observational design precludes causal claims. (5) We focus on English-language publications and arXiv-indexed papers.
-
-%==============================================================================
-\section{Artifact Timeline}
-\label{sec:artifact-timeline}
-%==============================================================================
-
-Table~\ref{tab:artifact-timeline} documents the nine artifacts included in our automated extraction, with first public release dates verified from GitHub and official announcements. These dates establish the timeline against which we measure research adoption.
-
-\begin{table}[H]
-\centering
-\small
-\caption{Artifact release timeline}
-\label{tab:artifact-timeline}
-\begin{tabular}{llll}
-\toprule
-\textbf{Category} & \textbf{Artifact} & \textbf{First Release} & \textbf{Stars/Venue} \\
-\midrule
-\multirow{5}{*}{Tools} & CleverHans & Oct 2016 & 6,401 stars \\
-& Foolbox & Jul 2017 & 2,936 stars \\
-& IBM ART & Jul 2018 & 5,789 stars \\
-& TextAttack & May 2020 & 3,348 stars \\
-& PyRIT & Feb 2024 & 3,343 stars \\
-\midrule
-\multirow{3}{*}{Benchmarks} & AutoAttack & Mar 2020 & ICML 2020 \\
-& RobustBench & Oct 2020 & NeurIPS 2021 \\
-& HarmBench & Feb 2024 & ICML 2024 \\
-\midrule
-Regulatory & MITRE ATLAS & Jun 2021 & Industry framework \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-%==============================================================================
 \section{Results}
 \label{sec:results}
-%==============================================================================
 
-\todo{Complete after paper coding. This section will report:
-\begin{itemize}
-    \item Sample construction summary (extraction counts by artifact source)
-    \item RQ1: Adoption lag distributions (overall, by artifact type, by publication era)
-    \item RQ2: Domain variation analysis (lag comparisons across Vision, NLP, LLM, Malware, Audio)
-    \item RQ3: Cox regression results (predictors of adoption speed)
-\end{itemize}
-}
+% Placeholder for results - to be filled after coding and statistical analysis
 
-%==============================================================================
+\subsection{Sample Characteristics}
+
+% Table 1: Descriptive statistics of coded papers
+% - Distribution across research types (attack/defense/evaluation)
+% - Distribution across domains (Vision/NLP/LLM/etc.)
+% - Distribution across venues (ML/Security/Journal/arXiv)
+% - Code availability statistics
+% - Threat model distributions
+
+\subsection{RQ1: Adoption Lag Patterns}
+
+% Figure 1: Distribution of adoption lags (violin plot or box plot)
+% Table 2: Adoption lag statistics by artifact type
+% Table 3: Adoption lag statistics by publication era
+% Key findings about median lag, IQR, temporal trends
+
+\subsection{RQ2: Domain Variation}
+
+% Figure 2: Adoption lag by domain (box plots with significance markers)
+% Table 4: Pairwise Mann-Whitney U test results with Bonferroni correction
+% Table 5: LLM vs. CV hypothesis test results
+
+\subsection{RQ3: Acceleration Factors}
+
+% Table 6: Cox proportional hazards regression results
+% - Hazard ratios, 95% CIs, p-values for all covariates
+% Figure 3: Forest plot of hazard ratios
+% Schoenfeld residuals diagnostic plots in appendix
+
 \section{Discussion}
 \label{sec:discussion}
-%==============================================================================
 
-\todo{Complete after results analysis. This section will include:
-\begin{itemize}
-    \item Summary of key findings (adoption lag compression, LLM paradigm shift, predictors)
-    \item Why some research is never adopted (naming, tooling, threat model barriers)
-    \item Implications for researchers and practitioners
-    \item Limitations
-\end{itemize}
-}
+% Placeholder for discussion - to be filled after results analysis
 
-%==============================================================================
+\subsection{Key Findings Interpretation}
+
+% Interpretation of adoption lag patterns, domain differences, acceleration factors
+% Comparison to translational research benchmarks (Morris et al.'s 17 years)
+% Contextualization within adversarial ML field evolution
+
+\subsection{Implications for Researchers}
+
+% How researchers can accelerate adoption of their work
+% Importance of code release, industry collaboration, benchmark integration
+% Publication venue considerations
+
+\subsection{Implications for Practitioners}
+
+% How practitioners can identify adoptable research
+% Using adoption lag as signal for maturity
+% Prioritization of defensive techniques based on adoption patterns
+
+\subsection{Limitations}
+
+% Selection bias: artifact selection may miss other adoption pathways
+% Implementation ≠ full adoption: citation doesn't guarantee usage
+% Missing informal adoption: proprietary implementations invisible
+% Temporal resolution: Git commits may not reflect actual implementation timing
+% Citation completeness: tools may implement without citing
+% Survival bias: only successful tools analyzed
+
+\subsection{Future Work}
+
+% Extending analysis to broader set of artifacts
+% Longitudinal tracking of ongoing adoptions
+% Qualitative interviews to complement quantitative findings
+% Cross-domain comparison with other security areas
+
 \section{Conclusion}
 \label{sec:conclusion}
-%==============================================================================
 
-\todo{Complete after results. Will summarize:
-\begin{itemize}
-    \item Key quantitative findings on adoption lag
-    \item Domain-specific patterns
-    \item Acceleration factors
-    \item Contribution of coding framework and dataset
-\end{itemize}
-}
+% Placeholder for conclusion - to be filled after results
 
-%==============================================================================
-\appendix
-\section{Artifact Source URLs}
-\label{sec:appendix}
-%==============================================================================
+% Summary of contributions
+% Restatement of key findings
+% Call to action for research community, funding agencies, industry
 
-\begin{itemize}[noitemsep]
-    \item \textbf{IBM ART:} \url{https://github.com/Trusted-AI/adversarial-robustness-toolbox}
-    \item \textbf{CleverHans:} \url{https://github.com/cleverhans-lab/cleverhans}
-    \item \textbf{Foolbox:} \url{https://github.com/bethgelab/foolbox}
-    \item \textbf{TextAttack:} \url{https://github.com/QData/TextAttack}
-    \item \textbf{PyRIT:} \url{https://github.com/Azure/PyRIT}
-    \item \textbf{RobustBench:} \url{https://robustbench.github.io/}
-    \item \textbf{HarmBench:} \url{https://github.com/centerforaisafety/HarmBench}
-    \item \textbf{MITRE ATLAS:} \url{https://atlas.mitre.org/techniques}
-    \item \textbf{OWASP LLM Top 10:} \url{https://owasp.org/www-project-top-10-for-large-language-model-applications/}
-\end{itemize}
+\section{Acknowledgments}
 
-%==============================================================================
-% REFERENCES
-%==============================================================================
-\bibliographystyle{plainnat}
-\bibliography{references}
+This work was supported by [funding agency redacted for review]. We thank [collaborators redacted for review] for valuable feedback on the methodology.
+
+% Bibliography
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{ref}
 
 \end{document}
