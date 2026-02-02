@@ -196,3 +196,5 @@ Adoption Lag = Date_artifact - Date_publication
 ## Research Gap Being Addressed
 
 Prior work characterized the research-practice gap **qualitatively** (Apruzzese 2023, Kumar 2020, Grosse 2023, Mink 2023). This study provides the first **quantitative measurement** of adoption timelines, identifying specific lag durations and acceleration factors.
+
+Submit to ACM CCS (April 29)and if rejected submit to USENIX Security (August)

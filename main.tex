@@ -144,7 +144,7 @@ This work investigates three research questions examining adoption lag patterns,
 \textbf{RQ2: Domain Variation.} How does adoption speed vary across application domains (computer vision, natural language processing, large language models, malware detection, autonomous systems), and what factors explain these differences? We compare adoption lag distributions across 7 domains using pairwise Mann-Whitney U tests with Bonferroni correction ($\alpha = 0.05/21 = 0.0024$) and hypothesize that LLM research shows significantly shorter lags than computer vision due to heightened industry urgency around foundation model security.
 
 \textbf{RQ3: Acceleration Factors.} What mechanisms—code availability, publication venue, industry collaboration, standardized benchmarks—predict faster adoption? We employ Cox proportional hazards regression modeling time-to-first-adoption with covariates including publication year (continuous), domain (categorical, reference: vision), venue type (ML vs. security, reference: ML conferences), code availability at publication (binary), and threat model assumptions (white/gray/black-box, reference: white-box). Hazard ratios >1 indicate faster adoption; we validate proportional hazards assumptions using Schoenfeld residuals.
-
+ 
 \section{Methodology}
 \label{sec:methodology}
 
